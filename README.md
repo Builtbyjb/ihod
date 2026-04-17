@@ -9,4 +9,7 @@ npm run dev-web
 
 # Run server
 npm run dev-server
+
+# Run web application and server
+npm run dev
 ```
