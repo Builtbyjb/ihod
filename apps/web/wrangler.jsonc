@@ -1,0 +1,17 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "ihod-web",
+  "compatibility_date": "2026-04-17",
+  "main": "src/main.tsx",
+  "env": {
+    "staging": {
+      "name": "ihod-web-staging",
+    },
+    "production": {
+      "name": "ihod-web-production",
+    },
+    "uat": {
+      "name": "ihod-web-uat",
+    },
+  },
+}
