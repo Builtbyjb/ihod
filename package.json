@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "dev-web": "npx turbo dev --filter=@ihod/web",
+    "dev-server": "npx turbo dev --filter=@ihod/server"
+  },
+  "devDependencies": {
+    "turbo": "^2.9.6"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "packageManager": "npm@8.5.0"
+}

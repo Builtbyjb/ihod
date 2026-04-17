@@ -4,6 +4,7 @@ node_modules
 # output
 out
 dist
+dist-ssr
 *.tgz
 
 # code coverage
@@ -13,6 +14,12 @@ coverage
 # logs
 logs
 _.log
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # dotenv environment variable files
@@ -32,3 +39,19 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # Finder (MacOS) folder config
 .DS_Store
+
+.turbo/cache
+
+.tanstack/
+
+*.local
+
+# Editor directories and files
+.vscode/*
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+.zed
