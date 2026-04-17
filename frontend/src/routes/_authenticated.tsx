@@ -1,9 +1,15 @@
 import { createFileRoute, redirect, Outlet } from "@tanstack/react-router";
+import Sidebar from "@/components/Sidebar";
 
 function AuthenticatedLayout() {
   return (
     <>
-      <Outlet />
+      <div>
+        <Sidebar />
+        <div className="md:pl-64">
+          <Outlet />
+        </div>
+      </div>
     </>
   );
 }

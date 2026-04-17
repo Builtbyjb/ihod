@@ -13,8 +13,14 @@ import { Route as GuestRouteImport } from './routes/_guest'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as GuestIndexRouteImport } from './routes/_guest/index'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as GuestPricingIndexRouteImport } from './routes/_guest/pricing/index'
+import { Route as AuthenticatedInvoicesIndexRouteImport } from './routes/_authenticated/invoices/index'
+import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated/clients/index'
+import { Route as AuthenticatedInvoicesNewIndexRouteImport } from './routes/_authenticated/invoices/new/index'
+import { Route as AuthenticatedInvoicesIdIndexRouteImport } from './routes/_authenticated/invoices/$id/index'
+import { Route as AuthenticatedInvoicesIdEditIndexRouteImport } from './routes/_authenticated/invoices/$id/edit/index'
 
 const GuestRoute = GuestRouteImport.update({
   id: '/_guest',
@@ -34,6 +40,11 @@ const GuestIndexRoute = GuestIndexRouteImport.update({
   path: '/',
   getParentRoute: () => GuestRoute,
 } as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -44,41 +55,115 @@ const GuestPricingIndexRoute = GuestPricingIndexRouteImport.update({
   path: '/pricing/',
   getParentRoute: () => GuestRoute,
 } as any)
+const AuthenticatedInvoicesIndexRoute =
+  AuthenticatedInvoicesIndexRouteImport.update({
+    id: '/invoices/',
+    path: '/invoices/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedClientsIndexRoute =
+  AuthenticatedClientsIndexRouteImport.update({
+    id: '/clients/',
+    path: '/clients/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedInvoicesNewIndexRoute =
+  AuthenticatedInvoicesNewIndexRouteImport.update({
+    id: '/invoices/new/',
+    path: '/invoices/new/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedInvoicesIdIndexRoute =
+  AuthenticatedInvoicesIdIndexRouteImport.update({
+    id: '/invoices/$id/',
+    path: '/invoices/$id/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedInvoicesIdEditIndexRoute =
+  AuthenticatedInvoicesIdEditIndexRouteImport.update({
+    id: '/invoices/$id/edit/',
+    path: '/invoices/$id/edit/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof GuestIndexRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/login/': typeof LoginIndexRoute
+  '/clients/': typeof AuthenticatedClientsIndexRoute
+  '/invoices/': typeof AuthenticatedInvoicesIndexRoute
   '/pricing/': typeof GuestPricingIndexRoute
+  '/invoices/$id/': typeof AuthenticatedInvoicesIdIndexRoute
+  '/invoices/new/': typeof AuthenticatedInvoicesNewIndexRoute
+  '/invoices/$id/edit/': typeof AuthenticatedInvoicesIdEditIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof GuestIndexRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/login': typeof LoginIndexRoute
+  '/clients': typeof AuthenticatedClientsIndexRoute
+  '/invoices': typeof AuthenticatedInvoicesIndexRoute
   '/pricing': typeof GuestPricingIndexRoute
+  '/invoices/$id': typeof AuthenticatedInvoicesIdIndexRoute
+  '/invoices/new': typeof AuthenticatedInvoicesNewIndexRoute
+  '/invoices/$id/edit': typeof AuthenticatedInvoicesIdEditIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/_guest': typeof GuestRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_guest/': typeof GuestIndexRoute
   '/login/': typeof LoginIndexRoute
+  '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
+  '/_authenticated/invoices/': typeof AuthenticatedInvoicesIndexRoute
   '/_guest/pricing/': typeof GuestPricingIndexRoute
+  '/_authenticated/invoices/$id/': typeof AuthenticatedInvoicesIdIndexRoute
+  '/_authenticated/invoices/new/': typeof AuthenticatedInvoicesNewIndexRoute
+  '/_authenticated/invoices/$id/edit/': typeof AuthenticatedInvoicesIdEditIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/login/' | '/pricing/'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/settings'
+    | '/login/'
+    | '/clients/'
+    | '/invoices/'
+    | '/pricing/'
+    | '/invoices/$id/'
+    | '/invoices/new/'
+    | '/invoices/$id/edit/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/login' | '/pricing'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/settings'
+    | '/login'
+    | '/clients'
+    | '/invoices'
+    | '/pricing'
+    | '/invoices/$id'
+    | '/invoices/new'
+    | '/invoices/$id/edit'
   id:
     | '__root__'
     | '/_authenticated'
     | '/_guest'
     | '/_authenticated/dashboard'
+    | '/_authenticated/settings'
     | '/_guest/'
     | '/login/'
+    | '/_authenticated/clients/'
+    | '/_authenticated/invoices/'
     | '/_guest/pricing/'
+    | '/_authenticated/invoices/$id/'
+    | '/_authenticated/invoices/new/'
+    | '/_authenticated/invoices/$id/edit/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -117,6 +202,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuestIndexRouteImport
       parentRoute: typeof GuestRoute
     }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -131,15 +223,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuestPricingIndexRouteImport
       parentRoute: typeof GuestRoute
     }
+    '/_authenticated/invoices/': {
+      id: '/_authenticated/invoices/'
+      path: '/invoices'
+      fullPath: '/invoices/'
+      preLoaderRoute: typeof AuthenticatedInvoicesIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/clients/': {
+      id: '/_authenticated/clients/'
+      path: '/clients'
+      fullPath: '/clients/'
+      preLoaderRoute: typeof AuthenticatedClientsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/invoices/new/': {
+      id: '/_authenticated/invoices/new/'
+      path: '/invoices/new'
+      fullPath: '/invoices/new/'
+      preLoaderRoute: typeof AuthenticatedInvoicesNewIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/invoices/$id/': {
+      id: '/_authenticated/invoices/$id/'
+      path: '/invoices/$id'
+      fullPath: '/invoices/$id/'
+      preLoaderRoute: typeof AuthenticatedInvoicesIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/invoices/$id/edit/': {
+      id: '/_authenticated/invoices/$id/edit/'
+      path: '/invoices/$id/edit'
+      fullPath: '/invoices/$id/edit/'
+      preLoaderRoute: typeof AuthenticatedInvoicesIdEditIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedClientsIndexRoute: typeof AuthenticatedClientsIndexRoute
+  AuthenticatedInvoicesIndexRoute: typeof AuthenticatedInvoicesIndexRoute
+  AuthenticatedInvoicesIdIndexRoute: typeof AuthenticatedInvoicesIdIndexRoute
+  AuthenticatedInvoicesNewIndexRoute: typeof AuthenticatedInvoicesNewIndexRoute
+  AuthenticatedInvoicesIdEditIndexRoute: typeof AuthenticatedInvoicesIdEditIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedClientsIndexRoute: AuthenticatedClientsIndexRoute,
+  AuthenticatedInvoicesIndexRoute: AuthenticatedInvoicesIndexRoute,
+  AuthenticatedInvoicesIdIndexRoute: AuthenticatedInvoicesIdIndexRoute,
+  AuthenticatedInvoicesNewIndexRoute: AuthenticatedInvoicesNewIndexRoute,
+  AuthenticatedInvoicesIdEditIndexRoute: AuthenticatedInvoicesIdEditIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
