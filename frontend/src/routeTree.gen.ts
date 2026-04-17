@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as GuestIndexRouteImport } from './routes/_guest/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as GuestPricingIndexRouteImport } from './routes/_guest/pricing/index'
 
 const GuestRoute = GuestRouteImport.update({
   id: '/_guest',
@@ -38,16 +39,23 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const GuestPricingIndexRoute = GuestPricingIndexRouteImport.update({
+  id: '/pricing/',
+  path: '/pricing/',
+  getParentRoute: () => GuestRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof GuestIndexRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/login/': typeof LoginIndexRoute
+  '/pricing/': typeof GuestPricingIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof GuestIndexRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/login': typeof LoginIndexRoute
+  '/pricing': typeof GuestPricingIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -56,12 +64,13 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_guest/': typeof GuestIndexRoute
   '/login/': typeof LoginIndexRoute
+  '/_guest/pricing/': typeof GuestPricingIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/login/'
+  fullPaths: '/' | '/dashboard' | '/login/' | '/pricing/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/login'
+  to: '/' | '/dashboard' | '/login' | '/pricing'
   id:
     | '__root__'
     | '/_authenticated'
@@ -69,6 +78,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_guest/'
     | '/login/'
+    | '/_guest/pricing/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -114,6 +124,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_guest/pricing/': {
+      id: '/_guest/pricing/'
+      path: '/pricing'
+      fullPath: '/pricing/'
+      preLoaderRoute: typeof GuestPricingIndexRouteImport
+      parentRoute: typeof GuestRoute
+    }
   }
 }
 
@@ -131,10 +148,12 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 
 interface GuestRouteChildren {
   GuestIndexRoute: typeof GuestIndexRoute
+  GuestPricingIndexRoute: typeof GuestPricingIndexRoute
 }
 
 const GuestRouteChildren: GuestRouteChildren = {
   GuestIndexRoute: GuestIndexRoute,
+  GuestPricingIndexRoute: GuestPricingIndexRoute,
 }
 
 const GuestRouteWithChildren = GuestRoute._addFileChildren(GuestRouteChildren)
