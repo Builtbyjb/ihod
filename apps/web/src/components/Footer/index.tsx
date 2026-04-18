@@ -2,10 +2,33 @@ import { Link } from "@tanstack/react-router";
 import { FileText } from "lucide-react";
 
 const footerLinks = {
-  Product: ["Features", "Pricing", "Templates", "Integrations", "API"],
-  Resources: ["Documentation", "Blog", "Guides", "Help Center", "Status"],
-  Company: ["About", "Careers", "Press", "Contact", "Partners"],
-  Legal: ["Privacy", "Terms", "Security", "Cookies"],
+  Product: [
+    // { name: "Features", href: "#" },
+    { name: "Pricing", href: "/pricing" },
+    // { name: "Templates", href: "#" },
+    // { name: "Integrations", href: "#" },
+    // { name: "API", href: "#" },
+  ],
+  // Resources: [
+  //   { name: "Documentation", href: "#" },
+  //   { name: "Blog", href: "#" },
+  //   { name: "Guides", href: "#" },
+  //   { name: "Help Center", href: "#" },
+  //   { name: "Status", href: "#" },
+  // ],
+  // Company: [
+  //   { name: "About", href: "#" },
+  //   { name: "Careers", href: "#" },
+  //   { name: "Press", href: "#" },
+  //   { name: "Contact", href: "#" },
+  //   { name: "Partners", href: "#" },
+  // ],
+  Legal: [
+    { name: "Privacy", href: "/privacy-policy" },
+    { name: "Terms", href: "/terms-of-service" },
+    { name: "Security", href: "/security" },
+    { name: "Cookies", href: "/cookies" },
+  ],
 };
 
 export default function Footer() {
@@ -33,12 +56,12 @@ export default function Footer() {
               </h3>
               <ul className="space-y-3">
                 {links.map((link) => (
-                  <li key={link}>
+                  <li key={link.name}>
                     <Link
-                      to="#"
+                      to={link.href}
                       className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      {link}
+                      {link.name}
                     </Link>
                   </li>
                 ))}
@@ -51,7 +74,7 @@ export default function Footer() {
           <p className="text-sm text-muted-foreground">
             © 2026 IHOD. All rights reserved.
           </p>
-          <div className="flex items-center gap-6">
+          {/*<div className="flex items-center gap-6">
             <Link
               to="#"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -70,7 +93,7 @@ export default function Footer() {
             >
               GitHub
             </Link>
-          </div>
+          </div>*/}
         </div>
       </div>
     </footer>

@@ -144,7 +144,11 @@ export default function InvoiceForm({
               </div>
               <div className="space-y-2">
                 <Label htmlFor="client">Client</Label>
-                <Select value={clientId} onValueChange={setClientId} required>
+                <Select
+                  value={clientId}
+                  onValueChange={() => setClientId}
+                  required
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select a client" />
                   </SelectTrigger>
@@ -232,7 +236,7 @@ export default function InvoiceForm({
               <div className="col-span-2 text-right">Total</div>
               <div className="col-span-1"></div>
             </div>
-            {items.map((item, index) => (
+            {items.map((item) => (
               <div
                 key={item.id}
                 className="grid sm:grid-cols-12 gap-4 items-start"

@@ -6,7 +6,8 @@
     "deploy-web": "npx turbo deploy --filter=@ihod/web",
     "deploy-server": "npx turbo deploy --filter=@ihod/server",
     "build-web": "npx turbo build --filter=@ihod/web",
-    "build-server": "npx turbo build --filter=@ihod/server"
+    "build-server": "npx turbo build --filter=@ihod/server",
+    "lint-web": "npx turbo lint --filter=@ihod/web"
   },
   "devDependencies": {
     "turbo": "^2.9.6",
@@ -16,5 +17,8 @@
     "apps/*",
     "packages/*"
   ],
-  "packageManager": "npm@8.5.0"
+  "packageManager": "npm@8.5.0",
+  "dependencies": {
+    "@tanstack/react-form": "^1.29.0"
+  }
 }

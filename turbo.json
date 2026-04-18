@@ -14,6 +14,9 @@
     "deploy": {
       "dependsOn": ["build"],
       "cache": false
+    },
+    "lint": {
+      "cache": false
     }
   }
 }

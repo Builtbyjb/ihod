@@ -41,16 +41,16 @@ const features = [
 
 export default function Features() {
   return (
-    <section id="features" className="py-24 lg:py-32">
+    <section id="features" className="py-16">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center mb-16">
           <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
             Features
           </p>
-          <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl text-balance">
+          <h2 className="text-3xl font-bold tracking-tight text-foreground text-balance">
             Everything you need to invoice like a pro
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground text-pretty">
+          <p className="mt-4 text-muted-foreground text-pretty">
             Powerful features that help you create, send, and track invoices
             effortlessly.
           </p>

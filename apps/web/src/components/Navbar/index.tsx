@@ -17,7 +17,7 @@ export default function Navbar() {
         </Link>
 
         <div className="hidden md:flex md:items-center md:gap-8">
-          <Link
+          {/*<Link
             to="/features"
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
@@ -28,27 +28,27 @@ export default function Navbar() {
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             How it works
-          </Link>
+          </Link>*/}
           <Link
             to="/pricing"
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             Pricing
           </Link>
-          <Link
+          {/*<Link
             to="/testimonials"
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             Testimonials
-          </Link>
+          </Link>*/}
         </div>
 
         <div className="hidden md:flex md:items-center md:gap-4">
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/dashboard">Log in</Link>
+          <Button variant="outline">
+            <Link to="/login">Log in</Link>
           </Button>
-          <Button size="sm" asChild>
-            <Link to="/dashboard">Start for free</Link>
+          <Button>
+            <Link to="/login">Start for free</Link>
           </Button>
         </div>
 

@@ -3,53 +3,47 @@
  * https://tanstack.com/router/v1/docs/how-to/setup-authentication
  */
 import React, { createContext, useContext, useState, useEffect } from "react";
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-}
-
-interface AuthState {
-  isAuthenticated: boolean;
-  user: User | null;
-  login: (username: string, password: string) => Promise<void>;
-  logout: () => void;
-}
+import { type User, type AuthState } from "./lib/types";
 
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Restore auth state on app load
   useEffect(() => {
     const token = localStorage.getItem("auth-token");
-    if (token) {
-      // Validate token with your API
-      fetch("/api/validate-token", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then((response) => response.json())
-        .then((userData) => {
-          if (userData.valid) {
-            setUser(userData.user);
-            setIsAuthenticated(true);
-          } else {
-            localStorage.removeItem("auth-token");
-          }
-        })
-        .catch(() => {
-          localStorage.removeItem("auth-token");
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    } else {
+    if (!token) {
       setIsLoading(false);
+      return;
     }
+
+    const controller = new AbortController();
+
+    fetch("/api/validate-token", {
+      headers: { Authorization: `Bearer ${token}` },
+      signal: controller.signal,
+    })
+      .then((response) => response.json())
+      .then((userData) => {
+        if (userData.valid) {
+          setUser(userData.user);
+          setIsAuthenticated(true);
+        } else {
+          localStorage.removeItem("auth-token");
+        }
+      })
+      .catch((err) => {
+        if (err.name === "AbortError") return;
+        localStorage.removeItem("auth-token");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+
+    return () => controller.abort();
   }, []);
 
   // Show loading state while checking auth

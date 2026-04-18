@@ -1,25 +1,27 @@
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function Hero() {
+  const navigate = useNavigate();
+
   return (
     <section className="relative overflow-hidden pt-32 pb-20 lg:pt-40 lg:pb-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center">
+        <div className="mx-auto max-w-4xl text-center">
           <div className="mb-8 flex justify-center">
-            <div className="inline-flex items-center gap-2 rounded-full bg-accent/20 px-4 py-1.5 text-sm font-medium text-foreground">
+            {/*<div className="inline-flex items-center gap-2 rounded-full bg-accent/70 px-4 py-1.5">
               <Sparkles className="h-4 w-4" />
               <span>New: Recurring invoices</span>
               <ArrowRight className="h-3 w-3" />
-            </div>
+            </div>*/}
           </div>
 
-          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl text-balance">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl text-balance">
             Create invoices in seconds, get paid faster
           </h1>
 
-          <p className="mt-6 text-lg leading-relaxed text-muted-foreground lg:text-xl text-pretty">
+          <p className="mt-6 leading-relaxed">
             The simplest way to create professional invoices. Designed for
             freelancers and small businesses who want to spend less time on
             paperwork and more time doing what they love.
@@ -27,30 +29,22 @@ export default function Hero() {
 
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button
-              size="lg"
-              className="w-full sm:w-auto text-base px-8"
-              asChild
+              className="w-full sm:w-auto px-8"
+              onClick={() => navigate({ to: "/login" })}
             >
-              <Link to="/dashboard">Start for free</Link>
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="w-full sm:w-auto text-base px-8"
-              asChild
-            >
-              <Link to="#how-it-works">See how it works</Link>
+              Start for free
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
 
-          <p className="mt-4 text-sm text-muted-foreground">
+          <p className="mt-4 text-muted-foreground">
             No credit card required · Free forever for up to 3 invoices/month
           </p>
         </div>
 
         <div className="mt-16 lg:mt-24">
           <div className="relative mx-auto max-w-5xl">
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10 pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-t from-background via-transparent to-transparent z-10 pointer-events-none" />
             <div className="rounded-2xl border border-border bg-card p-2 shadow-2xl shadow-primary/5">
               <div className="rounded-xl bg-muted/50 p-6 lg:p-8">
                 <InvoicePreview />
@@ -65,7 +59,7 @@ export default function Hero() {
 
 function InvoicePreview() {
   return (
-    <div className="bg-card rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
+    <div className="bg-white/70 rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
       <div className="flex justify-between items-start mb-8">
         <div>
           <h3 className="text-2xl font-bold text-foreground">INVOICE</h3>
