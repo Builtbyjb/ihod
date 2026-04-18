@@ -15,27 +15,20 @@ function isTokenExpired(accessToken: string): boolean {
   return exp < now;
 }
 
-export function authenticateUser(context: Context): boolean {
+export async function authenticateUser(context: Context): Promise<boolean> {
   if (!context.auth) return false;
 
-  if (context.auth.accessToken) {
-    if (isTokenExpired(context.auth.accessToken)) {
-      context.auth
-        .refreshToken()
-        .then()
-        .catch(() => {
-          return false;
-        });
+  try {
+    if (context.auth.accessToken) {
+      if (isTokenExpired(context.auth.accessToken)) {
+        await context.auth.refreshToken();
+      }
+    } else {
+      await context.auth.refreshToken();
     }
-  } else {
-    // refresh token if fails return false
-    context.auth
-      .refreshToken()
-      .then()
-      .catch(() => {
-        return false;
-      });
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
   }
-
-  return true;
 }

@@ -30,7 +30,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      await fetch(`${API_URL}/api/v1/logout`, {
+      await fetch(`${API_URL}/api/v1/auth/logout`, {
         credentials: "include",
       });
     } catch (error) {
@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const refreshToken = useCallback(async () => {
-    const response = await fetch(`${API_URL}/api/v1/refresh-token`, {
+    const response = await fetch(`${API_URL}/api/v1/auth/refresh-token`, {
       credentials: "include",
     });
 
@@ -85,7 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const login = async (email: string): Promise<boolean> => {
-    const response = await fetch(`${API_URL}/api/v1/login`, {
+    const response = await fetch(`${API_URL}/api/v1/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),

@@ -11,7 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as GuestRouteImport } from './routes/_guest'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as SetupInfoIndexRouteImport } from './routes/setup-info/index'
+import { Route as SetupProfileIndexRouteImport } from './routes/setup-profile/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as GuestIndexRouteImport } from './routes/_guest/index'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -33,9 +33,9 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SetupInfoIndexRoute = SetupInfoIndexRouteImport.update({
-  id: '/setup-info/',
-  path: '/setup-info/',
+const SetupProfileIndexRoute = SetupProfileIndexRouteImport.update({
+  id: '/setup-profile/',
+  path: '/setup-profile/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginIndexRoute = LoginIndexRouteImport.update({
@@ -110,7 +110,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/login/': typeof LoginIndexRoute
-  '/setup-info/': typeof SetupInfoIndexRoute
+  '/setup-profile/': typeof SetupProfileIndexRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
   '/invoices/': typeof AuthenticatedInvoicesIndexRoute
   '/pricing/': typeof GuestPricingIndexRoute
@@ -125,7 +125,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/login': typeof LoginIndexRoute
-  '/setup-info': typeof SetupInfoIndexRoute
+  '/setup-profile': typeof SetupProfileIndexRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
   '/invoices': typeof AuthenticatedInvoicesIndexRoute
   '/pricing': typeof GuestPricingIndexRoute
@@ -143,7 +143,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_guest/': typeof GuestIndexRoute
   '/login/': typeof LoginIndexRoute
-  '/setup-info/': typeof SetupInfoIndexRoute
+  '/setup-profile/': typeof SetupProfileIndexRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
   '/_authenticated/invoices/': typeof AuthenticatedInvoicesIndexRoute
   '/_guest/pricing/': typeof GuestPricingIndexRoute
@@ -160,7 +160,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/settings'
     | '/login/'
-    | '/setup-info/'
+    | '/setup-profile/'
     | '/clients/'
     | '/invoices/'
     | '/pricing/'
@@ -175,7 +175,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/settings'
     | '/login'
-    | '/setup-info'
+    | '/setup-profile'
     | '/clients'
     | '/invoices'
     | '/pricing'
@@ -192,7 +192,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_guest/'
     | '/login/'
-    | '/setup-info/'
+    | '/setup-profile/'
     | '/_authenticated/clients/'
     | '/_authenticated/invoices/'
     | '/_guest/pricing/'
@@ -207,7 +207,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   GuestRoute: typeof GuestRouteWithChildren
   LoginIndexRoute: typeof LoginIndexRoute
-  SetupInfoIndexRoute: typeof SetupInfoIndexRoute
+  SetupProfileIndexRoute: typeof SetupProfileIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -226,11 +226,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/setup-info/': {
-      id: '/setup-info/'
-      path: '/setup-info'
-      fullPath: '/setup-info/'
-      preLoaderRoute: typeof SetupInfoIndexRouteImport
+    '/setup-profile/': {
+      id: '/setup-profile/'
+      path: '/setup-profile'
+      fullPath: '/setup-profile/'
+      preLoaderRoute: typeof SetupProfileIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login/': {
@@ -364,7 +364,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   GuestRoute: GuestRouteWithChildren,
   LoginIndexRoute: LoginIndexRoute,
-  SetupInfoIndexRoute: SetupInfoIndexRoute,
+  SetupProfileIndexRoute: SetupProfileIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

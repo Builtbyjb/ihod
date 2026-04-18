@@ -25,7 +25,7 @@ export default function OTP() {
     if (value.length == 8) {
       try {
         console.log(value);
-        const response = await fetch(`${API_URL}/api/v1/verify-otp`, {
+        const response = await fetch(`${API_URL}/api/v1/auth/verify-otp`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -37,7 +37,7 @@ export default function OTP() {
         }
         const data = await response.json();
         if (data.firstLogin) {
-          navigate({ to: "/setup-info" });
+          navigate({ to: "/setup-profile" });
         } else {
           navigate({ to: "/dashboard" });
         }

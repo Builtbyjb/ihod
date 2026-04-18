@@ -59,7 +59,7 @@ function RouteComponent() {
       const payload = { ...value, userId: user.id };
       console.log(payload);
       try {
-        const response = await fetch(`${API_URL}/api/v1/setup-info`, {
+        const response = await fetch(`${API_URL}/api/v1/user/setup-profile`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -308,6 +308,6 @@ function RouteComponent() {
   );
 }
 
-export const Route = createFileRoute("/setup-info/")({
+export const Route = createFileRoute("/setup-profile/")({
   component: RouteComponent,
 });

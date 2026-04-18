@@ -19,8 +19,9 @@ function AuthenticatedLayout() {
  * Routes that require a user to be authenticated
  */
 export const Route = createFileRoute("/_authenticated")({
-  beforeLoad: ({ context, location }) => {
-    if (!authenticateUser(context)) {
+  beforeLoad: async ({ context, location }) => {
+    const isAuthenticated = await authenticateUser(context);
+    if (!isAuthenticated) {
       throw redirect({
         to: "/login",
         search: {
