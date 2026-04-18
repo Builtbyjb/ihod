@@ -19,9 +19,12 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
-    "react-refresh/only-export-components": [
-      "warn",
-      { allowConstantExport: true },
-    ],
+    rules: {
+      "react-refresh/only-export-components": [
+        "off",
+        { allowExportNames: ["Route"] }, // tells eslint Route export is expected
+      ],
+      "react-hooks/set-state-in-effect": "warn",
+    },
   },
 ]);

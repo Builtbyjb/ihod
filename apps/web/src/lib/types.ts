@@ -40,3 +40,20 @@ export interface DashboardStats {
   pendingAmount: number;
   totalClients: number;
 }
+
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+}
+
+export interface AuthState {
+  isAuthenticated: boolean;
+  user: User | null;
+  login: (username: string, password: string) => Promise<void>;
+  logout: () => void;
+}
+
+export interface Context {
+  auth: AuthState | undefined;
+}

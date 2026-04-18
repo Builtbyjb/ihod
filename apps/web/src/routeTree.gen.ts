@@ -15,6 +15,8 @@ import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as GuestIndexRouteImport } from './routes/_guest/index'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as GuestTermsOfServiceIndexRouteImport } from './routes/_guest/terms-of-service/index'
+import { Route as GuestPrivacyPolicyIndexRouteImport } from './routes/_guest/privacy-policy/index'
 import { Route as GuestPricingIndexRouteImport } from './routes/_guest/pricing/index'
 import { Route as AuthenticatedInvoicesIndexRouteImport } from './routes/_authenticated/invoices/index'
 import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated/clients/index'
@@ -49,6 +51,17 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
+} as any)
+const GuestTermsOfServiceIndexRoute =
+  GuestTermsOfServiceIndexRouteImport.update({
+    id: '/terms-of-service/',
+    path: '/terms-of-service/',
+    getParentRoute: () => GuestRoute,
+  } as any)
+const GuestPrivacyPolicyIndexRoute = GuestPrivacyPolicyIndexRouteImport.update({
+  id: '/privacy-policy/',
+  path: '/privacy-policy/',
+  getParentRoute: () => GuestRoute,
 } as any)
 const GuestPricingIndexRoute = GuestPricingIndexRouteImport.update({
   id: '/pricing/',
@@ -94,6 +107,8 @@ export interface FileRoutesByFullPath {
   '/clients/': typeof AuthenticatedClientsIndexRoute
   '/invoices/': typeof AuthenticatedInvoicesIndexRoute
   '/pricing/': typeof GuestPricingIndexRoute
+  '/privacy-policy/': typeof GuestPrivacyPolicyIndexRoute
+  '/terms-of-service/': typeof GuestTermsOfServiceIndexRoute
   '/invoices/$id/': typeof AuthenticatedInvoicesIdIndexRoute
   '/invoices/new/': typeof AuthenticatedInvoicesNewIndexRoute
   '/invoices/$id/edit/': typeof AuthenticatedInvoicesIdEditIndexRoute
@@ -106,6 +121,8 @@ export interface FileRoutesByTo {
   '/clients': typeof AuthenticatedClientsIndexRoute
   '/invoices': typeof AuthenticatedInvoicesIndexRoute
   '/pricing': typeof GuestPricingIndexRoute
+  '/privacy-policy': typeof GuestPrivacyPolicyIndexRoute
+  '/terms-of-service': typeof GuestTermsOfServiceIndexRoute
   '/invoices/$id': typeof AuthenticatedInvoicesIdIndexRoute
   '/invoices/new': typeof AuthenticatedInvoicesNewIndexRoute
   '/invoices/$id/edit': typeof AuthenticatedInvoicesIdEditIndexRoute
@@ -121,6 +138,8 @@ export interface FileRoutesById {
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
   '/_authenticated/invoices/': typeof AuthenticatedInvoicesIndexRoute
   '/_guest/pricing/': typeof GuestPricingIndexRoute
+  '/_guest/privacy-policy/': typeof GuestPrivacyPolicyIndexRoute
+  '/_guest/terms-of-service/': typeof GuestTermsOfServiceIndexRoute
   '/_authenticated/invoices/$id/': typeof AuthenticatedInvoicesIdIndexRoute
   '/_authenticated/invoices/new/': typeof AuthenticatedInvoicesNewIndexRoute
   '/_authenticated/invoices/$id/edit/': typeof AuthenticatedInvoicesIdEditIndexRoute
@@ -135,6 +154,8 @@ export interface FileRouteTypes {
     | '/clients/'
     | '/invoices/'
     | '/pricing/'
+    | '/privacy-policy/'
+    | '/terms-of-service/'
     | '/invoices/$id/'
     | '/invoices/new/'
     | '/invoices/$id/edit/'
@@ -147,6 +168,8 @@ export interface FileRouteTypes {
     | '/clients'
     | '/invoices'
     | '/pricing'
+    | '/privacy-policy'
+    | '/terms-of-service'
     | '/invoices/$id'
     | '/invoices/new'
     | '/invoices/$id/edit'
@@ -161,6 +184,8 @@ export interface FileRouteTypes {
     | '/_authenticated/clients/'
     | '/_authenticated/invoices/'
     | '/_guest/pricing/'
+    | '/_guest/privacy-policy/'
+    | '/_guest/terms-of-service/'
     | '/_authenticated/invoices/$id/'
     | '/_authenticated/invoices/new/'
     | '/_authenticated/invoices/$id/edit/'
@@ -215,6 +240,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/_guest/terms-of-service/': {
+      id: '/_guest/terms-of-service/'
+      path: '/terms-of-service'
+      fullPath: '/terms-of-service/'
+      preLoaderRoute: typeof GuestTermsOfServiceIndexRouteImport
+      parentRoute: typeof GuestRoute
+    }
+    '/_guest/privacy-policy/': {
+      id: '/_guest/privacy-policy/'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy/'
+      preLoaderRoute: typeof GuestPrivacyPolicyIndexRouteImport
+      parentRoute: typeof GuestRoute
     }
     '/_guest/pricing/': {
       id: '/_guest/pricing/'
@@ -288,11 +327,15 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 interface GuestRouteChildren {
   GuestIndexRoute: typeof GuestIndexRoute
   GuestPricingIndexRoute: typeof GuestPricingIndexRoute
+  GuestPrivacyPolicyIndexRoute: typeof GuestPrivacyPolicyIndexRoute
+  GuestTermsOfServiceIndexRoute: typeof GuestTermsOfServiceIndexRoute
 }
 
 const GuestRouteChildren: GuestRouteChildren = {
   GuestIndexRoute: GuestIndexRoute,
   GuestPricingIndexRoute: GuestPricingIndexRoute,
+  GuestPrivacyPolicyIndexRoute: GuestPrivacyPolicyIndexRoute,
+  GuestTermsOfServiceIndexRoute: GuestTermsOfServiceIndexRoute,
 }
 
 const GuestRouteWithChildren = GuestRoute._addFileChildren(GuestRouteChildren)
