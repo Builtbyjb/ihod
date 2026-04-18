@@ -48,12 +48,22 @@ export interface User {
 }
 
 export interface AuthState {
-  isAuthenticated: boolean;
+  accessToken: string | null;
   user: User | null;
-  login: (username: string, password: string) => Promise<void>;
+  login: (email: string) => Promise<boolean>;
   logout: () => void;
+  refreshToken: () => Promise<AuthResponse>;
 }
 
 export interface Context {
   auth: AuthState | undefined;
+}
+
+export interface AuthResponse {
+  accessToken: string;
+  user: User;
+}
+
+export interface OTPResponse {
+  firstLogin: boolean;
 }

@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { FileText } from "lucide-react";
+import { APP_NAME } from "@/lib/constant";
 
 const footerLinks = {
   Product: [
@@ -41,7 +42,9 @@ export default function Footer() {
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
                 <FileText className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold tracking-tight">IHOD</span>
+              <span className="text-xl font-bold tracking-tight">
+                {APP_NAME}
+              </span>
             </Link>
             <p className="mt-4 text-sm text-muted-foreground max-w-xs">
               The simplest way to create professional invoices and get paid

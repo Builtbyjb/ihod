@@ -10,7 +10,7 @@ export default function NotFound() {
     <main className="min-h-screen bg-background flex flex-col items-center justify-center overflow-hidden space-y-4">
       <h1 className="text-7xl font-bold">404</h1>
       <h2 className="text-2xl font-medium text-foreground">Page not found</h2>
-      <p className="text-muted-foreground leading-relaxed">
+      <p className="leading-relaxed">
         Looks like you&apos;ve wandered into uncharted territory. The page
         you&apos;re looking for doesn&apos;t exist.
       </p>

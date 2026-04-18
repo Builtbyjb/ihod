@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import {
   InputOTP,
   InputOTPGroup,
@@ -11,14 +12,39 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { toast } from "sonner";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function OTP() {
   const [value, setValue] = useState("");
+  const navigate = useNavigate();
 
-  const handleChange = (value: string) => {
+  const handleChange = async (value: string) => {
     setValue(value);
     if (value.length == 8) {
-      console.log(value);
+      try {
+        console.log(value);
+        const response = await fetch(`${API_URL}/api/v1/verify-otp`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ otp: value }),
+        });
+        if (!response.ok) {
+          throw new Error("Failed to verify OTP");
+        }
+        const data = await response.json();
+        if (data.firstLogin) {
+          navigate({ to: "/setup-info" });
+        } else {
+          navigate({ to: "/dashboard" });
+        }
+      } catch (error) {
+        toast.error("Error verifying OTP: " + error.message);
+        console.error(error);
+      }
     }
   };
 

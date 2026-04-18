@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/field";
 import { ArrowLeft } from "lucide-react";
 import OTP from "@/components/OTP";
+import { useAuth } from "@/auth";
 
 const emailFormSchema = z.object({
   email: z.string().email(),
@@ -29,6 +30,7 @@ const emailFormSchema = z.object({
 function RouteComponent() {
   const navigate = useNavigate();
   const [isVerified, setIsVerified] = useState(false);
+  const { login } = useAuth();
 
   const form = useForm({
     defaultValues: {
@@ -38,8 +40,16 @@ function RouteComponent() {
       onSubmit: emailFormSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log(value.email);
-      setIsVerified(true);
+      try {
+        const success = await login(value.email);
+        if (success) {
+          console.log(value.email);
+          setIsVerified(true);
+        }
+      } catch (error) {
+        toast.error("Login failed: " + error.message);
+        console.error(error);
+      }
       toast.success("Verification email sent");
     },
   });
@@ -80,7 +90,7 @@ function RouteComponent() {
                         onBlur={field.handleBlur}
                         onChange={(e) => field.handleChange(e.target.value)}
                         aria-invalid={isInvalid}
-                        placeholder="Enter your email"
+                        // placeholder="Enter your email"
                         autoComplete="email"
                       />
                       {isInvalid && (

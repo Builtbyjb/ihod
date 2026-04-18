@@ -1,50 +1,79 @@
-/*
- * NOTE: placeholder auth implementation
- * https://tanstack.com/router/v1/docs/how-to/setup-authentication
- */
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { type User, type AuthState } from "./lib/types";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import { type User, type AuthState, type AuthResponse } from "@/lib/types";
+import { toast } from "sonner";
+import { useNavigate } from "@tanstack/react-router";
+import { z } from "zod";
 
+const responseSchema = z.object({
+  accessToken: z.string(),
+  user: z.object({
+    id: z.string(),
+    username: z.string(),
+    email: z.string(),
+  }),
+});
+
+const API_URL = import.meta.env.VITE_API_URL;
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const logout = async () => {
+    try {
+      await fetch(`${API_URL}/api/v1/logout`, {
+        credentials: "include",
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setUser(null);
+      setAccessToken(null);
+      navigate({ to: "/login" });
+    }
+  };
+
+  const refreshToken = useCallback(async () => {
+    const response = await fetch(`${API_URL}/api/v1/refresh-token`, {
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to refresh token");
+    }
+
+    const data: AuthResponse = await response.json();
+    const parsed = responseSchema.parse(data);
+    return parsed;
+  }, []);
 
   // Restore auth state on app load
   useEffect(() => {
-    const token = localStorage.getItem("auth-token");
-    if (!token) {
-      setIsLoading(false);
-      return;
-    }
-
-    const controller = new AbortController();
-
-    fetch("/api/validate-token", {
-      headers: { Authorization: `Bearer ${token}` },
-      signal: controller.signal,
-    })
-      .then((response) => response.json())
-      .then((userData) => {
-        if (userData.valid) {
-          setUser(userData.user);
-          setIsAuthenticated(true);
-        } else {
-          localStorage.removeItem("auth-token");
-        }
-      })
-      .catch((err) => {
-        if (err.name === "AbortError") return;
-        localStorage.removeItem("auth-token");
-      })
-      .finally(() => {
+    const handleLoad = async () => {
+      setIsLoading(true);
+      try {
+        const data = await refreshToken();
+        setAccessToken(data.accessToken);
+        setUser(data.user);
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to refresh token");
+      } finally {
         setIsLoading(false);
-      });
+      }
+    };
 
-    return () => controller.abort();
-  }, []);
+    handleLoad();
+  }, [refreshToken]);
 
   // Show loading state while checking auth
   if (isLoading) {
@@ -55,33 +84,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
-  const login = async (username: string, password: string) => {
-    // Replace with your authentication logic
-    const response = await fetch("/api/login", {
+  const login = async (email: string): Promise<boolean> => {
+    const response = await fetch(`${API_URL}/api/v1/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ email }),
     });
 
     if (response.ok) {
-      const userData = await response.json();
-      setUser(userData);
-      setIsAuthenticated(true);
-      // Store token for persistence
-      localStorage.setItem("auth-token", userData.token);
+      const data: AuthResponse = await response.json();
+      const parsed = responseSchema.parse(data);
+      setUser(parsed.user);
+      setAccessToken(parsed.accessToken);
+      return response.ok;
     } else {
       throw new Error("Authentication failed");
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem("auth-token");
-  };
-
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider
+      value={{ accessToken, user, login, logout, refreshToken }}
+    >
       {children}
     </AuthContext.Provider>
   );
