@@ -95,7 +95,7 @@ export default function InvoicesTable({
               <TableHead className="hidden lg:table-cell">Due Date</TableHead>
               <TableHead>Amount</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
+              <TableHead className="w-12.5"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -151,13 +151,16 @@ export default function InvoicesTable({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem>
-                          <Link href={`/dashboard/invoices/${invoice.id}`}>
+                          <Link to="/invoices/$id" params={{ id: invoice.id }}>
                             <Eye className="mr-2 h-4 w-4" />
                             View
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem>
-                          <Link href={`/dashboard/invoices/${invoice.id}/edit`}>
+                          <Link
+                            to="/invoices/$id/edit"
+                            params={{ id: invoice.id }}
+                          >
                             <Pencil className="mr-2 h-4 w-4" />
                             Edit
                           </Link>

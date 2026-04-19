@@ -52,7 +52,7 @@ export default function RecentInvoices({ invoices }: RecentInvoicesProps) {
           <CardDescription>Latest invoice activity</CardDescription>
         </div>
         <Link
-          href="/dashboard/invoices"
+          to="/invoices"
           className="text-sm font-medium text-primary hover:underline"
         >
           View all
