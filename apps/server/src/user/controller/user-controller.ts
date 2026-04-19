@@ -13,15 +13,17 @@ const setupProfileSchema = z.object({
 });
 
 const userRouteV1 = new Hono().basePath("/user");
-// userRouteV1.get("/", (c) => {
-//   return c.text("User route");
-// });
 
 userRouteV1.post(
   "/setup-profile",
   zValidator("json", setupProfileSchema),
   (c) => {
     const data = c.req.valid("json");
+    // decode refresh token from cookie
+    // get user id from decoded token
+    // update user table
+    // Create member
+    // Create organization
     console.log(data);
     return c.json({ message: "Setup profile" });
   },

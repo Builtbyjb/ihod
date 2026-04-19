@@ -140,7 +140,6 @@ function RouteComponent() {
                         onBlur={field.handleBlur}
                         onChange={(e) => field.handleChange(e.target.value)}
                         aria-invalid={isInvalid}
-                        // placeholder="Enter your last name"
                         autoComplete="off"
                       />
                       {isInvalid && (
@@ -168,7 +167,6 @@ function RouteComponent() {
                         onBlur={field.handleBlur}
                         onChange={(e) => field.handleChange(e.target.value)}
                         aria-invalid={isInvalid}
-                        // placeholder="What should we call you?"
                         autoComplete="off"
                       />
                       {isInvalid && (
@@ -299,7 +297,7 @@ function RouteComponent() {
               Reset
             </Button>
             <Button type="submit" form="setup-info-form">
-              Save
+              Submit
             </Button>
           </Field>
         </CardFooter>

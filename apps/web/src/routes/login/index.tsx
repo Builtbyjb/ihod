@@ -90,7 +90,6 @@ function RouteComponent() {
                         onBlur={field.handleBlur}
                         onChange={(e) => field.handleChange(e.target.value)}
                         aria-invalid={isInvalid}
-                        // placeholder="Enter your email"
                         autoComplete="email"
                       />
                       {isInvalid && (
@@ -113,7 +112,7 @@ function RouteComponent() {
               Reset
             </Button>
             <Button type="submit" form="login-form">
-              Save
+              Submit
             </Button>
           </Field>
         </CardFooter>

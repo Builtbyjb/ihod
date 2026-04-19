@@ -8,9 +8,14 @@
   },
   "dependencies": {
     "@hono/zod-validator": "^0.7.6",
+    "dotenv": "^17.4.2",
+    "drizzle-orm": "^0.45.2",
     "hono": "^4.12.14"
   },
   "devDependencies": {
-    "wrangler": "^4.4.0"
+    "@types/node": "^24.12.2",
+    "drizzle-kit": "^0.31.10",
+    "tsx": "^4.21.0",
+    "wrangler": "^4.83.0"
   }
 }
