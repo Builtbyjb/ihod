@@ -9,7 +9,7 @@ function InnerApp() {
 
 function App() {
   return (
-    <AuthProvider>
+    <AuthProvider router={router}>
       <InnerApp />
     </AuthProvider>
   );

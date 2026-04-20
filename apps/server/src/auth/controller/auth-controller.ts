@@ -72,11 +72,11 @@ authRouteV1.post("/login", zValidator("json", loginSchema), async (c) => {
         text: `Your OTP code is: ${otp}`,
     });
 
-    // Create a short lived jwt token that stores user id and otp in an http Only cookie
+    const exp = 60 * 30; // Token expires in 30 minutes
     const payload: OTPPayload = {
         userId: result.id,
         otp: otp,
-        exp: Math.floor(Date.now() / 1000) + 60 * 30, // Token expires in 30 minutes
+        exp: Math.floor(Date.now() / 1000) + exp,
     };
 
     const secret = c.env.JWT_SECRET;
@@ -89,10 +89,10 @@ authRouteV1.post("/login", zValidator("json", loginSchema), async (c) => {
 
     setCookie(c, "otp_token", token, {
         httpOnly: true,
-        secure: false,
+        secure: true,
         sameSite: "lax",
         path: "/",
-        maxAge: 60 * 30, // 30 minutes
+        maxAge: exp
     });
 
     return c.json({ message: "OTP sent to your email" }, 200);
@@ -124,10 +124,10 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
         return c.json({ message: "Invalid OTP" }, 400);
     }
 
-    const exp = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 90; // Token expires in 90 days
+    const exp = 60 * 60 * 24 * 90; // Token expires in 90 days
     const payload: ResponsePayload = {
         userId: decoded.userId,
-        exp: exp,
+        exp: Math.floor(Date.now() / 1000) + exp,
     };
 
     const refreshToken = await sign(payload, secret);
@@ -137,9 +137,10 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
         secure: true,
         sameSite: "Lax",
         path: "/",
-        maxAge: 60 * 30, // 30 minutes
+        maxAge: exp
     });
 
+    // Verify user exists
     const result = await db
         .select()
         .from(users)
@@ -165,7 +166,6 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
 
 authRouteV1.get("/refresh-token", async (c) => {
     const refreshToken = getCookie(c, "refresh_token");
-    console.log(refreshToken)
     if (!refreshToken) return c.json({ message: "No refresh token" }, 400);
 
     const secret = c.env.JWT_SECRET;
@@ -197,7 +197,7 @@ authRouteV1.get("/refresh-token", async (c) => {
     return c.json(res);
 });
 
-authRouteV1.post("/logout", (c) => {
+authRouteV1.get("/logout", (c) => {
     deleteCookie(c, "refresh_token");
     return c.json({ message: "Logged out" });
 });

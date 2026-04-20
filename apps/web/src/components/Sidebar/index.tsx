@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useLocation } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard,
   FileText,
@@ -8,6 +9,7 @@ import {
   PlusCircle,
   Settings,
   Receipt,
+  LogOut,
 } from "lucide-react";
 
 const navItems = [
@@ -32,15 +34,17 @@ const navItems = [
     icon: PlusCircle,
   },
 ];
+import { useAuth } from "@/hooks/auth";
 
 export default function Sidebar() {
   const pathname = useLocation({ select: (location) => location.pathname });
+  const { logout } = useAuth();
 
   return (
     <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 border-r border-border bg-card">
-      <div className="flex flex-col flex-1 min-h-0">
+      <div className="flex flex-col min-h-0">
         <div className="flex items-center h-16 px-6 border-b border-border">
-          <Link href="/dashboard" className="flex items-center gap-2">
+          <Link to="/dashboard" className="flex items-center gap-2">
             <Receipt className="h-6 w-6" />
             <span className="text-xl font-bold">Invoicely</span>
           </Link>
@@ -53,7 +57,7 @@ export default function Sidebar() {
             return (
               <Link
                 key={item.href}
-                href={item.href}
+                to={item.href}
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors",
                   isActive
@@ -66,21 +70,29 @@ export default function Sidebar() {
               </Link>
             );
           })}
+          <div>
+            <Link
+              to="/settings"
+              className={cn(
+                "flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors",
+                pathname === "/settings"
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              )}
+            >
+              <Settings className="h-5 w-5" />
+              Settings
+            </Link>
+            <Button
+              variant="ghost"
+              className="text-red-600"
+              onClick={() => logout()}
+            >
+              <LogOut className="h-5 w-5" />
+              Logout
+            </Button>
+          </div>
         </nav>
-        <div className="p-3 border-t border-border">
-          <Link
-            href="/dashboard/settings"
-            className={cn(
-              "flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors",
-              pathname === "/dashboard/settings"
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground",
-            )}
-          >
-            <Settings className="h-5 w-5" />
-            Settings
-          </Link>
-        </div>
       </div>
     </aside>
   );

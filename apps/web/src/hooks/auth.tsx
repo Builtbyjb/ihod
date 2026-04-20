@@ -5,9 +5,9 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
+import type { AnyRouter } from "@tanstack/react-router";
 import type { User, AuthState, AuthResponse, OTPResponse } from "@/lib/types";
 // import { toast } from "sonner";
-import { useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 
 const otpResponseSchema = z.object({
@@ -18,11 +18,16 @@ const otpResponseSchema = z.object({
 const API_URL = import.meta.env.VITE_API_URL;
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({
+  children,
+  router,
+}: {
+  children: React.ReactNode;
+  router: AnyRouter;
+}) {
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
 
   const logout = async () => {
     try {
@@ -34,7 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setUser(null);
       setAccessToken(null);
-      navigate({ to: "/login" });
+      await router.navigate({ to: "/login" });
     }
   };
 
@@ -43,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       credentials: "include",
     });
 
-    if (!response.status) {
+    if (!response.ok) {
       throw new Error("Failed to refresh token");
     }
 
