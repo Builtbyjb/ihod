@@ -1,0 +1,69 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "server",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-04-17",
+  "env": {
+    "staging": {
+      "name": "ihod-web-staging",
+    },
+    "production": {
+      "name": "ihod-web-production",
+    },
+    "uat": {
+      "name": "ihod-web-uat",
+    },
+    "dev": {
+      "name": "ihod-web-dev",
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "ihod-dev",
+          "database_id": "3e8f2fbc-0e94-48c3-9ccb-ec293c6d721f",
+          "migrations_dir": "drizzle/migrations",
+        },
+      ],
+      "send_email": [
+        {
+          "name": "SEND_EMAIL",
+        },
+      ],
+    },
+  },
+  "dev": {
+    "port": 8585,
+  },
+
+  // "compatibility_flags": [
+  //   "nodejs_compat"
+  // ],
+  // "vars": {
+  //   "MY_VAR": "my-variable"
+  // },
+  // "kv_namespaces": [
+  //   {
+  //     "binding": "MY_KV_NAMESPACE",
+  //     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  //   }
+  // ],
+  // "r2_buckets": [
+  //   {
+  //     "binding": "MY_BUCKET",
+  //     "bucket_name": "my-bucket"
+  //   }
+  // ],
+  // "d1_databases": [
+  //   {
+  //     "binding": "DB",
+  //     "database_name": "my-database",
+  //     "database_id": "",
+  //   },
+  // ],
+  // "ai": {
+  //   "binding": "AI"
+  // },
+  // "observability": {
+  //   "enabled": true,
+  //   "head_sampling_rate": 1
+  // }
+}
