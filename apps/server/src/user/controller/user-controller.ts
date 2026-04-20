@@ -65,7 +65,6 @@ userRouteV1.post(
         }).returning({ id: organizations.id }).get();
 
         // Create member
-        // TODO: Define roles
         await db.insert(members).values({
             userId: decoded.userId,
             organizationId: organization.id,
