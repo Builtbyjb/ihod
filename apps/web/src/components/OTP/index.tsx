@@ -32,9 +32,11 @@ export default function OTP() {
           },
           body: JSON.stringify({ otp: value }),
         });
+
         if (!response.ok) {
           throw new Error("Failed to verify OTP");
         }
+
         const data = await response.json();
         if (!data.setupCompleted) {
           navigate({ to: "/setup-profile" });

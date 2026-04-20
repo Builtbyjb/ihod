@@ -45,6 +45,8 @@ userRouteV1.post(
             "HS256",
         )) as ResponsePayload;
 
+        // TODO: Check if setupCompleted is already true
+
         // update user table
         await db.update(users).set({
             firstname: data.firstname,
@@ -63,13 +65,12 @@ userRouteV1.post(
         }).returning({ id: organizations.id }).get();
 
         // Create member
+        // TODO: Define roles
         await db.insert(members).values({
             userId: decoded.userId,
             organizationId: organization.id,
             roleId: 1,
         });
-
-        // TODO: Define roles
 
         return c.json({ message: "Profile setup completed" });
     },

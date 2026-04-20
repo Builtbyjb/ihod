@@ -10,6 +10,7 @@
     "lint-web": "npx turbo lint --filter=@ihod/web"
   },
   "devDependencies": {
+    "drizzle-kit": "^0.31.10",
     "turbo": "^2.9.6",
     "wrangler": "^4.83.0"
   },

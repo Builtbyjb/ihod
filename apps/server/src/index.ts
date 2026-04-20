@@ -2,8 +2,9 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import authRouteV1 from "./auth/controller/auth-controller";
 import userRouteV1 from "./user/controller/user-controller";
+import { Bindings } from "@/lib/types";
 
-const app = new Hono();
+const app = new Hono<{ Bindings: Bindings }>();
 
 app.use(
     "/api/*",

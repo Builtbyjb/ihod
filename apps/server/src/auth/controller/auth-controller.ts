@@ -31,6 +31,7 @@ const otpSchema = z.object({
 authRouteV1.post("/login", zValidator("json", loginSchema), async (c) => {
     const { email } = c.req.valid("json");
     const db = drizzle(c.env.DB);
+    console.log('DB binding:', c.env.DB);
     // Create user
     // NOTE: This could error
     const result = await db
@@ -40,8 +41,19 @@ authRouteV1.post("/login", zValidator("json", loginSchema), async (c) => {
 
     // Generate a OTP
     const otp = generateOTP();
+    const sender = process.env.EMAIL_DOMAIN;
+    if (!sender) {
+        console.error("EMAIL_DOMAIN not configured");
+        return c.json({ message: "Internal server error" }, 500);
+    }
 
-    // TODO: Send OTP to user name
+    // Send OTP to user name
+    await c.env.EMAIL.send({
+        from: sender,
+        to: email,
+        subject: "Your OTP code",
+        text: `Your OTP code is: ${otp}`,
+    });
 
     // Create a short lived jwt token that stores user id and otp in an http Only cookie
     const payload: OTPPayload = {
