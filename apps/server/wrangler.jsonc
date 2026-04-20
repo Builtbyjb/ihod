@@ -13,6 +13,25 @@
     "uat": {
       "name": "ihod-web-uat",
     },
+    "dev": {
+      "name": "ihod-web-dev",
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "ihod-dev",
+          "database_id": "3e8f2fbc-0e94-48c3-9ccb-ec293c6d721f",
+          "migrations_dir": "drizzle/migrations",
+        },
+      ],
+      "send_email": [
+        {
+          "name": "SEND_EMAIL",
+        },
+      ],
+    },
+  },
+  "dev": {
+    "port": 8585,
   },
 
   // "compatibility_flags": [
@@ -35,10 +54,10 @@
   // ],
   // "d1_databases": [
   //   {
-  //     "binding": "MY_DB",
+  //     "binding": "DB",
   //     "database_name": "my-database",
-  //     "database_id": ""
-  //   }
+  //     "database_id": "",
+  //   },
   // ],
   // "ai": {
   //   "binding": "AI"

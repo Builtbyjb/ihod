@@ -10,6 +10,7 @@
     "lint-web": "npx turbo lint --filter=@ihod/web"
   },
   "devDependencies": {
+    "drizzle-kit": "^0.31.10",
     "turbo": "^2.9.6",
     "wrangler": "^4.83.0"
   },
@@ -19,6 +20,7 @@
   ],
   "packageManager": "npm@8.5.0",
   "dependencies": {
-    "@tanstack/react-form": "^1.29.0"
+    "@tanstack/react-form": "^1.29.0",
+    "jwt-decode": "^4.0.0"
   }
 }

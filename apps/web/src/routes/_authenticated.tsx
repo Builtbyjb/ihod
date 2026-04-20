@@ -1,5 +1,6 @@
 import { createFileRoute, redirect, Outlet } from "@tanstack/react-router";
 import Sidebar from "@/components/Sidebar";
+import { authenticateUser } from "@/lib/utils";
 
 function AuthenticatedLayout() {
   return (
@@ -18,8 +19,9 @@ function AuthenticatedLayout() {
  * Routes that require a user to be authenticated
  */
 export const Route = createFileRoute("/_authenticated")({
-  beforeLoad: ({ context, location }) => {
-    if (context.auth && !context.auth.isAuthenticated) {
+  beforeLoad: async ({ context, location }) => {
+    const isAuthenticated = await authenticateUser(context);
+    if (!isAuthenticated) {
       throw redirect({
         to: "/login",
         search: {

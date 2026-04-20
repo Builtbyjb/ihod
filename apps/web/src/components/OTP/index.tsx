@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import {
   InputOTP,
   InputOTPGroup,
@@ -11,14 +12,28 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/auth";
 
 export default function OTP() {
   const [value, setValue] = useState("");
+  const navigate = useNavigate();
+  const { verifyOtp } = useAuth();
 
-  const handleChange = (value: string) => {
+  const handleChange = async (value: string) => {
     setValue(value);
     if (value.length == 8) {
-      console.log(value);
+      try {
+        const response = await verifyOtp(value);
+        if (!response.setupCompleted) {
+          navigate({ to: "/setup-profile" });
+        } else {
+          navigate({ to: "/dashboard" });
+        }
+      } catch (error) {
+        toast.error("Error verifying OTP: " + error.message);
+        console.error(error);
+      }
     }
   };
 
