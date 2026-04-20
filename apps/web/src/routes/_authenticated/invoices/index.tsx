@@ -18,20 +18,22 @@ import { Plus, Search } from "lucide-react";
 import type { Invoice } from "@/lib/types";
 import { pdf } from "@react-pdf/renderer";
 import InvoicePDF from "@/components/InvoicePDF";
+import { useNavigate } from "@tanstack/react-router";
 
 function RouteComponent() {
   const { invoices, loading, updateInvoice, deleteInvoice } = useInvoices();
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  // const [search, setSearch] = useState("");
+  // const [statusFilter, setStatusFilter] = useState<string>("all");
+  const navigate = useNavigate();
 
-  const filteredInvoices = invoices.filter((invoice) => {
-    const matchesSearch =
-      invoice.invoiceNumber.toLowerCase().includes(search.toLowerCase()) ||
-      invoice.client.name.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" || invoice.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  // const filteredInvoices = invoices.filter((invoice) => {
+  //   const matchesSearch =
+  //     invoice.invoiceNumber.toLowerCase().includes(search.toLowerCase()) ||
+  //     invoice.client.name.toLowerCase().includes(search.toLowerCase());
+  //   const matchesStatus =
+  //     statusFilter === "all" || invoice.status === statusFilter;
+  //   return matchesSearch && matchesStatus;
+  // });
 
   const handleStatusChange = (id: string, status: Invoice["status"]) => {
     updateInvoice(id, { status });
@@ -63,7 +65,7 @@ function RouteComponent() {
       <main className="flex-1 p-4 md:p-6 space-y-4">
         <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
-            <div className="relative w-full sm:w-64">
+            {/*<div className="relative w-full sm:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
@@ -72,8 +74,8 @@ function RouteComponent() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
-            </div>
-            <Select value={statusFilter} onValueChange={() => setStatusFilter}>
+            </div>*/}
+            {/*<Select value={statusFilter} onValueChange={() => setStatusFilter}>
               <SelectTrigger className="w-full sm:w-40">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
@@ -84,18 +86,16 @@ function RouteComponent() {
                 <SelectItem value="paid">Paid</SelectItem>
                 <SelectItem value="overdue">Overdue</SelectItem>
               </SelectContent>
-            </Select>
+            </Select>*/}
           </div>
-          <Button>
-            <Link to="/invoices/new">
-              <Plus className="mr-2 h-4 w-4" />
-              Create Invoice
-            </Link>
+          <Button onClick={() => navigate({ to: "/invoices/new" })}>
+            <Plus className="mr-2 h-4 w-4" />
+            Create Invoice
           </Button>
         </div>
 
         <InvoicesTable
-          invoices={filteredInvoices}
+          invoices={invoices}
           onDelete={deleteInvoice}
           onStatusChange={handleStatusChange}
           onDownload={handleDownload}

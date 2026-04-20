@@ -140,6 +140,7 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
         maxAge: exp
     });
 
+    // Verify user exists
     const result = await db
         .select()
         .from(users)
@@ -165,7 +166,6 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
 
 authRouteV1.get("/refresh-token", async (c) => {
     const refreshToken = getCookie(c, "refresh_token");
-    console.log(refreshToken)
     if (!refreshToken) return c.json({ message: "No refresh token" }, 400);
 
     const secret = c.env.JWT_SECRET;

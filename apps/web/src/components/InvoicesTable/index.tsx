@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import type { Invoice } from "@/lib/types";
 import { format } from "date-fns";
+import { useNavigate } from "@tanstack/react-router";
 
 interface InvoicesTableProps {
   invoices: Invoice[];
@@ -53,6 +54,7 @@ export default function InvoicesTable({
   onDownload,
 }: InvoicesTableProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -149,21 +151,28 @@ export default function InvoicesTable({
                           <span className="sr-only">Open menu</span>
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Link to="/invoices/$id" params={{ id: invoice.id }}>
-                            <Eye className="mr-2 h-4 w-4" />
-                            View
-                          </Link>
+                      <DropdownMenuContent align="end" className="w-44">
+                        <DropdownMenuItem
+                          onClick={() =>
+                            navigate({
+                              to: "/invoices/$id",
+                              params: { id: invoice.id },
+                            })
+                          }
+                        >
+                          <Eye className="mr-2 h-4 w-4" />
+                          View
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Link
-                            to="/invoices/$id/edit"
-                            params={{ id: invoice.id }}
-                          >
-                            <Pencil className="mr-2 h-4 w-4" />
-                            Edit
-                          </Link>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            navigate({
+                              to: "/invoices/$id/edit",
+                              params: { id: invoice.id },
+                            })
+                          }
+                        >
+                          <Pencil className="mr-2 h-4 w-4" />
+                          Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onDownload(invoice)}>
                           <Download className="mr-2 h-4 w-4" />
@@ -187,7 +196,7 @@ export default function InvoicesTable({
                             Mark as Paid
                           </DropdownMenuItem>
                         )}
-                        <DropdownMenuSeparator />
+                        {/*<DropdownMenuSeparator />*/}
                         <DropdownMenuItem
                           onClick={() => setDeleteId(invoice.id)}
                           className="text-destructive"

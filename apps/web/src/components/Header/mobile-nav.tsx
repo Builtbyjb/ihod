@@ -12,7 +12,10 @@ import {
   Settings,
   Menu,
   Receipt,
+  LogOut,
 } from "lucide-react";
+
+import { useAuth } from "@/hooks/auth";
 
 const navItems = [
   {
@@ -22,22 +25,22 @@ const navItems = [
   },
   {
     title: "Invoices",
-    href: "/dashboard/invoices",
+    href: "/invoices",
     icon: FileText,
   },
   {
     title: "Clients",
-    href: "/dashboard/clients",
+    href: "/clients",
     icon: Users,
   },
   {
     title: "Create Invoice",
-    href: "/dashboard/invoices/new",
+    href: "/invoices/new",
     icon: PlusCircle,
   },
   {
     title: "Settings",
-    href: "/dashboard/settings",
+    href: "/settings",
     icon: Settings,
   },
 ];
@@ -47,6 +50,8 @@ export function MobileNav() {
   const pathname = useLocation({
     select: (location) => location.pathname,
   });
+
+  const { logout } = useAuth();
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -90,6 +95,14 @@ export function MobileNav() {
                 </Link>
               );
             })}
+            <Button
+              variant="ghost"
+              className="text-red-600"
+              onClick={() => logout()}
+            >
+              <LogOut className="h-5 w-5" />
+              Logout
+            </Button>
           </nav>
         </div>
       </SheetContent>
