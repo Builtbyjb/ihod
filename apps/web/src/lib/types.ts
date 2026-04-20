@@ -53,6 +53,7 @@ export interface AuthState {
     login: (email: string) => Promise<boolean>;
     logout: () => void;
     refreshToken: () => Promise<AuthResponse>;
+    verifyOtp: (otp: string) => Promise<OTPResponse>;
 }
 
 export interface Context {
@@ -61,9 +62,8 @@ export interface Context {
 
 export interface AuthResponse {
     accessToken: string;
-    user: User;
 }
 
-export interface OTPResponse {
-    firstLogin: boolean;
+export interface OTPResponse extends AuthResponse {
+    setupCompleted: boolean;
 }

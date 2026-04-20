@@ -1,8 +1,10 @@
 import type { JWTPayload } from "hono/utils/jwt/types";
 
-export interface Bindings {
+export type Bindings = {
     DB: D1Database;
-    EMAIL: {
+    EMAIL_DOMAIN: string;
+    JWT_SECRET: string;
+    SEND_EMAIL: {
         send: (email: {
             to: string;
             from: string;

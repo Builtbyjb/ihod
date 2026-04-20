@@ -33,8 +33,8 @@ const currencies = [
 ];
 
 const schema = z.object({
-  firstName: z.string().min(2),
-  lastName: z.string().min(2),
+  firstname: z.string().min(2),
+  lastname: z.string().min(2),
   username: z.string().min(2),
   businessName: z.string().min(2),
   businessType: z.string().min(2),
@@ -51,8 +51,8 @@ function RouteComponent() {
 
   const form = useForm({
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      firstname: "",
+      lastname: "",
       username: "",
       businessName: "",
       businessType: "",
@@ -66,10 +66,10 @@ function RouteComponent() {
     },
     onSubmit: async ({ value }) => {
       const payload = { ...value };
-      console.log(payload);
       try {
         const response = await fetch(`${API_URL}/api/v1/user/setup-profile`, {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
@@ -79,11 +79,11 @@ function RouteComponent() {
           throw new Error("Error setting profile");
         }
 
+        toast.success("Setup complete");
         navigate({ to: "/dashboard" });
       } catch (error) {
         console.error(error);
       }
-      toast.success("Setup complete");
     },
   });
   return (
@@ -105,7 +105,7 @@ function RouteComponent() {
           >
             <FieldGroup>
               <form.Field
-                name="firstName"
+                name="firstname"
                 children={(field) => {
                   const isInvalid =
                     field.state.meta.isTouched && !field.state.meta.isValid;
@@ -132,7 +132,7 @@ function RouteComponent() {
                 }}
               />
               <form.Field
-                name="lastName"
+                name="lastname"
                 children={(field) => {
                   const isInvalid =
                     field.state.meta.isTouched && !field.state.meta.isValid;

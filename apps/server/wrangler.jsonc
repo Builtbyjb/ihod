@@ -23,16 +23,16 @@
           "migrations_dir": "drizzle/migrations",
         },
       ],
+      "send_email": [
+        {
+          "name": "SEND_EMAIL",
+        },
+      ],
     },
   },
   "dev": {
     "port": 8585,
   },
-  "send_email": [
-    {
-      "name": "SEND_EMAIL",
-    },
-  ],
 
   // "compatibility_flags": [
   //   "nodejs_compat"

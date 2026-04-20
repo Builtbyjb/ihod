@@ -15,10 +15,10 @@ app.use(
             "Upgrade-Insecure-Requests",
             "Content-Type",
             "Authorization",
+            "Set-Cookie"
         ],
         allowMethods: ["POST", "GET", "OPTIONS"],
         exposeHeaders: ["Content-Length", "X-Kuma-Revision"],
-        maxAge: 600,
         credentials: true,
     }),
 );

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
 import { Bindings } from "@/lib/types";
 import { drizzle } from "drizzle-orm/d1";
-import { eq } from "drizzle-orm";
+import { DrizzleQueryError, eq } from "drizzle-orm";
 import { users } from "@/db/schema";
 import { generateOTP } from "@/auth/service/auth-service";
 import { sign, verify } from "hono/jwt";
@@ -31,24 +31,41 @@ const otpSchema = z.object({
 authRouteV1.post("/login", zValidator("json", loginSchema), async (c) => {
     const { email } = c.req.valid("json");
     const db = drizzle(c.env.DB);
-    console.log('DB binding:', c.env.DB);
+
     // Create user
-    // NOTE: This could error
-    const result = await db
-        .insert(users)
-        .values({ email: email })
-        .returning({ id: users.id });
+    let result;
+    try {
+        result = await db
+            .insert(users)
+            .values({ email: email })
+            .returning({ id: users.id }).get();
+
+    } catch (error) {
+        // Fetch existing user if insert fails
+        if (error instanceof DrizzleQueryError) {
+            result = await db
+                .select({ id: users.id })
+                .from(users)
+                .where(eq(users.email, email))
+                .get();
+        }
+    }
+
+    if (!result) {
+        console.log("Error creating or finding user")
+        return c.json({ message: "Internal server error" }, 500);
+    }
 
     // Generate a OTP
     const otp = generateOTP();
-    const sender = process.env.EMAIL_DOMAIN;
+    const sender = c.env.EMAIL_DOMAIN;
     if (!sender) {
         console.error("EMAIL_DOMAIN not configured");
         return c.json({ message: "Internal server error" }, 500);
     }
 
     // Send OTP to user name
-    await c.env.EMAIL.send({
+    await c.env.SEND_EMAIL.send({
         from: sender,
         to: email,
         subject: "Your OTP code",
@@ -57,12 +74,12 @@ authRouteV1.post("/login", zValidator("json", loginSchema), async (c) => {
 
     // Create a short lived jwt token that stores user id and otp in an http Only cookie
     const payload: OTPPayload = {
-        userId: result[0].id,
+        userId: result.id,
         otp: otp,
         exp: Math.floor(Date.now() / 1000) + 60 * 30, // Token expires in 30 minutes
     };
 
-    const secret = process.env.JWT_SECRET;
+    const secret = c.env.JWT_SECRET;
     if (!secret) {
         console.error("JWT secret not configured");
         return c.json({ message: "Internal server error" }, 500);
@@ -72,13 +89,13 @@ authRouteV1.post("/login", zValidator("json", loginSchema), async (c) => {
 
     setCookie(c, "otp_token", token, {
         httpOnly: true,
-        secure: true,
-        sameSite: "Lax",
+        secure: false,
+        sameSite: "lax",
         path: "/",
         maxAge: 60 * 30, // 30 minutes
     });
 
-    return c.json({ message: "OTP sent to your email" });
+    return c.json({ message: "OTP sent to your email" }, 200);
 });
 
 authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
@@ -90,10 +107,16 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
         return c.json({ message: "OTP token not found" }, 400);
     }
 
+    const secret = c.env.JWT_SECRET;
+    if (!secret) {
+        console.error("JWT secret not configured");
+        return c.json({ message: "Internal server error" }, 500);
+    }
+
     // TODO: Handle verification failure
     const decoded: OTPPayload = (await verify(
         otpToken,
-        "mySecretKey",
+        secret,
         "HS256",
     )) as OTPPayload;
 
@@ -106,12 +129,6 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
         userId: decoded.userId,
         exp: exp,
     };
-
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-        console.error("JWT secret not configured");
-        return c.json({ message: "Internal server error" }, 500);
-    }
 
     const refreshToken = await sign(payload, secret);
 
@@ -146,11 +163,12 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
     });
 });
 
-authRouteV1.post("/refresh-token", async (c) => {
+authRouteV1.get("/refresh-token", async (c) => {
     const refreshToken = getCookie(c, "refresh_token");
-    if (!refreshToken) return c.json({ message: "No refresh token" }, 401);
+    console.log(refreshToken)
+    if (!refreshToken) return c.json({ message: "No refresh token" }, 400);
 
-    const secret = process.env.JWT_SECRET;
+    const secret = c.env.JWT_SECRET;
     if (!secret) {
         console.error("JWT secret not configured");
         return c.json({ message: "Internal server error" }, 500);
@@ -171,7 +189,12 @@ authRouteV1.post("/refresh-token", async (c) => {
         secret,
     );
 
-    return c.json({ message: "Refresh token", accessToken: accessToken });
+    const res = {
+        message: "Token refreshed",
+        accessToken: accessToken,
+    }
+
+    return c.json(res);
 });
 
 authRouteV1.post("/logout", (c) => {

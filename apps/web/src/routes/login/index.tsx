@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/field";
 import { ArrowLeft } from "lucide-react";
 import OTP from "@/components/OTP";
-import { useAuth } from "@/auth";
+import { useAuth } from "@/hooks/auth";
 
 const emailFormSchema = z.object({
   email: z.string().email(),
@@ -42,10 +42,7 @@ function RouteComponent() {
     onSubmit: async ({ value }) => {
       try {
         const success = await login(value.email);
-        if (success) {
-          console.log(value.email);
-          setIsVerified(true);
-        }
+        if (success) setIsVerified(true);
       } catch (error) {
         toast.error("Login failed: " + error.message);
         console.error(error);

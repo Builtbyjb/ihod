@@ -32,7 +32,7 @@ userRouteV1.post(
         const refreshToken = getCookie(c, "refresh_token");
         if (!refreshToken) return c.json({ message: "No refresh token" }, 401);
 
-        const secret = process.env.JWT_SECRET;
+        const secret = c.env.JWT_SECRET;
         if (!secret) {
             console.error("JWT secret not configured");
             return c.json({ message: "Internal server error" }, 500);

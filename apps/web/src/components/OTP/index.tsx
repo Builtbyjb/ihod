@@ -13,32 +13,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { useAuth } from "@/hooks/auth";
 
 export default function OTP() {
   const [value, setValue] = useState("");
   const navigate = useNavigate();
+  const { verifyOtp } = useAuth();
 
   const handleChange = async (value: string) => {
     setValue(value);
     if (value.length == 8) {
       try {
-        console.log(value);
-        const response = await fetch(`${API_URL}/api/v1/auth/verify-otp`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ otp: value }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to verify OTP");
-        }
-
-        const data = await response.json();
-        if (!data.setupCompleted) {
+        const response = await verifyOtp(value);
+        if (!response.setupCompleted) {
           navigate({ to: "/setup-profile" });
         } else {
           navigate({ to: "/dashboard" });
