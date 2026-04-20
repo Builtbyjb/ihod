@@ -18,7 +18,19 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
-import { useAuth } from "@/auth";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const currencies = [
+  { name: "Naira (NGN)", value: "NGN" },
+  { name: "Canadian Dollar (CAD)", value: "CAD" },
+  { name: "US Dollar (USD)", value: "USD" },
+];
 
 const schema = z.object({
   firstName: z.string().min(2),
@@ -28,12 +40,13 @@ const schema = z.object({
   businessType: z.string().min(2),
   currency: z.string().min(2),
   businessAddress: z.string().min(2),
+  city: z.string().min(2),
+  country: z.string().min(2),
 });
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function RouteComponent() {
-  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const form = useForm({
@@ -45,18 +58,14 @@ function RouteComponent() {
       businessType: "",
       currency: "",
       businessAddress: "",
+      city: "",
+      country: "",
     },
     validators: {
       onSubmit: schema,
     },
     onSubmit: async ({ value }) => {
-      if (!user) {
-        toast.error("You must be authenticated before setting up your profile");
-        logout();
-        return;
-      }
-
-      const payload = { ...value, userId: user.id };
+      const payload = { ...value };
       console.log(payload);
       try {
         const response = await fetch(`${API_URL}/api/v1/user/setup-profile`, {
@@ -230,7 +239,6 @@ function RouteComponent() {
                   );
                 }}
               />
-              {/* TODO: This should be a select option */}
               <form.Field
                 name="currency"
                 children={(field) => {
@@ -241,15 +249,32 @@ function RouteComponent() {
                       <FieldLabel htmlFor="currency-input">
                         Preferred Currency
                       </FieldLabel>
-                      <Input
-                        required
-                        id="currency-input"
+                      <Select
                         name={field.name}
                         value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        aria-invalid={isInvalid}
-                      />
+                        onValueChange={(e) => {
+                          if (e) field.handleChange(e);
+                        }}
+                      >
+                        <SelectTrigger
+                          id="select-currency"
+                          aria-invalid={isInvalid}
+                          className="min-w-30"
+                        >
+                          <SelectValue placeholder="Select currency" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {/*<SelectItem value="auto">Auto</SelectItem>*/}
+                          {currencies.map((currency) => (
+                            <SelectItem
+                              key={currency.value}
+                              value={currency.name}
+                            >
+                              {currency.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
                       )}
@@ -257,7 +282,6 @@ function RouteComponent() {
                   );
                 }}
               />
-              {/* TODO: should use an address api */}
               <form.Field
                 name="businessAddress"
                 children={(field) => {
@@ -276,6 +300,7 @@ function RouteComponent() {
                         onBlur={field.handleBlur}
                         onChange={(e) => field.handleChange(e.target.value)}
                         aria-invalid={isInvalid}
+                        placeholder="Street Address"
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
@@ -284,6 +309,62 @@ function RouteComponent() {
                   );
                 }}
               />
+              <Field orientation="horizontal">
+                <form.Field
+                  name="city"
+                  children={(field) => {
+                    const isInvalid =
+                      field.state.meta.isTouched && !field.state.meta.isValid;
+                    return (
+                      <Field data-invalid={isInvalid}>
+                        <FieldLabel htmlFor="business-city-input">
+                          City
+                        </FieldLabel>
+                        <Input
+                          required
+                          id="business-city-input"
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          aria-invalid={isInvalid}
+                          placeholder="City, State ZIP"
+                        />
+                        {isInvalid && (
+                          <FieldError errors={field.state.meta.errors} />
+                        )}
+                      </Field>
+                    );
+                  }}
+                />
+                <form.Field
+                  name="country"
+                  children={(field) => {
+                    const isInvalid =
+                      field.state.meta.isTouched && !field.state.meta.isValid;
+                    return (
+                      <Field data-invalid={isInvalid}>
+                        <FieldLabel htmlFor="business-address-input">
+                          Country
+                        </FieldLabel>
+                        <Input
+                          required
+                          id="business-address-input"
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          aria-invalid={isInvalid}
+                          placeholder="Country"
+                        />
+                        {isInvalid && (
+                          <FieldError errors={field.state.meta.errors} />
+                        )}
+                      </Field>
+                    );
+                  }}
+                />
+              </Field>
             </FieldGroup>
           </form>
         </CardContent>

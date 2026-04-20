@@ -36,7 +36,7 @@ export default function OTP() {
           throw new Error("Failed to verify OTP");
         }
         const data = await response.json();
-        if (data.firstLogin) {
+        if (!data.setupCompleted) {
           navigate({ to: "/setup-profile" });
         } else {
           navigate({ to: "/dashboard" });

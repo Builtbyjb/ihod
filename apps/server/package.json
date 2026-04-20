@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.12.2",
-    "drizzle-kit": "^0.31.10",
+    "drizzle-kit": "^0.18.1",
     "tsx": "^4.21.0",
     "wrangler": "^4.83.0"
   }
