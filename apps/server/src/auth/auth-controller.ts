@@ -4,8 +4,8 @@ import { zValidator } from "@hono/zod-validator";
 import { Bindings } from "@/lib/types";
 import { drizzle } from "drizzle-orm/d1";
 import { DrizzleQueryError, eq } from "drizzle-orm";
-import { users } from "@/db/schema";
-import { generateOTP } from "@/auth/service/auth-service";
+import { members, organizations, users } from "@/db/schema";
+import { generateOTP } from "@/lib/utils";
 import { sign, verify } from "hono/jwt";
 import { setCookie, getCookie, deleteCookie } from "hono/cookie";
 import type { JWTPayload } from "hono/utils/jwt/types";
@@ -35,19 +35,11 @@ authRouteV1.post("/login", zValidator("json", loginSchema), async (c) => {
     // Create user
     let result;
     try {
-        result = await db
-            .insert(users)
-            .values({ email: email })
-            .returning({ id: users.id }).get();
-
+        result = await db.insert(users).values({ email: email }).returning({ id: users.id }).get();
     } catch (error) {
         // Fetch existing user if insert fails
         if (error instanceof DrizzleQueryError) {
-            result = await db
-                .select({ id: users.id })
-                .from(users)
-                .where(eq(users.email, email))
-                .get();
+            result = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).get();
         }
     }
 
@@ -114,19 +106,23 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
     }
 
     // TODO: Handle verification failure
-    const decoded: OTPPayload = (await verify(
-        otpToken,
-        secret,
-        "HS256",
-    )) as OTPPayload;
-
+    const decoded: OTPPayload = (await verify(otpToken, secret, "HS256")) as OTPPayload;
     if (decoded.otp !== otp) {
         return c.json({ message: "Invalid OTP" }, 400);
     }
 
+    // Verify user exists
+    const user = await db.select().from(users).where(eq(users.id, decoded.userId)).get();
+    if (!user) return c.json({ message: "User not found" }, 404);
+
+    // Verify user is part of an organization
+    const organization = await db.select().from(members).where(eq(members.userId, decoded.userId)).get()
+    if (!organization) return c.json({ message: "User organization not found" }, 404);
+
     const exp = 60 * 60 * 24 * 90; // Token expires in 90 days
     const payload: ResponsePayload = {
         userId: decoded.userId,
+        organizationId: organization.id,
         exp: Math.floor(Date.now() / 1000) + exp,
     };
 
@@ -140,18 +136,10 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
         maxAge: exp
     });
 
-    // Verify user exists
-    const result = await db
-        .select()
-        .from(users)
-        .where(eq(users.id, decoded.userId))
-        .get();
-
-    if (!result) return c.json({ message: "User not found" }, 404);
-
     const accessToken = await sign(
         {
             userId: decoded.userId,
+            organizationId: organization.id,
             exp: Math.floor(Date.now() / 1000) + 60 * 30, // 30 minutes
         },
         secret,
@@ -159,12 +147,13 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
 
     return c.json({
         message: "OTP verified",
-        setupCompleted: result.setupCompleted,
+        setupCompleted: user.setupCompleted,
         accessToken: accessToken,
     });
 });
 
 authRouteV1.get("/refresh-token", async (c) => {
+    const db = drizzle(c.env.DB);
     const refreshToken = getCookie(c, "refresh_token");
     if (!refreshToken) return c.json({ message: "No refresh token" }, 400);
 
@@ -175,26 +164,27 @@ authRouteV1.get("/refresh-token", async (c) => {
     }
 
     // TODO: Handle verification failure
-    const decoded = (await verify(
-        refreshToken,
-        secret,
-        "HS256",
-    )) as ResponsePayload;
+    const decoded = (await verify(refreshToken, secret, "HS256")) as ResponsePayload;
+
+    // Get organization id
+    const organization = await db.select().from(members).where(eq(members.userId, decoded.userId)).get()
+    if (!organization) return c.json({ message: "User organization not found" }, 404);
 
     const accessToken = await sign(
         {
             userId: decoded.userId,
+            organizationId: organization.id,
             exp: Math.floor(Date.now() / 1000) + 60 * 30, // 30 minutes
         },
         secret,
     );
 
-    const res = {
+    const response = {
         message: "Token refreshed",
         accessToken: accessToken,
     }
 
-    return c.json(res);
+    return c.json(response);
 });
 
 authRouteV1.get("/logout", (c) => {

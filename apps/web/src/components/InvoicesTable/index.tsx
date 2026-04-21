@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
+// import { Link } from "@tanstack/react-router";
 import {
   Table,
   TableBody,
@@ -42,8 +42,8 @@ import { useNavigate } from "@tanstack/react-router";
 
 interface InvoicesTableProps {
   invoices: Invoice[];
-  onDelete: (id: string) => void;
-  onStatusChange: (id: string, status: Invoice["status"]) => void;
+  onDelete: (id: number) => void;
+  onStatusChange: (id: number, status: Invoice["status"]) => void;
   onDownload: (invoice: Invoice) => void;
 }
 
@@ -53,7 +53,7 @@ export default function InvoicesTable({
   onStatusChange,
   onDownload,
 }: InvoicesTableProps) {
-  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
   const navigate = useNavigate();
 
   const formatCurrency = (amount: number) => {
@@ -133,7 +133,7 @@ export default function InvoicesTable({
                     {format(new Date(invoice.dueDate), "MMM d, yyyy")}
                   </TableCell>
                   <TableCell className="font-semibold">
-                    {formatCurrency(invoice.total)}
+                    {formatCurrency(invoice.taxRate)}
                   </TableCell>
                   <TableCell>
                     <Badge
@@ -156,7 +156,7 @@ export default function InvoicesTable({
                           onClick={() =>
                             navigate({
                               to: "/invoices/$id",
-                              params: { id: invoice.id },
+                              params: { id: invoice.id.toString() },
                             })
                           }
                         >
@@ -167,7 +167,7 @@ export default function InvoicesTable({
                           onClick={() =>
                             navigate({
                               to: "/invoices/$id/edit",
-                              params: { id: invoice.id },
+                              params: { id: invoice.id.toString() },
                             })
                           }
                         >
@@ -189,13 +189,13 @@ export default function InvoicesTable({
                         )}
                         {(invoice.status === "sent" ||
                           invoice.status === "overdue") && (
-                          <DropdownMenuItem
-                            onClick={() => onStatusChange(invoice.id, "paid")}
-                          >
-                            <CheckCircle className="mr-2 h-4 w-4" />
-                            Mark as Paid
-                          </DropdownMenuItem>
-                        )}
+                            <DropdownMenuItem
+                              onClick={() => onStatusChange(invoice.id, "paid")}
+                            >
+                              <CheckCircle className="mr-2 h-4 w-4" />
+                              Mark as Paid
+                            </DropdownMenuItem>
+                          )}
                         {/*<DropdownMenuSeparator />*/}
                         <DropdownMenuItem
                           onClick={() => setDeleteId(invoice.id)}

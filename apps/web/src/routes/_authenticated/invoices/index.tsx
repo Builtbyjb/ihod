@@ -35,7 +35,7 @@ function RouteComponent() {
   //   return matchesSearch && matchesStatus;
   // });
 
-  const handleStatusChange = (id: string, status: Invoice["status"]) => {
+  const handleStatusChange = (id: number, status: Invoice["status"]) => {
     updateInvoice(id, { status });
   };
 

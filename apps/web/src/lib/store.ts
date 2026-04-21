@@ -42,7 +42,7 @@ export function useClients() {
         });
     }, []);
 
-    const updateClient = useCallback((id: string, updates: Partial<Client>) => {
+    const updateClient = useCallback((id: number, updates: Partial<Client>) => {
         setClients((prev) => {
             const updated = prev.map((c) => (c.id === id ? { ...c, ...updates } : c));
             saveToStorage(CLIENTS_KEY, updated);
@@ -50,7 +50,7 @@ export function useClients() {
         });
     }, []);
 
-    const deleteClient = useCallback((id: string) => {
+    const deleteClient = useCallback((id: number) => {
         setClients((prev) => {
             const updated = prev.filter((c) => c.id !== id);
             saveToStorage(CLIENTS_KEY, updated);
@@ -59,7 +59,7 @@ export function useClients() {
     }, []);
 
     const getClient = useCallback(
-        (id: string) => {
+        (id: number) => {
             return clients.find((c) => c.id === id);
         },
         [clients],
@@ -78,7 +78,7 @@ export function useInvoices() {
         setLoading(false);
     }, []);
 
-    const updateInvoice = useCallback((id: string, updates: Partial<Invoice>) => {
+    const updateInvoice = useCallback((id: number, updates: Partial<Invoice>) => {
         setInvoices((prev) => {
             const updated = prev.map((inv) =>
                 inv.id === id ? { ...inv, ...updates } : inv,
@@ -88,7 +88,7 @@ export function useInvoices() {
         });
     }, []);
 
-    const deleteInvoice = useCallback((id: string) => {
+    const deleteInvoice = useCallback((id: number) => {
         setInvoices((prev) => {
             const updated = prev.filter((inv) => inv.id !== id);
             saveToStorage(INVOICES_KEY, updated);
@@ -122,18 +122,33 @@ export function useDashboardStats(
 ): DashboardStats {
     const totalRevenue = invoices
         .filter((inv) => inv.status === "paid")
-        .reduce((sum, inv) => sum + inv.total, 0);
+        .reduce((sum, inv) => sum + inv.taxRate, 0);
 
     const paidInvoices = invoices.filter((inv) => inv.status === "paid").length;
 
     const pendingAmount = invoices
         .filter((inv) => inv.status === "sent" || inv.status === "overdue")
-        .reduce((sum, inv) => sum + inv.total, 0);
+        .reduce((sum, inv) => sum + inv.taxRate, 0);
 
     const totalClients = clients.length;
 
     return { totalRevenue, paidInvoices, pendingAmount, totalClients };
 }
+
+const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+];
 
 export function getMonthlyRevenue(invoices: Invoice[]) {
     const monthlyData: { [key: string]: number } = {};
@@ -143,23 +158,9 @@ export function getMonthlyRevenue(invoices: Invoice[]) {
         .forEach((inv) => {
             const date = new Date(inv.issueDate);
             const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-            monthlyData[monthKey] = (monthlyData[monthKey] || 0) + inv.total;
+            monthlyData[monthKey] = (monthlyData[monthKey] || 0);
         });
 
-    const months = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-    ];
     const currentYear = new Date().getFullYear();
 
     return months.map((month, index) => {

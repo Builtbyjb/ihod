@@ -36,10 +36,11 @@ import {
 import { format } from "date-fns";
 
 const invoiceFormSchema = z.object({
-  clientId: z.string(),
+  clientId: z.number().positive(),
   issueDate: z.date(),
   dueDate: z.date(),
   taxRate: z.number().min(0).max(100),
+  status: z.enum(["draft", "sent", "paid", "overdue"]),
   items: z.array(
     z.object({
       description: z.string(),
@@ -57,6 +58,13 @@ interface InvoiceFormProps {
 
 type InvoiceForm = z.infer<typeof invoiceFormSchema>;
 
+const status = [
+  { label: "Draft", value: "draft" },
+  { label: "Sent", value: "sent" },
+  { label: "Paid", value: "paid" },
+  { label: "Overdue", value: "overdue" }
+]
+
 export default function InvoiceForm({
   clients,
   existingInvoice,
@@ -66,10 +74,11 @@ export default function InvoiceForm({
 
   const form = useForm({
     defaultValues: {
-      clientId: "",
+      clientId: 0,
       issueDate: new Date(),
       dueDate: new Date(),
       taxRate: 0,
+      status: "draft",
       items: [
         {
           description: "",
@@ -90,14 +99,14 @@ export default function InvoiceForm({
 
   const [items, setItems] = useState<InvoiceItem[]>(
     existingInvoice?.items || [
-      { id: uuidv4(), description: "", quantity: 1, unitPrice: 0, total: 0 },
+      { id: uuidv4(), description: "", quantity: 1, unitPrice: 0 },
     ],
   );
 
   const addItem = () => {
     setItems([
       ...items,
-      { id: uuidv4(), description: "", quantity: 1, unitPrice: 0, total: 0 },
+      { id: uuidv4(), description: "", quantity: 1, unitPrice: 0 },
     ]);
   };
 
@@ -131,54 +140,94 @@ export default function InvoiceForm({
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Select client */}
-            <form.Field
-              name="clientId"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor="client-id-select">Client</FieldLabel>
-                    <Select
-                      name={field.name}
-                      value={field.state.value}
-                      onValueChange={(e) => {
-                        if (e) field.handleChange(e);
-                      }}
-                      required
-                    >
-                      <SelectTrigger
-                        id="select-client"
-                        aria-invalid={isInvalid}
+            <div className="flex gap-4">
+              <form.Field
+                name="clientId"
+                children={(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor="client-id-select">Client</FieldLabel>
+                      <Select
+                        name={field.name}
+                        value={field.state.value}
+                        onValueChange={(e) => {
+                          if (e) field.handleChange(e);
+                        }}
+                        required
                       >
-                        <SelectValue placeholder="Select a client">
-                          {clients.find(c => c.id === field.state.value)?.name}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          {clients.map((client) => (
-                            <SelectItem key={client.id} value={client.id}>
-                              {client.name}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                    <FieldDescription>
-                      Could not find a client? Add a new client
-                      <Button
-                        onClick={() => navigate({ to: "/clients" })}
-                        variant="ghost"
-                        className="underline"
+                        <SelectTrigger
+                          id="select-client"
+                          aria-invalid={isInvalid}
+                        >
+                          <SelectValue placeholder="Select a client">
+                            {clients.find(c => c.id === field.state.value)?.name}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {clients.map((client) => (
+                              <SelectItem key={client.id} value={client.id}>
+                                {client.name}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      <FieldDescription>
+                        Add a new client {" "}
+                        <Button
+                          onClick={() => navigate({ to: "/clients" })}
+                          variant="ghost"
+                          className="underline p-0 text-muted-foreground"
+                        >
+                          here
+                        </Button>
+                      </FieldDescription>
+                    </Field>
+                  );
+                }}
+              />
+              <form.Field
+                name="status"
+                children={(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor="invoice-status-select">Invoice Status</FieldLabel>
+                      <Select
+                        name={field.name}
+                        value={field.state.value}
+                        onValueChange={(e) => {
+                          if (e) field.handleChange(e);
+                        }}
+                        required
                       >
-                        here
-                      </Button>
-                    </FieldDescription>
-                  </Field>
-                );
-              }}
-            />
+                        <SelectTrigger
+                          id="status-select"
+                          aria-invalid={isInvalid}
+                        >
+                          <SelectValue placeholder="Select Status">
+                            {status.find(c => c.value === field.state.value)?.label}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {status.map((status) => (
+                              <SelectItem key={status.value} value={status.value}>
+                                {status.label}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                  );
+                }}
+              />
+            </div>
             <div className="grid gap-8 sm:grid-cols-2">
               {/* Issue Date */}
               <form.Field
