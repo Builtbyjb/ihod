@@ -78,14 +78,6 @@ export function useInvoices() {
         setLoading(false);
     }, []);
 
-    const addInvoice = useCallback((invoice: Invoice) => {
-        setInvoices((prev) => {
-            const updated = [...prev, invoice];
-            saveToStorage(INVOICES_KEY, updated);
-            return updated;
-        });
-    }, []);
-
     const updateInvoice = useCallback((id: string, updates: Partial<Invoice>) => {
         setInvoices((prev) => {
             const updated = prev.map((inv) =>
@@ -118,7 +110,6 @@ export function useInvoices() {
     return {
         invoices,
         loading,
-        addInvoice,
         updateInvoice,
         deleteInvoice,
         getNextInvoiceNumber,
