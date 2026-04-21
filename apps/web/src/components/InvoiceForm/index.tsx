@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -141,7 +141,7 @@ export default function InvoiceForm({
                     <FieldLabel htmlFor="client-id-select">Client</FieldLabel>
                     <Select
                       name={field.name}
-                      value={clients.find(c => c.id === field.state.value)?.name}
+                      value={field.state.value}
                       onValueChange={(e) => {
                         if (e) field.handleChange(e);
                       }}
@@ -151,7 +151,9 @@ export default function InvoiceForm({
                         id="select-client"
                         aria-invalid={isInvalid}
                       >
-                        <SelectValue placeholder="Select a client" />
+                        <SelectValue placeholder="Select a client">
+                          {clients.find(c => c.id === field.state.value)?.name}
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
