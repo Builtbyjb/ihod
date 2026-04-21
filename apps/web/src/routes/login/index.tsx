@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,6 +22,7 @@ import {
 import { ArrowLeft } from "lucide-react";
 import OTP from "@/components/OTP";
 import { useAuth } from "@/hooks/auth";
+import { authenticateUser } from "@/lib/utils";
 
 const emailFormSchema = z.object({
   email: z.string().email(),
@@ -127,5 +128,14 @@ function RouteComponent() {
 }
 
 export const Route = createFileRoute("/login/")({
+  beforeLoad: async ({ context }) => {
+    const isAuthenticated = await authenticateUser(context);
+    if (isAuthenticated) {
+      throw redirect({
+        to: "/dashboard",
+      });
+    }
+
+  },
   component: RouteComponent,
 });

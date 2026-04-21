@@ -1,20 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Link } from "@tanstack/react-router";
+// import { useState } from "react";
+// import { Link } from "@tanstack/react-router";
 import Header from "@/components/Header";
 import InvoicesTable from "@/components/InvoicesTable";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+// import { Input } from "@/components/ui/input";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
 import { useInvoices } from "@/lib/store";
 import { Spinner } from "@/components/ui/spinner";
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
 import type { Invoice } from "@/lib/types";
 import { pdf } from "@react-pdf/renderer";
 import InvoicePDF from "@/components/InvoicePDF";
@@ -35,7 +35,7 @@ function RouteComponent() {
   //   return matchesSearch && matchesStatus;
   // });
 
-  const handleStatusChange = (id: string, status: Invoice["status"]) => {
+  const handleStatusChange = (id: number, status: Invoice["status"]) => {
     updateInvoice(id, { status });
   };
 

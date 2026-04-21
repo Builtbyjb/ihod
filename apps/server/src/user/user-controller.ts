@@ -62,6 +62,7 @@ userRouteV1.post(
             address: data.businessAddress,
             city: data.city,
             country: data.country,
+            currency: data.currency,
         }).returning({ id: organizations.id }).get();
 
         // Create member

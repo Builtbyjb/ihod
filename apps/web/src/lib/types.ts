@@ -1,5 +1,5 @@
 export interface Client {
-    id: string;
+    id: number;
     name: string;
     email: string;
     phone: string;
@@ -10,23 +10,19 @@ export interface Client {
 }
 
 export interface InvoiceItem {
-    id: string;
+    id: string,
     description: string;
     quantity: number;
     unitPrice: number;
-    total: number;
 }
 
 export interface Invoice {
-    id: string;
+    id: number;
     invoiceNumber: string;
     clientId: string;
     client: Client;
     items: InvoiceItem[];
-    subtotal: number;
     taxRate: number;
-    taxAmount: number;
-    total: number;
     status: "draft" | "sent" | "paid" | "overdue";
     issueDate: string;
     dueDate: string;
@@ -42,7 +38,7 @@ export interface DashboardStats {
 }
 
 export interface User {
-    id: string;
+    id: number;
     username: string;
     email: string;
 }

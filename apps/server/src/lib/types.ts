@@ -19,3 +19,9 @@ export type Bindings = {
 export type ResponsePayload = JWTPayload & {
     userId: number;
 };
+
+export interface InvoiceItem {
+    description: string,
+    quantity: number,
+    unitPrice: number
+}
