@@ -29,21 +29,15 @@ import type { Client } from "@/lib/types";
 import { format } from "date-fns";
 
 interface ClientsTableProps {
-  clients: Client[];
   onEdit: (client: Client) => void;
-  onDelete: (id: string) => void;
 }
 
-export default function ClientsTable({
-  clients,
-  onEdit,
-  onDelete,
-}: ClientsTableProps) {
-  const [deleteId, setDeleteId] = useState<string | null>(null);
+export default function ClientsTable({ onEdit }: ClientsTableProps) {
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const clients: Client[] = []
 
   const handleDelete = () => {
     if (deleteId) {
-      onDelete(deleteId);
       setDeleteId(null);
     }
   };

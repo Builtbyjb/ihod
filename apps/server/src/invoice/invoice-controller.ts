@@ -7,8 +7,8 @@ const invoiceRouteV1 = new Hono<{ Bindings: Bindings }>().basePath("/invoice")
 
 const invoiceFormSchema = z.object({
     clientId: z.number(),
-    issueDate: z.date(),
-    dueDate: z.date(),
+    issueDate: z.coerce.date(),
+    dueDate: z.coerce.date(),
     taxRate: z.number().min(0).max(100),
     status: z.enum(["draft", "sent", "paid", "overdue"]),
     items: z.array(
@@ -26,3 +26,5 @@ invoiceRouteV1.post("/create", zValidator("json", invoiceFormSchema), (c) => {
     console.log(data)
     return c.json({ message: "Invoice created" })
 })
+
+export default invoiceRouteV1;

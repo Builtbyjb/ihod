@@ -35,6 +35,8 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const invoiceFormSchema = z.object({
   clientId: z.number().positive(),
   issueDate: z.date(),
@@ -93,7 +95,26 @@ export default function InvoiceForm({
     },
     onSubmit: async ({ value }) => {
       console.log(value);
-      toast.success("Invoice created");
+      try {
+        const response = await fetch(`${API_URL}/api/v1/invoice/create`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(value)
+        })
+
+        if (!response.ok) {
+          throw new Error("Failed to create invoice")
+        }
+
+        toast.success("Invoice created")
+      } catch (error) {
+        console.log(error)
+        toast.error("Failed to create invoice: " + error.message);
+
+      }
     },
   });
 
@@ -161,8 +182,8 @@ export default function InvoiceForm({
                           id="select-client"
                           aria-invalid={isInvalid}
                         >
-                          <SelectValue placeholder="Select a client">
-                            {clients.find(c => c.id === field.state.value)?.name}
+                          <SelectValue >
+                            {clients.find(c => c.id === field.state.value)?.name || "Select a client"}
                           </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
@@ -185,6 +206,9 @@ export default function InvoiceForm({
                           here
                         </Button>
                       </FieldDescription>
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
                     </Field>
                   );
                 }}
@@ -223,6 +247,9 @@ export default function InvoiceForm({
                           </SelectGroup>
                         </SelectContent>
                       </Select>
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
                     </Field>
                   );
                 }}

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 // import { useState } from "react";
 // import { Link } from "@tanstack/react-router";
 import Header from "@/components/Header";
-import InvoicesTable from "@/components/InvoicesTable";
+// import InvoicesTable from "@/components/InvoicesTable";
 import { Button } from "@/components/ui/button";
 // import { Input } from "@/components/ui/input";
 // import {
@@ -12,52 +12,13 @@ import { Button } from "@/components/ui/button";
 //   SelectTrigger,
 //   SelectValue,
 // } from "@/components/ui/select";
-import { useInvoices } from "@/lib/store";
-import { Spinner } from "@/components/ui/spinner";
 import { Plus } from "lucide-react";
-import type { Invoice } from "@/lib/types";
-import { pdf } from "@react-pdf/renderer";
-import InvoicePDF from "@/components/InvoicePDF";
 import { useNavigate } from "@tanstack/react-router";
 
 function RouteComponent() {
-  const { invoices, loading, updateInvoice, deleteInvoice } = useInvoices();
   // const [search, setSearch] = useState("");
   // const [statusFilter, setStatusFilter] = useState<string>("all");
   const navigate = useNavigate();
-
-  // const filteredInvoices = invoices.filter((invoice) => {
-  //   const matchesSearch =
-  //     invoice.invoiceNumber.toLowerCase().includes(search.toLowerCase()) ||
-  //     invoice.client.name.toLowerCase().includes(search.toLowerCase());
-  //   const matchesStatus =
-  //     statusFilter === "all" || invoice.status === statusFilter;
-  //   return matchesSearch && matchesStatus;
-  // });
-
-  const handleStatusChange = (id: number, status: Invoice["status"]) => {
-    updateInvoice(id, { status });
-  };
-
-  const handleDownload = async (invoice: Invoice) => {
-    const blob = await pdf(<InvoicePDF invoice={invoice} />).toBlob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${invoice.invoiceNumber}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner className="h-8 w-8" />
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -94,12 +55,12 @@ function RouteComponent() {
           </Button>
         </div>
 
-        <InvoicesTable
+        {/*<InvoicesTable
           invoices={invoices}
           onDelete={deleteInvoice}
           onStatusChange={handleStatusChange}
           onDownload={handleDownload}
-        />
+        />*/}
       </main>
     </div>
   );
