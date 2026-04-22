@@ -33,13 +33,23 @@ function RouteComponent() {
 
   const handleFormClose = (open: boolean) => {
     setFormOpen(open);
-    if (!open) {
-      setEditingClient(null);
-    }
+    setEditingClient(null);
   };
 
-  const handleClientUpdate = (client: Client) => {
+  const handleClientEdit = (editedClient: Client) => {
+    setClients((prev) =>
+      prev.map((client) =>
+        client.id === editedClient.id ? editedClient : client
+      )
+    );
+  }
+
+  const handleClientAdd = (client: Client) => {
     setClients((prev) => [...prev, client])
+  }
+
+  const handleClientDelete = (clientId: number) => {
+    setClients((prev) => prev.filter(c => c.id !== clientId))
   }
 
   useEffect(() => {
@@ -91,13 +101,14 @@ function RouteComponent() {
           </Button>
         </div>
 
-        <ClientsTable onEdit={handleEdit} clients={clients} />
+        <ClientsTable onEdit={handleEdit} clients={clients} deleteClient={handleClientDelete} />
 
         <ClientForm
           open={formOpen}
           onOpenChange={handleFormClose}
           client={editingClient}
-          updateClient={handleClientUpdate}
+          addClient={handleClientAdd}
+          editClient={handleClientEdit}
         />
       </main>
     </div>

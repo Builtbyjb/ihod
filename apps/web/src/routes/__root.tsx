@@ -26,7 +26,7 @@ function RootComponent() {
             },
             style: {
               borderRadius: "calc(var(--radius)  + 4px)",
-              backgroundColor: "hsl(from var(--accent) h s l / 0.5)",
+              backgroundColor: "hsl(from var(--accent) h s l / 1)",
             },
           }}
           closeButton={false}

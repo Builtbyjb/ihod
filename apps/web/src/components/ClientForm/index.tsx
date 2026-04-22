@@ -14,12 +14,14 @@ import type { Client } from "@/lib/types";
 import { useForm } from "@tanstack/react-form";
 import * as z from "zod";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
+import { useEffect } from "react";
 
 interface ClientFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   client?: Client | null;
-  updateClient: (client: Client) => void;
+  addClient: (client: Client) => void;
+  editClient: (client: Client) => void;
 }
 
 const clientFormSchema = z.object({
@@ -31,8 +33,60 @@ const clientFormSchema = z.object({
   country: z.string(),
 })
 
+type ClientFormType = z.infer<typeof clientFormSchema>;
+
 const API_URL = import.meta.env.VITE_API_URL;
-export default function ClientForm({ open, onOpenChange, client, updateClient }: ClientFormProps) {
+export default function ClientForm({ open, onOpenChange, client, addClient, editClient }: ClientFormProps) {
+
+  const handleClientCreate = async (value: ClientFormType) => {
+    try {
+      const response = await fetch(`${API_URL}/api/v1/clients/create`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(value)
+      })
+
+      if (!response.ok) throw new Error("Failed to add client")
+
+      const newValue = { ...value, createdAt: new Date().toString() }
+      addClient(newValue as Client)
+      onOpenChange(false)
+      toast.success("Client data added")
+    } catch (error) {
+      console.log(error)
+      toast.error("Failed to add client")
+    }
+  }
+
+  const handleClientUpdate = async (id: number, value: ClientFormType) => {
+    try {
+      if (!client) throw new Error("Cannot edit null client object")
+
+      const response = await fetch(`${API_URL}/api/v1/clients/edit/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(value)
+      })
+
+      if (!response.ok) throw new Error("Failed to edit client")
+
+      const newValue: Client = {
+        ...value,
+        id: client.id,
+        createdAt: client.createdAt,
+        organizationId: client.organizationId
+      }
+
+      editClient(newValue)
+      onOpenChange(false)
+      toast.success("Client data updated")
+    } catch (error) {
+      console.log(error)
+      toast.error("Failed to edit client")
+    }
+  }
 
   const form = useForm({
     defaultValues: {
@@ -47,33 +101,31 @@ export default function ClientForm({ open, onOpenChange, client, updateClient }:
       onSubmit: clientFormSchema,
     },
     onSubmit: async ({ value }) => {
-      try {
-        const response = await fetch(`${API_URL}/api/v1/clients/create`, {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(value)
-        })
-
-        if (!response.ok) {
-          throw new Error("Failed to add client")
-        }
-
-        const newValue = { ...value, createdAt: new Date().toString() }
-        updateClient(newValue as Client)
-        onOpenChange(false)
-        toast.success("Client added")
-      } catch (error) {
-        console.log(error)
-        toast.error("Failed to add client")
-      }
+      if (client) await handleClientUpdate(client.id, value)
+      else await handleClientCreate(value)
     }
   })
 
+  useEffect(() => {
+    /* Set default values for client update  */
+    if (client) {
+      form.setFieldValue("name", client.name);
+      form.setFieldValue("email", client.email);
+      form.setFieldValue("phone", client.phone);
+      form.setFieldValue("address", client.address);
+      form.setFieldValue("city", client.city);
+      form.setFieldValue("country", client.country);
+    }
+  }, [client, form])
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(open) => {
+      if (!open) {
+        form.reset()
+      }
+      onOpenChange(open)
+    }
+    }>
       <DialogContent className="sm:max-w-125">
         <DialogHeader>
           <DialogTitle>{client ? "Edit Client" : "Add New Client"}</DialogTitle>

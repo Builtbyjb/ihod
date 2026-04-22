@@ -7,7 +7,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,20 +26,41 @@ import {
 import { MoreHorizontal, Pencil, Trash2, Mail, Phone } from "lucide-react";
 import type { Client } from "@/lib/types";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 interface ClientsTableProps {
   onEdit: (client: Client) => void;
   clients: Client[];
+  deleteClient: (clientId: number) => void;
 }
 
-export default function ClientsTable({ onEdit, clients }: ClientsTableProps) {
+const API_URL = import.meta.env.VITE_API_URL
+export default function ClientsTable({ onEdit, clients, deleteClient }: ClientsTableProps) {
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (deleteId) {
-      setDeleteId(null);
-    }
-  };
+      try {
+        const response = await fetch(`${API_URL}/api/v1/clients/delete/${deleteId}`, {
+          method: "DELETE",
+          credentials: "include",
+        })
+
+        if (!response.ok) {
+          throw new Error("Failed to delete client")
+        }
+
+        deleteClient(deleteId)
+        toast.success("Client deleted")
+
+      } catch (error) {
+        console.log(error)
+        toast.error("Failed to delete client")
+      } finally {
+        setDeleteId(null);
+      }
+    };
+  }
 
   return (
     <>
@@ -139,7 +159,7 @@ export default function ClientsTable({ onEdit, clients }: ClientsTableProps) {
               undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="bg-background">
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}

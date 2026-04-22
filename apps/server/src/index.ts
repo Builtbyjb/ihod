@@ -19,7 +19,7 @@ app.use(
             "Authorization",
             "Set-Cookie"
         ],
-        allowMethods: ["POST", "GET", "OPTIONS"],
+        allowMethods: ["POST", "GET", "OPTIONS", "DELETE", "PATCH", "PUT"],
         exposeHeaders: ["Content-Length", "X-Kuma-Revision"],
         credentials: true,
     }),

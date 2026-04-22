@@ -28,6 +28,7 @@ export const organizations = sqliteTable("organizations", {
     currency: text("address"),
     city: text("city"),
     country: text("country"),
+    deleted: int("deleted", { mode: "boolean" }).notNull().default(false),
     createdAt: int("created_at", { mode: "timestamp" }).default(
         sql`(unixepoch())`,
     ),
@@ -45,6 +46,7 @@ export const members = sqliteTable("members", {
         sql`(unixepoch())`,
     ),
     endDate: int("end_date", { mode: "timestamp" }),
+    deleted: int("deleted", { mode: "boolean" }).notNull().default(false),
     createdAt: int("created_at", { mode: "timestamp" }).default(
         sql`(unixepoch())`,
     ),
@@ -74,6 +76,7 @@ export const clients = sqliteTable("clients", {
     address: text("address"),
     city: text("city"),
     country: text("country"),
+    deleted: int("deleted", { mode: "boolean" }).notNull().default(false),
     createdAt: int("created_at", { mode: "timestamp" }).default(
         sql`(unixepoch())`,
     ),
@@ -93,6 +96,7 @@ export const invoices = sqliteTable("invoices", {
     taxRate: int("tax_rate", { mode: "number" }),
     items: text("items", { mode: "json" }).$type<InvoiceItem[]>().default([]),
     notes: text("notes"),
+    deleted: int("deleted", { mode: "boolean" }).notNull().default(false),
     createdAt: int("created_at", { mode: "timestamp" }).default(
         sql`(unixepoch())`,
     ),
