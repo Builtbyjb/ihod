@@ -154,8 +154,9 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
 
 authRouteV1.get("/refresh-token", async (c) => {
     const db = drizzle(c.env.DB);
+
     const refreshToken = getCookie(c, "refresh_token");
-    if (!refreshToken) return c.json({ message: "No refresh token" }, 400);
+    if (!refreshToken) return c.json({ message: "No refresh token" }, 401);
 
     const secret = c.env.JWT_SECRET;
     if (!secret) {

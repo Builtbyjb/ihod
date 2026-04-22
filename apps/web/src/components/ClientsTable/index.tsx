@@ -30,11 +30,11 @@ import { format } from "date-fns";
 
 interface ClientsTableProps {
   onEdit: (client: Client) => void;
+  clients: Client[];
 }
 
-export default function ClientsTable({ onEdit }: ClientsTableProps) {
+export default function ClientsTable({ onEdit, clients }: ClientsTableProps) {
   const [deleteId, setDeleteId] = useState<number | null>(null);
-  const clients: Client[] = []
 
   const handleDelete = () => {
     if (deleteId) {
@@ -52,7 +52,7 @@ export default function ClientsTable({ onEdit }: ClientsTableProps) {
               <TableHead className="hidden sm:table-cell">Contact</TableHead>
               <TableHead className="hidden md:table-cell">Location</TableHead>
               <TableHead className="hidden lg:table-cell">Added</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
+              <TableHead className="w-12.5"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -104,10 +104,8 @@ export default function ClientsTable({ onEdit }: ClientsTableProps) {
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Open menu</span>
-                        </Button>
+                        <MoreHorizontal className="h-4 w-4" />
+                        <span className="sr-only">Open menu</span>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => onEdit(client)}>
@@ -127,6 +125,7 @@ export default function ClientsTable({ onEdit }: ClientsTableProps) {
                 </TableRow>
               ))
             )}
+
           </TableBody>
         </Table>
       </div>

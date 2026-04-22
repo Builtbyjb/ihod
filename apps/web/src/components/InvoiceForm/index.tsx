@@ -96,7 +96,7 @@ export default function InvoiceForm({
     onSubmit: async ({ value }) => {
       console.log(value);
       try {
-        const response = await fetch(`${API_URL}/api/v1/invoice/create`, {
+        const response = await fetch(`${API_URL}/api/v1/invoices/create`, {
           method: "POST",
           credentials: "include",
           headers: {

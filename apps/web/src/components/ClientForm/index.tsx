@@ -19,6 +19,7 @@ interface ClientFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   client?: Client | null;
+  updateClient: (client: Client) => void;
 }
 
 const clientFormSchema = z.object({
@@ -30,7 +31,8 @@ const clientFormSchema = z.object({
   country: z.string(),
 })
 
-export default function ClientForm({ open, onOpenChange, client }: ClientFormProps) {
+const API_URL = import.meta.env.VITE_API_URL;
+export default function ClientForm({ open, onOpenChange, client, updateClient }: ClientFormProps) {
 
   const form = useForm({
     defaultValues: {
@@ -45,9 +47,28 @@ export default function ClientForm({ open, onOpenChange, client }: ClientFormPro
       onSubmit: clientFormSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log(value)
-      toast.success("Client added")
+      try {
+        const response = await fetch(`${API_URL}/api/v1/clients/create`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(value)
+        })
 
+        if (!response.ok) {
+          throw new Error("Failed to add client")
+        }
+
+        const newValue = { ...value, createdAt: new Date().toString() }
+        updateClient(newValue as Client)
+        onOpenChange(false)
+        toast.success("Client added")
+      } catch (error) {
+        console.log(error)
+        toast.error("Failed to add client")
+      }
     }
   })
 
@@ -173,7 +194,6 @@ export default function ClientForm({ open, onOpenChange, client }: ClientFormPro
             }}
           />
           <Field orientation="horizontal" >
-
             {/* City */}
             <form.Field
               name="city"

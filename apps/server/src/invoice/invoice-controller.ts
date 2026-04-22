@@ -3,7 +3,7 @@ import { Bindings } from "@/lib/types";
 import { z } from "zod"
 import { zValidator } from "@hono/zod-validator";
 
-const invoiceRouteV1 = new Hono<{ Bindings: Bindings }>().basePath("/invoice")
+const invoiceRouteV1 = new Hono<{ Bindings: Bindings }>().basePath("/invoices")
 
 const invoiceFormSchema = z.object({
     clientId: z.number(),
@@ -20,6 +20,11 @@ const invoiceFormSchema = z.object({
     ),
     notes: z.string(),
 });
+
+invoiceRouteV1.get("/", async (c) => {
+
+    return c.json({ message: "All Invoices" }, 200)
+})
 
 invoiceRouteV1.post("/create", zValidator("json", invoiceFormSchema), (c) => {
     const data = c.req.valid("json")

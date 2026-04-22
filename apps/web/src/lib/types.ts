@@ -1,5 +1,6 @@
 export interface Client {
     id: number;
+    organizationId: number;
     name: string;
     email: string;
     phone: string;

@@ -1,15 +1,30 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import ClientsTable from "@/components/ClientsTable";
 import ClientForm from "@/components/ClientForm";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import type { Client } from "@/lib/types";
+import * as z from "zod";
 
+const clientsResponseSchema = z.array(z.object({
+  id: z.number(),
+  organizationId: z.number(),
+  name: z.string(),
+  email: z.string().email(),
+  phone: z.string(),
+  address: z.string(),
+  city: z.string(),
+  country: z.string(),
+  createdAt: z.string(),
+}))
+
+const API_URL = import.meta.env.VITE_API_URL;
 function RouteComponent() {
   const [formOpen, setFormOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [clients, setClients] = useState<Client[]>([]);
 
   const handleEdit = (client: Client) => {
     setEditingClient(client);
@@ -22,6 +37,38 @@ function RouteComponent() {
       setEditingClient(null);
     }
   };
+
+  const handleClientUpdate = (client: Client) => {
+    setClients((prev) => [...prev, client])
+  }
+
+  useEffect(() => {
+    const handleFetch = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/v1/clients`, {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch clients")
+        }
+
+        const data = await response.json()
+        const parsedClients = clientsResponseSchema.parse(data.data)
+
+        setClients(parsedClients)
+
+      } catch (error) {
+        console.log(error)
+      }
+    };
+
+    handleFetch();
+  }, [])
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -44,12 +91,13 @@ function RouteComponent() {
           </Button>
         </div>
 
-        <ClientsTable onEdit={handleEdit} />
+        <ClientsTable onEdit={handleEdit} clients={clients} />
 
         <ClientForm
           open={formOpen}
           onOpenChange={handleFormClose}
           client={editingClient}
+          updateClient={handleClientUpdate}
         />
       </main>
     </div>
