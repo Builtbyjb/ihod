@@ -11,6 +11,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -23,10 +24,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { MoreHorizontal, Pencil, Trash2, Mail, Phone } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, Mail, Phone, Eye } from "lucide-react";
 import type { Client } from "@/lib/types";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { Link } from "@tanstack/react-router";
 
 interface ClientsTableProps {
   onEdit: (client: Client) => void;
@@ -128,10 +130,17 @@ export default function ClientsTable({ onEdit, clients, deleteClient }: ClientsT
                         <span className="sr-only">Open menu</span>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        <Link to="/clients/$clientId" params={{ clientId: client.id.toString() }}>
+                          <DropdownMenuItem >
+                            <Eye className="mr-2 h-4 w-4" />
+                            View
+                          </DropdownMenuItem>
+                        </Link>
                         <DropdownMenuItem onClick={() => onEdit(client)}>
                           <Pencil className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem
                           onClick={() => setDeleteId(client.id)}
                           className="text-destructive"
@@ -148,7 +157,7 @@ export default function ClientsTable({ onEdit, clients, deleteClient }: ClientsT
 
           </TableBody>
         </Table>
-      </div>
+      </div >
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>

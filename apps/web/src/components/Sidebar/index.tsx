@@ -2,15 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { useLocation } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  LayoutDashboard,
-  FileText,
-  Users,
-  PlusCircle,
-  Settings,
-  Receipt,
-  LogOut,
-} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { LayoutDashboard, Users, Settings, Receipt, LogOut } from "lucide-react";
 
 const navItems = [
   {
@@ -19,19 +12,9 @@ const navItems = [
     icon: LayoutDashboard,
   },
   {
-    title: "Invoices",
-    href: "/invoices",
-    icon: FileText,
-  },
-  {
     title: "Clients",
     href: "/clients",
     icon: Users,
-  },
-  {
-    title: "Create Invoice",
-    href: "/invoices/new",
-    icon: PlusCircle,
   },
 ];
 import { useAuth } from "@/hooks/auth";
@@ -46,14 +29,18 @@ export default function Sidebar() {
         <div className="flex items-center h-16 px-6 border-b border-border">
           <Link to="/dashboard" className="flex items-center gap-2">
             <Receipt className="h-6 w-6" />
-            <span className="text-xl font-bold">Invoicely</span>
+            <span className="text-xl font-bold flex items-center">
+              IHOD
+              <Badge variant="outline"
+                className="bg-blue-100 text-blue-600">
+                beta
+              </Badge>
+            </span>
           </Link>
         </div>
         <nav className="flex-1 px-3 py-4 space-y-1">
           {navItems.map((item) => {
-            const isActive =
-              pathname === item.href ||
-              (item.href !== "/dashboard" && pathname.startsWith(item.href));
+            const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
             return (
               <Link
                 key={item.href}

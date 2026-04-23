@@ -39,20 +39,17 @@ import {
 import type { Invoice } from "@/lib/types";
 import { format } from "date-fns";
 import { useNavigate } from "@tanstack/react-router";
+import { calculateTotalAmount } from "@/lib/utils";
 
 interface InvoicesTableProps {
+  clientId: string
   invoices: Invoice[];
   onDelete: (id: number) => void;
   onStatusChange: (id: number, status: Invoice["status"]) => void;
   onDownload: (invoice: Invoice) => void;
 }
 
-export default function InvoicesTable({
-  invoices,
-  onDelete,
-  onStatusChange,
-  onDownload,
-}: InvoicesTableProps) {
+export default function InvoicesTable({ invoices, onDelete, onStatusChange, onDownload, clientId }: InvoicesTableProps) {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const navigate = useNavigate();
 
@@ -118,13 +115,13 @@ export default function InvoicesTable({
                       <span className="font-medium">
                         {invoice.invoiceNumber}
                       </span>
-                      <span className="text-sm text-muted-foreground sm:hidden">
+                      {/*<span className="text-sm text-muted-foreground sm:hidden">
                         {invoice.client.name}
-                      </span>
+                      </span>*/}
                     </div>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">
-                    <span className="font-medium">{invoice.client.name}</span>
+                    {/*<span className="font-medium">{invoice.client.name}</span>*/}
                   </TableCell>
                   <TableCell className="hidden md:table-cell text-sm">
                     {format(new Date(invoice.issueDate), "MMM d, yyyy")}
@@ -133,7 +130,7 @@ export default function InvoicesTable({
                     {format(new Date(invoice.dueDate), "MMM d, yyyy")}
                   </TableCell>
                   <TableCell className="font-semibold">
-                    {formatCurrency(invoice.taxRate)}
+                    {formatCurrency(calculateTotalAmount(invoice.items, invoice.taxRate))}
                   </TableCell>
                   <TableCell>
                     <Badge
@@ -146,17 +143,15 @@ export default function InvoicesTable({
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Open menu</span>
-                        </Button>
+                        <MoreHorizontal className="h-4 w-4" />
+                        <span className="sr-only">Open menu</span>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-44">
                         <DropdownMenuItem
                           onClick={() =>
                             navigate({
-                              to: "/invoices/$id",
-                              params: { id: invoice.id.toString() },
+                              to: "/clients/$clientId/invoices/$invoiceId",
+                              params: { invoiceId: invoice.id.toString(), clientId },
                             })
                           }
                         >
@@ -166,8 +161,8 @@ export default function InvoicesTable({
                         <DropdownMenuItem
                           onClick={() =>
                             navigate({
-                              to: "/invoices/$id/edit",
-                              params: { id: invoice.id.toString() },
+                              to: "/clients/$clientId/invoices/$invoiceId/edit",
+                              params: { invoiceId: invoice.id.toString(), clientId },
                             })
                           }
                         >
@@ -179,7 +174,7 @@ export default function InvoicesTable({
                           Download PDF
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        {invoice.status === "draft" && (
+                        {/*{invoice.status === "draft" && (
                           <DropdownMenuItem
                             onClick={() => onStatusChange(invoice.id, "sent")}
                           >
@@ -195,7 +190,7 @@ export default function InvoicesTable({
                               <CheckCircle className="mr-2 h-4 w-4" />
                               Mark as Paid
                             </DropdownMenuItem>
-                          )}
+                          )}*/}
                         {/*<DropdownMenuSeparator />*/}
                         <DropdownMenuItem
                           onClick={() => setDeleteId(invoice.id)}

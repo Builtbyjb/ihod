@@ -11,11 +11,12 @@ export interface Client {
 }
 
 export interface InvoiceItem {
-    id: string,
     description: string;
     quantity: number;
     unitPrice: number;
 }
+
+export type InvoiceStatus = "draft" | "sent" | "paid" | "overdue";
 
 export interface Invoice {
     id: number;
@@ -24,7 +25,7 @@ export interface Invoice {
     client: Client;
     items: InvoiceItem[];
     taxRate: number;
-    status: "draft" | "sent" | "paid" | "overdue";
+    status: InvoiceStatus;
     issueDate: string;
     dueDate: string;
     notes: string;

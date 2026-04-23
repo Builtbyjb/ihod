@@ -5,40 +5,30 @@ import { Input } from "@/components/ui/input";
 // import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup } from "@/components/ui/select";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectGroup,
-} from "@/components/ui/select";
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/ui/combobox"
 import { Plus, Trash2, ChevronDownIcon } from "lucide-react";
 import type { Client, Invoice, InvoiceItem } from "@/lib/types";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import * as z from "zod";
-import { v4 as uuidv4 } from "uuid";
-import {
-  Field,
-  FieldDescription,
-  FieldLabel,
-  FieldError,
-  FieldGroup,
-  FieldContent,
-} from "@/components/ui/field";
+import { Field, FieldDescription, FieldLabel, FieldError, FieldGroup, FieldContent } from "@/components/ui/field";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
+import { calculateTotalAmount, calculateTaxAmount } from "@/lib/utils";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const invoiceFormSchema = z.object({
-  clientId: z.number().positive(),
+  clientId: z.number(),
   issueDate: z.date(),
   dueDate: z.date(),
   taxRate: z.number().min(0).max(100),
@@ -54,7 +44,6 @@ const invoiceFormSchema = z.object({
 });
 
 interface InvoiceFormProps {
-  clients: Client[];
   existingInvoice?: Invoice | null;
 }
 
@@ -67,12 +56,34 @@ const status = [
   { label: "Overdue", value: "overdue" }
 ]
 
-export default function InvoiceForm({
-  clients,
-  existingInvoice,
-}: InvoiceFormProps) {
+export default function InvoiceForm({ existingInvoice }: InvoiceFormProps) {
   const navigate = useNavigate();
   const router = useRouter();
+  const [clients, setClients] = useState<Client[]>([])
+
+  const handleClientSearch = async (query: string) => {
+    if (query.length > 1) {
+      try {
+        const response = await fetch(`${API_URL}/api/v1/clients/search`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query })
+        })
+
+        if (!response.ok) {
+          throw new Error("Failed to search for clients")
+        }
+
+        const data = await response.json();
+        setClients(data.data)
+      } catch (error) {
+        console.log(error)
+        toast.error("Failed to search for clients")
+      }
+
+    }
+  }
 
   const form = useForm({
     defaultValues: {
@@ -94,46 +105,41 @@ export default function InvoiceForm({
       onSubmit: invoiceFormSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log(value);
       try {
         const response = await fetch(`${API_URL}/api/v1/invoices/create`, {
           method: "POST",
           credentials: "include",
-          headers: {
-            "Content-Type": "application/json"
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(value)
         })
 
-        if (!response.ok) {
-          throw new Error("Failed to create invoice")
-        }
+        if (!response.ok) throw new Error("Failed to create invoice")
 
         toast.success("Invoice created")
+        form.reset()
       } catch (error) {
         console.log(error)
         toast.error("Failed to create invoice: " + error.message);
-
       }
     },
   });
 
   const [items, setItems] = useState<InvoiceItem[]>(
     existingInvoice?.items || [
-      { id: uuidv4(), description: "", quantity: 1, unitPrice: 0 },
+      { description: "", quantity: 1, unitPrice: 0 },
     ],
   );
 
   const addItem = () => {
     setItems([
       ...items,
-      { id: uuidv4(), description: "", quantity: 1, unitPrice: 0 },
+      { description: "", quantity: 1, unitPrice: 0 },
     ]);
   };
 
-  const removeItem = (id: string) => {
+  const removeItem = (idx: number) => {
     if (items.length > 1) {
-      setItems(items.filter((item) => item.id !== id));
+      setItems(items.filter((_, i) => i !== idx));
     }
   };
 
@@ -165,37 +171,34 @@ export default function InvoiceForm({
               <form.Field
                 name="clientId"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor="client-id-select">Client</FieldLabel>
-                      <Select
+                      <FieldLabel htmlFor="search-clients">Client</FieldLabel>
+                      <Combobox
                         name={field.name}
-                        value={field.state.value}
+                        value={clients.find(c => c.id === field.state.value)?.name || ""}
                         onValueChange={(e) => {
-                          if (e) field.handleChange(e);
+                          if (e) field.handleChange(Number(e));
                         }}
-                        required
+                        items={clients}
                       >
-                        <SelectTrigger
-                          id="select-client"
-                          aria-invalid={isInvalid}
-                        >
-                          <SelectValue >
-                            {clients.find(c => c.id === field.state.value)?.name || "Select a client"}
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {clients.map((client) => (
-                              <SelectItem key={client.id} value={client.id}>
+                        <ComboboxInput
+                          id="search-clients"
+                          onChange={(e) => handleClientSearch(e.target.value)}
+                          placeholder="Search clients by name"
+                        />
+                        <ComboboxContent>
+                          <ComboboxEmpty>No Clients found.</ComboboxEmpty>
+                          <ComboboxList>
+                            {(client) => (
+                              <ComboboxItem key={client.id} value={client.id}>
                                 {client.name}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
+                              </ComboboxItem>
+                            )}
+                          </ComboboxList>
+                        </ComboboxContent>
+                      </Combobox>
                       <FieldDescription>
                         Add a new client {" "}
                         <Button
@@ -229,10 +232,7 @@ export default function InvoiceForm({
                         }}
                         required
                       >
-                        <SelectTrigger
-                          id="status-select"
-                          aria-invalid={isInvalid}
-                        >
+                        <SelectTrigger id="status-select" aria-invalid={isInvalid} >
                           <SelectValue placeholder="Select Status">
                             {status.find(c => c.value === field.state.value)?.label}
                           </SelectValue>
@@ -247,9 +247,7 @@ export default function InvoiceForm({
                           </SelectGroup>
                         </SelectContent>
                       </Select>
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
                     </Field>
                   );
                 }}
@@ -260,8 +258,7 @@ export default function InvoiceForm({
               <form.Field
                 name="issueDate"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor="issue-date-input">
@@ -278,15 +275,10 @@ export default function InvoiceForm({
                           <Calendar
                             mode="single"
                             selected={field.state.value}
-                            onSelect={(e) => {
-                              if (e) field.handleChange(e);
-                            }}
-                          />
+                            onSelect={(e) => { if (e) field.handleChange(e); }} />
                         </PopoverContent>
                       </Popover>
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
                     </Field>
                   );
                 }}
@@ -295,8 +287,7 @@ export default function InvoiceForm({
               <form.Field
                 name="dueDate"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor="issue-date-input">
@@ -313,15 +304,11 @@ export default function InvoiceForm({
                           <Calendar
                             mode="single"
                             selected={field.state.value}
-                            onSelect={(e) => {
-                              if (e) field.handleChange(e);
-                            }}
+                            onSelect={(e) => { if (e) field.handleChange(e); }}
                           />
                         </PopoverContent>
                       </Popover>
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
                     </Field>
                   );
                 }}
@@ -357,24 +344,19 @@ export default function InvoiceForm({
                 <form.Field
                   name="taxRate"
                   children={(field) => {
-                    const isInvalid =
-                      field.state.meta.isTouched && !field.state.meta.isValid;
+                    const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                     return (
                       <Field data-invalid={isInvalid} className="w-16">
                         <Input
                           id="tax-rate-input"
                           name={field.name}
                           value={field.state.value}
-                          onChange={(e) =>
-                            field.handleChange(Number(e.target.value))
-                          }
+                          onChange={(e) => field.handleChange(Number(e.target.value))}
                           className="w-16 h-8 text-center"
                           min="0"
                           max="100"
                         />
-                        {isInvalid && (
-                          <FieldError errors={field.state.meta.errors} />
-                        )}
+                        {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
                       </Field>
                     );
                   }}
@@ -384,11 +366,7 @@ export default function InvoiceForm({
               {/* Tax amount */}
               <div>
                 <form.Subscribe
-                  selector={(s) => {
-                    const subtotal = s.values.items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0)
-                    const taxAmount = subtotal * ((s.values.taxRate) / 100)
-                    return taxAmount
-                  }}
+                  selector={(s) => calculateTaxAmount(s.values.items, s.values.taxRate)}
                   children={(taxAmount) => {
                     return (
                       <Field>
@@ -403,11 +381,7 @@ export default function InvoiceForm({
             </div>
             {/* Total amount to pay */}
             <form.Subscribe
-              selector={(s) => {
-                const subtotal = s.values.items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0)
-                const taxAmount = subtotal * ((s.values.taxRate) / 100)
-                return subtotal + taxAmount
-              }}
+              selector={(s) => calculateTotalAmount(s.values.items, s.values.taxRate)}
               children={(total) => {
                 return (
                   <div className="flex justify-between pt-4 border-t border-border">
@@ -428,7 +402,6 @@ export default function InvoiceForm({
           </CardContent>
         </Card>
       </div>
-
       {/* Line Items */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
@@ -441,17 +414,12 @@ export default function InvoiceForm({
         <CardContent>
           <div className="space-y-4">
             <FieldGroup>
-              {items.map((item, idx) => (
-                <Field
-                  key={idx}
-                  orientation="responsive"
-                  className="grid md:grid-cols-12 gap-4"
-                >
+              {items.map((_, idx) => (
+                <Field key={idx} orientation="responsive" className="grid md:grid-cols-12 gap-4" >
                   <form.Field
                     name={`items[${idx}].description`}
                     children={(field) => {
-                      const isInvalid =
-                        field.state.meta.isTouched && !field.state.meta.isValid;
+                      const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                       return (
                         <Field data-invalid={isInvalid} className="col-span-5">
                           <FieldLabel htmlFor={`line-item-description-${idx}`}>
@@ -469,9 +437,7 @@ export default function InvoiceForm({
                             placeholder="Item description"
                             autoComplete="off"
                           />
-                          {isInvalid && (
-                            <FieldError errors={field.state.meta.errors} />
-                          )}
+                          {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
                         </Field>
                       );
                     }}
@@ -479,8 +445,7 @@ export default function InvoiceForm({
                   <form.Field
                     name={`items[${idx}].quantity`}
                     children={(field) => {
-                      const isInvalid =
-                        field.state.meta.isTouched && !field.state.meta.isValid;
+                      const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                       return (
                         <Field data-invalid={isInvalid} className="col-span-2">
                           <FieldLabel htmlFor={`line-item-quantity-${idx}`}>
@@ -493,14 +458,10 @@ export default function InvoiceForm({
                             name={field.name}
                             value={field.state.value}
                             onBlur={field.handleBlur}
-                            onChange={(e) =>
-                              field.handleChange(Number(e.target.value))
-                            }
+                            onChange={(e) => field.handleChange(Number(e.target.value))}
                             aria-invalid={isInvalid}
                           />
-                          {isInvalid && (
-                            <FieldError errors={field.state.meta.errors} />
-                          )}
+                          {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
                         </Field>
                       );
                     }}
@@ -522,14 +483,10 @@ export default function InvoiceForm({
                             name={field.name}
                             value={field.state.value}
                             onBlur={field.handleBlur}
-                            onChange={(e) =>
-                              field.handleChange(Number(e.target.value))
-                            }
+                            onChange={(e) => field.handleChange(Number(e.target.value))}
                             aria-invalid={isInvalid}
                           />
-                          {isInvalid && (
-                            <FieldError errors={field.state.meta.errors} />
-                          )}
+                          {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
                         </Field>
                       );
                     }}
@@ -537,11 +494,8 @@ export default function InvoiceForm({
                   <form.Subscribe
                     selector={(s) => {
                       const item = s.values.items[idx]
-                      if (item && item.quantity && item.unitPrice) {
-                        return item.quantity * item.unitPrice
-                      } else {
-                        return 0
-                      }
+                      if (item && item.quantity && item.unitPrice) return item.quantity * item.unitPrice
+                      else return 0
                     }}
                     children={(total) => {
                       return (
@@ -562,7 +516,7 @@ export default function InvoiceForm({
                         type="button"
                         variant="destructive"
                         size="icon"
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => removeItem(idx)}
                         disabled={items.length === 1}
                         className="h-9 w-9"
                       >
@@ -586,8 +540,7 @@ export default function InvoiceForm({
           <form.Field
             name="notes"
             children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
                   <Textarea
@@ -607,11 +560,7 @@ export default function InvoiceForm({
       </Card>
 
       <div className="flex gap-4 justify-end">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.history.back()}
-        >
+        <Button type="button" variant="outline" onClick={() => router.history.back()} >
           Cancel
         </Button>
         <Button type="submit" form="create-invoice-form">

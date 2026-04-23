@@ -1,12 +1,18 @@
 import { Hono } from "hono";
-import { Bindings } from "@/lib/types";
+import { Bindings, ResponsePayload } from "@/lib/types";
 import { z } from "zod"
 import { zValidator } from "@hono/zod-validator";
+import { verify } from "hono/utils/jwt/jwt";
+import { getCookie } from "hono/cookie";
+import { drizzle } from "drizzle-orm/d1";
+import { eq, and } from "drizzle-orm";
+import { invoices } from "@/db/schema";
+import { generateInvoiceNumber } from "@/lib/utils";
 
-const invoiceRouteV1 = new Hono<{ Bindings: Bindings }>().basePath("/invoices")
+const invoiceRouteV1 = new Hono<{ Bindings: Bindings }>()
 
 const invoiceFormSchema = z.object({
-    clientId: z.number(),
+    clientId: z.string(),
     issueDate: z.coerce.date(),
     dueDate: z.coerce.date(),
     taxRate: z.number().min(0).max(100),
@@ -22,14 +28,63 @@ const invoiceFormSchema = z.object({
 });
 
 invoiceRouteV1.get("/", async (c) => {
+    const clientId = c.req.param("id")
+    if (!clientId) return c.json({ message: "No client Id" }, 400)
 
-    return c.json({ message: "All Invoices" }, 200)
+    const db = drizzle(c.env.DB)
+
+    const refreshToken = getCookie(c, "refresh_token");
+    if (!refreshToken) return c.json({ message: "No refresh token" }, 401)
+
+    const secret = c.env.JWT_SECRET;
+    if (!secret) {
+        console.log("JWT secret not configured")
+        return c.json({ message: "Internal Server Error" }, 500)
+    }
+
+    // TODO: Better error handling
+    const decoded = (await verify(refreshToken, secret, "HS256")) as ResponsePayload
+
+    // TODO: Better error handling
+    const result = await db.select().from(invoices).where(
+        and(
+            eq(invoices.clientId, clientId),
+            eq(invoices.deleted, false)
+        )
+    )
+
+    return c.json({ message: "All Invoices", data: result }, 200)
 })
 
-invoiceRouteV1.post("/create", zValidator("json", invoiceFormSchema), (c) => {
+invoiceRouteV1.post("/create", zValidator("json", invoiceFormSchema), async (c) => {
+    const db = drizzle(c.env.DB)
     const data = c.req.valid("json")
-    console.log(data)
-    return c.json({ message: "Invoice created" })
+
+    const refreshToken = getCookie(c, "refresh_token");
+    if (!refreshToken) return c.json({ message: "No refresh token" }, 401)
+
+    const secret = c.env.JWT_SECRET;
+    if (!secret) {
+        console.log("JWT secret not configured")
+        return c.json({ message: "Internal Server Error" }, 500)
+    }
+
+    // TODO: Better error handling
+    const decoded = (await verify(refreshToken, secret, "HS256")) as ResponsePayload
+
+    // TODO: Better error handling
+    await db.insert(invoices).values({
+        id: "INV-" + generateInvoiceNumber(),
+        clientId: data.clientId,
+        issueDate: data.issueDate,
+        dueDate: data.dueDate,
+        status: data.status,
+        taxRate: data.taxRate,
+        items: data.items,
+        notes: data.notes,
+    })
+
+    return c.json({ message: "Invoice created" }, 200)
 })
 
 export default invoiceRouteV1;
