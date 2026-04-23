@@ -89,7 +89,7 @@ export default function InvoicesTable({ invoices, onDelete, onStatusChange, onDo
           <TableHeader>
             <TableRow>
               <TableHead>Invoice</TableHead>
-              <TableHead className="hidden sm:table-cell">Client</TableHead>
+              {/*<TableHead className="hidden sm:table-cell">Client</TableHead>*/}
               <TableHead className="hidden md:table-cell">Date</TableHead>
               <TableHead className="hidden lg:table-cell">Due Date</TableHead>
               <TableHead>Amount</TableHead>
@@ -98,112 +98,114 @@ export default function InvoicesTable({ invoices, onDelete, onStatusChange, onDo
             </TableRow>
           </TableHeader>
           <TableBody>
-            {invoices.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={7}
-                  className="h-32 text-center text-muted-foreground"
-                >
-                  No invoices found. Create your first invoice to get started.
-                </TableCell>
-              </TableRow>
-            ) : (
-              invoices.map((invoice) => (
-                <TableRow key={invoice.id}>
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <span className="font-medium">
-                        {invoice.invoiceNumber}
-                      </span>
-                      {/*<span className="text-sm text-muted-foreground sm:hidden">
-                        {invoice.client.name}
-                      </span>*/}
-                    </div>
-                  </TableCell>
-                  <TableCell className="hidden sm:table-cell">
-                    {/*<span className="font-medium">{invoice.client.name}</span>*/}
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell text-sm">
-                    {format(new Date(invoice.issueDate), "MMM d, yyyy")}
-                  </TableCell>
-                  <TableCell className="hidden lg:table-cell text-sm">
-                    {format(new Date(invoice.dueDate), "MMM d, yyyy")}
-                  </TableCell>
-                  <TableCell className="font-semibold">
-                    {formatCurrency(calculateTotalAmount(invoice.items, invoice.taxRate))}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={getStatusVariant(invoice.status)}
-                      className="capitalize"
+            {invoices && (
+              <>
+                {invoices.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={7}
+                      className="h-32 text-center text-muted-foreground"
                     >
-                      {invoice.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Open menu</span>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-44">
-                        <DropdownMenuItem
-                          onClick={() =>
-                            navigate({
-                              to: "/clients/$clientId/invoices/$invoiceId",
-                              params: { invoiceId: invoice.id.toString(), clientId },
-                            })
-                          }
+                      No invoices found. Create your first invoice to get started.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  invoices.map((invoice) => (
+                    <TableRow key={invoice.id}>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <span className="font-medium">
+                            {invoice.id}
+                          </span>
+                        </div>
+                      </TableCell>
+                      {/*<TableCell className="hidden sm:table-cell">*/}
+                      {/*<span className="font-medium">{invoice.client.name}</span>*/}
+                      {/*</TableCell>*/}
+                      <TableCell className="hidden md:table-cell text-sm">
+                        {format(new Date(invoice.issueDate), "MMM d, yyyy")}
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell text-sm">
+                        {format(new Date(invoice.dueDate), "MMM d, yyyy")}
+                      </TableCell>
+                      <TableCell className="font-semibold">
+                        {formatCurrency(calculateTotalAmount(invoice.items, invoice.taxRate))}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={getStatusVariant(invoice.status)}
+                          className="capitalize"
                         >
-                          <Eye className="mr-2 h-4 w-4" />
-                          View
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() =>
-                            navigate({
-                              to: "/clients/$clientId/invoices/$invoiceId/edit",
-                              params: { invoiceId: invoice.id.toString(), clientId },
-                            })
-                          }
-                        >
-                          <Pencil className="mr-2 h-4 w-4" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onDownload(invoice)}>
-                          <Download className="mr-2 h-4 w-4" />
-                          Download PDF
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        {/*{invoice.status === "draft" && (
-                          <DropdownMenuItem
-                            onClick={() => onStatusChange(invoice.id, "sent")}
-                          >
-                            <Send className="mr-2 h-4 w-4" />
-                            Mark as Sent
-                          </DropdownMenuItem>
-                        )}
-                        {(invoice.status === "sent" ||
-                          invoice.status === "overdue") && (
+                          {invoice.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger>
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Open menu</span>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-44">
                             <DropdownMenuItem
-                              onClick={() => onStatusChange(invoice.id, "paid")}
+                              onClick={() =>
+                                navigate({
+                                  to: "/clients/$clientId/invoices/$invoiceId",
+                                  params: { invoiceId: invoice.id.toString(), clientId },
+                                })
+                              }
                             >
-                              <CheckCircle className="mr-2 h-4 w-4" />
-                              Mark as Paid
+                              <Eye className="mr-2 h-4 w-4" />
+                              View
                             </DropdownMenuItem>
-                          )}*/}
-                        {/*<DropdownMenuSeparator />*/}
-                        <DropdownMenuItem
-                          onClick={() => setDeleteId(invoice.id)}
-                          className="text-destructive"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))
+                            <DropdownMenuItem
+                              onClick={() =>
+                                navigate({
+                                  to: "/clients/$clientId/invoices/$invoiceId/edit",
+                                  params: { invoiceId: invoice.id.toString(), clientId },
+                                })
+                              }
+                            >
+                              <Pencil className="mr-2 h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onDownload(invoice)}>
+                              <Download className="mr-2 h-4 w-4" />
+                              Download PDF
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            {/*{invoice.status === "draft" && (
+                              <DropdownMenuItem
+                                onClick={() => onStatusChange(invoice.id, "sent")}
+                              >
+                                <Send className="mr-2 h-4 w-4" />
+                                Mark as Sent
+                              </DropdownMenuItem>
+                            )}
+                            {(invoice.status === "sent" ||
+                              invoice.status === "overdue") && (
+                                <DropdownMenuItem
+                                  onClick={() => onStatusChange(invoice.id, "paid")}
+                                >
+                                  <CheckCircle className="mr-2 h-4 w-4" />
+                                  Mark as Paid
+                                </DropdownMenuItem>
+                              )}*/}
+                            {/*<DropdownMenuSeparator />*/}
+                            <DropdownMenuItem
+                              onClick={() => setDeleteId(invoice.id)}
+                              className="text-destructive"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+
+              </>
             )}
           </TableBody>
         </Table>

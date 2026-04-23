@@ -41,9 +41,10 @@ function RouteComponent() {
         if (!response.ok) throw new Error("Failed to fetch client")
 
         const result = await response.json()
-        console.log(result)
+        // console.log(result)
+        // TODO: Zod validate
         setClientInfo(result.clientInfo)
-        setInvoices(result.invoice)
+        setInvoices(result.invoices)
       } catch (error) {
         console.log(error)
         toast.error("Failed to fetch invoices")
@@ -67,13 +68,12 @@ function RouteComponent() {
           <p>{clientInfo.country}</p>
         </div>
       )}
-      <div className="flex">
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
-          <Button onClick={() => navigate({ to: "/clients/$clientId/invoices/new", params: { clientId } })}>
-            <Plus className="mr-2 h-4 w-4" />
-            Create Invoice
-          </Button>
-        </div>
+      <div>
+        <Button onClick={() => navigate({ to: "/clients/$clientId/invoices/new", params: { clientId } })}>
+          <Plus className="mr-2 h-4 w-4" />
+          Create Invoice
+        </Button>
+        <br />
         <InvoicesTable
           clientId={clientId}
           invoices={invoices}

@@ -9,7 +9,7 @@ import type { Client } from "@/lib/types";
 import * as z from "zod";
 
 const clientsResponseSchema = z.array(z.object({
-  id: z.number(),
+  id: z.string(),
   organizationId: z.number(),
   name: z.string(),
   email: z.string().email(),
@@ -48,7 +48,7 @@ function RouteComponent() {
     setClients((prev) => [...prev, client])
   }
 
-  const handleClientDelete = (clientId: number) => {
+  const handleClientDelete = (clientId: string) => {
     setClients((prev) => prev.filter(c => c.id !== clientId))
   }
 

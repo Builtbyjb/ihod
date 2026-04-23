@@ -5,7 +5,7 @@ import { zValidator } from "@hono/zod-validator";
 import { getCookie } from "hono/cookie";
 import { drizzle } from "drizzle-orm/d1";
 import { eq, and, sql, like } from "drizzle-orm";
-import { clients, invoices } from "@/db/schema";
+import { clients, invoices, members } from "@/db/schema";
 import { verify } from "hono/utils/jwt/jwt";
 import invoiceRouteV1 from "@/invoice/invoice-controller";
 
@@ -49,11 +49,14 @@ clientRouteV1.get("/", async (c) => {
     // TODO: Better error handling
     const decoded = (await verify(refreshToken, secret, "HS256")) as ResponsePayload;
 
+    const member = await db.select().from(members).where(eq(members.userId, decoded.userId))
+    if (member.length == 0) return c.json("User is not part of an organization", 400)
+
     // TODO: Better error handling
     const result = await db.select().from(clients)
         .where(
             and(
-                eq(clients.organizationId, decoded.organizationId),
+                eq(clients.organizationId, member[0].organizationId),
                 eq(clients.deleted, false)
             )
         );
@@ -110,10 +113,13 @@ clientRouteV1.post("/create", zValidator("json", clientFormSchema), async (c) =>
     //  TODO: Better error handling
     const decoded = (await verify(refreshToken, secret, "HS256")) as ResponsePayload;
 
+    const result = await db.select().from(members).where(eq(members.userId, decoded.userId))
+    if (result.length == 0) return c.json("User is not part of an organization", 400)
+
     //  TODO: Better error handling
     await db.insert(clients).values({
         id: crypto.randomUUID(),
-        organizationId: decoded.organizationId,
+        organizationId: result[0].organizationId,
         name: data.name,
         email: data.email,
         phone: data.phone,
@@ -196,10 +202,13 @@ clientRouteV1.post("/search", async (c) => {
     // TODO: Better error handling
     const decoded = (await verify(refreshToken, secret, "HS256")) as ResponsePayload
 
+    const member = await db.select().from(members).where(eq(members.userId, decoded.userId))
+    if (member.length == 0) return c.json("User is not part of an organization", 400)
+
     // TODO: Better error handling
     const result = await db.select().from(clients)
         .where(and(
-            eq(clients.organizationId, decoded.organizationId),
+            eq(clients.organizationId, member[0].organizationId),
             like(clients.name, `%${data.query}%`),
             eq(clients.deleted, false)
         ))
@@ -207,5 +216,5 @@ clientRouteV1.post("/search", async (c) => {
     return c.json({ data: result }, 200)
 })
 
-clientRouteV1.route("/:id/invoices", invoiceRouteV1)
+clientRouteV1.route("/:clientId/invoices", invoiceRouteV1)
 export default clientRouteV1;

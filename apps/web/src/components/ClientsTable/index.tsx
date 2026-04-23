@@ -33,12 +33,12 @@ import { Link } from "@tanstack/react-router";
 interface ClientsTableProps {
   onEdit: (client: Client) => void;
   clients: Client[];
-  deleteClient: (clientId: number) => void;
+  deleteClient: (clientId: string) => void;
 }
 
 const API_URL = import.meta.env.VITE_API_URL
 export default function ClientsTable({ onEdit, clients, deleteClient }: ClientsTableProps) {
-  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const handleDelete = async () => {
     if (deleteId) {
@@ -130,7 +130,7 @@ export default function ClientsTable({ onEdit, clients, deleteClient }: ClientsT
                         <span className="sr-only">Open menu</span>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <Link to="/clients/$clientId" params={{ clientId: client.id.toString() }}>
+                        <Link to="/clients/$clientId" params={{ clientId: client.id }}>
                           <DropdownMenuItem >
                             <Eye className="mr-2 h-4 w-4" />
                             View

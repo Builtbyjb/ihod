@@ -28,7 +28,6 @@ import { calculateTotalAmount, calculateTaxAmount } from "@/lib/utils";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const invoiceFormSchema = z.object({
-  clientId: z.number(),
   issueDate: z.date(),
   dueDate: z.date(),
   taxRate: z.number().min(0).max(100),
@@ -44,6 +43,7 @@ const invoiceFormSchema = z.object({
 });
 
 interface InvoiceFormProps {
+  clientInfo: Client | null;
   existingInvoice?: Invoice | null;
 }
 
@@ -56,7 +56,7 @@ const status = [
   { label: "Overdue", value: "overdue" }
 ]
 
-export default function InvoiceForm({ existingInvoice }: InvoiceFormProps) {
+export default function InvoiceForm({ clientInfo, existingInvoice }: InvoiceFormProps) {
   const navigate = useNavigate();
   const router = useRouter();
   const [clients, setClients] = useState<Client[]>([])
@@ -87,7 +87,6 @@ export default function InvoiceForm({ existingInvoice }: InvoiceFormProps) {
 
   const form = useForm({
     defaultValues: {
-      clientId: 0,
       issueDate: new Date(),
       dueDate: new Date(),
       taxRate: 0,
@@ -106,11 +105,14 @@ export default function InvoiceForm({ existingInvoice }: InvoiceFormProps) {
     },
     onSubmit: async ({ value }) => {
       try {
-        const response = await fetch(`${API_URL}/api/v1/invoices/create`, {
+        if (!clientInfo) throw new Error("Client Id not found")
+        const payload = { ...value, clientId: clientInfo.id }
+
+        const response = await fetch(`${API_URL}/api/v1/clients/${clientInfo.id}/invoices/create`, {
           method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(value)
+          body: JSON.stringify(payload)
         })
 
         if (!response.ok) throw new Error("Failed to create invoice")
@@ -168,54 +170,13 @@ export default function InvoiceForm({ existingInvoice }: InvoiceFormProps) {
           <CardContent className="space-y-4">
             {/* Select client */}
             <div className="flex gap-4">
-              <form.Field
-                name="clientId"
-                children={(field) => {
-                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-                  return (
-                    <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor="search-clients">Client</FieldLabel>
-                      <Combobox
-                        name={field.name}
-                        value={clients.find(c => c.id === field.state.value)?.name || ""}
-                        onValueChange={(e) => {
-                          if (e) field.handleChange(Number(e));
-                        }}
-                        items={clients}
-                      >
-                        <ComboboxInput
-                          id="search-clients"
-                          onChange={(e) => handleClientSearch(e.target.value)}
-                          placeholder="Search clients by name"
-                        />
-                        <ComboboxContent>
-                          <ComboboxEmpty>No Clients found.</ComboboxEmpty>
-                          <ComboboxList>
-                            {(client) => (
-                              <ComboboxItem key={client.id} value={client.id}>
-                                {client.name}
-                              </ComboboxItem>
-                            )}
-                          </ComboboxList>
-                        </ComboboxContent>
-                      </Combobox>
-                      <FieldDescription>
-                        Add a new client {" "}
-                        <Button
-                          onClick={() => navigate({ to: "/clients" })}
-                          variant="ghost"
-                          className="underline p-0 text-muted-foreground"
-                        >
-                          here
-                        </Button>
-                      </FieldDescription>
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
-                    </Field>
-                  );
-                }}
-              />
+              <Field>
+                <FieldContent>
+                  <h1 className="text-lg">{clientInfo?.name}</h1>
+                  <p className="text-muted-foreground">{clientInfo?.email}</p>
+                  <p className="text-muted-foreground">{clientInfo?.phone}</p>
+                </FieldContent>
+              </Field>
               <form.Field
                 name="status"
                 children={(field) => {

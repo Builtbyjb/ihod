@@ -44,6 +44,11 @@ export function calculateTaxAmount(items: InvoiceItem[], taxRate: number): numbe
     return taxAmount
 }
 
+export function calculateSubTotal(items: InvoiceItem[]): number {
+    const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0)
+    return subtotal
+}
+
 // const handleDownload = async (invoice: Invoice, InvoicePDF) => {
 //     const blob = await pdf(<InvoicePDF invoice={ invoice } />).toBlob();
 //     const url = URL.createObjectURL(blob);

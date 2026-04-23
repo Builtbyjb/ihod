@@ -115,14 +115,9 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
     const user = await db.select().from(users).where(eq(users.id, decoded.userId)).get();
     if (!user) return c.json({ message: "User not found" }, 404);
 
-    // Verify user is part of an organization
-    const member = await db.select().from(members).where(eq(members.userId, decoded.userId)).get()
-    if (!member) return c.json({ message: "Member not found" }, 404);
-
     const exp = 60 * 60 * 24 * 90; // Token expires in 90 days
     const payload: ResponsePayload = {
         userId: decoded.userId,
-        organizationId: member.organizationId,
         exp: Math.floor(Date.now() / 1000) + exp,
     };
 
@@ -139,7 +134,6 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
     const accessToken = await sign(
         {
             userId: decoded.userId,
-            organizationId: member.id,
             exp: Math.floor(Date.now() / 1000) + 60 * 30, // 30 minutes
         },
         secret,
@@ -167,14 +161,9 @@ authRouteV1.get("/refresh-token", async (c) => {
     // TODO: Handle verification failure
     const decoded = (await verify(refreshToken, secret, "HS256")) as ResponsePayload;
 
-    // Get organization id
-    const member = await db.select().from(members).where(eq(members.userId, decoded.userId)).get()
-    if (!member) return c.json({ message: "User organization not found" }, 404);
-
     const accessToken = await sign(
         {
             userId: decoded.userId,
-            organizationId: member.organizationId,
             exp: Math.floor(Date.now() / 1000) + 60 * 30, // 30 minutes
         },
         secret,

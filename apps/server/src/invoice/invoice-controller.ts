@@ -6,7 +6,7 @@ import { verify } from "hono/utils/jwt/jwt";
 import { getCookie } from "hono/cookie";
 import { drizzle } from "drizzle-orm/d1";
 import { eq, and } from "drizzle-orm";
-import { invoices } from "@/db/schema";
+import { clients, invoices } from "@/db/schema";
 import { generateInvoiceNumber } from "@/lib/utils";
 
 const invoiceRouteV1 = new Hono<{ Bindings: Bindings }>()
@@ -28,7 +28,7 @@ const invoiceFormSchema = z.object({
 });
 
 invoiceRouteV1.get("/", async (c) => {
-    const clientId = c.req.param("id")
+    const clientId = c.req.param("clientId")
     if (!clientId) return c.json({ message: "No client Id" }, 400)
 
     const db = drizzle(c.env.DB)
@@ -56,6 +56,39 @@ invoiceRouteV1.get("/", async (c) => {
     return c.json({ message: "All Invoices", data: result }, 200)
 })
 
+invoiceRouteV1.get("/:invoiceId", async (c) => {
+    const clientId = c.req.param("clientId")
+    if (!clientId) return c.json({ message: "No client Id" }, 400)
+
+    const invoiceId = c.req.param("invoiceId")
+    if (!invoiceId) return c.json({ message: "No invoice Id" }, 400)
+
+    const db = drizzle(c.env.DB)
+
+    const refreshToken = getCookie(c, "refresh_token");
+    if (!refreshToken) return c.json({ message: "No refresh token" }, 401)
+
+    const secret = c.env.JWT_SECRET;
+    if (!secret) {
+        console.log("JWT secret not configured")
+        return c.json({ message: "Internal Server Error" }, 500)
+    }
+
+    // TODO: Better error handling
+    (await verify(refreshToken, secret, "HS256")) as ResponsePayload
+
+    const clientResult = await db.select().from(clients).where(eq(clients.id, clientId)).get()
+    if (!clientResult) return c.json({ message: "Client not found" }, 404)
+
+    const invoiceResult = await db.select().from(invoices).where(and(
+        eq(invoices.clientId, clientId),
+        eq(invoices.id, invoiceId)
+    )).get()
+    if (!invoiceResult) return c.json({ message: "Invoice not found" }, 404)
+
+    return c.json({ invoice: invoiceResult, client: clientResult }, 200)
+})
+
 invoiceRouteV1.post("/create", zValidator("json", invoiceFormSchema), async (c) => {
     const db = drizzle(c.env.DB)
     const data = c.req.valid("json")
@@ -70,11 +103,11 @@ invoiceRouteV1.post("/create", zValidator("json", invoiceFormSchema), async (c) 
     }
 
     // TODO: Better error handling
-    const decoded = (await verify(refreshToken, secret, "HS256")) as ResponsePayload
+    (await verify(refreshToken, secret, "HS256")) as ResponsePayload
 
     // TODO: Better error handling
     await db.insert(invoices).values({
-        id: "INV-" + generateInvoiceNumber(),
+        id: "inv-" + generateInvoiceNumber(),
         clientId: data.clientId,
         issueDate: data.issueDate,
         dueDate: data.dueDate,
