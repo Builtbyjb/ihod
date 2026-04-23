@@ -59,7 +59,7 @@ export default function ClientForm({ open, onOpenChange, client, addClient, edit
     }
   }
 
-  const handleClientUpdate = async (id: number, value: ClientFormType) => {
+  const handleClientUpdate = async (id: string, value: ClientFormType) => {
     try {
       if (!client) throw new Error("Cannot edit null client object")
 

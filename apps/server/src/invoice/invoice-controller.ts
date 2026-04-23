@@ -5,7 +5,7 @@ import { zValidator } from "@hono/zod-validator";
 import { verify } from "hono/utils/jwt/jwt";
 import { getCookie } from "hono/cookie";
 import { drizzle } from "drizzle-orm/d1";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 import { clients, invoices } from "@/db/schema";
 import { generateInvoiceNumber } from "@/lib/utils";
 
@@ -118,6 +118,36 @@ invoiceRouteV1.post("/create", zValidator("json", invoiceFormSchema), async (c) 
     })
 
     return c.json({ message: "Invoice created" }, 200)
+})
+
+invoiceRouteV1.put("/:invoiceId/edit", zValidator("json", invoiceFormSchema), async (c) => {
+    const invoiceId = c.req.param("invoiceId")
+    const db = drizzle(c.env.DB)
+    const data = c.req.valid("json")
+    const refreshToken = getCookie(c, "refresh_token");
+    if (!refreshToken) return c.json({ message: "No refresh token" }, 401)
+
+    const secret = c.env.JWT_SECRET;
+    if (!secret) {
+        console.log("JWT secret not configured")
+        return c.json({ message: "Internal Server Error" }, 500)
+    }
+
+    // TODO: Better error handling
+    (await verify(refreshToken, secret, "HS256")) as ResponsePayload
+
+    // TODO: Better error handling
+    await db.update(invoices).set({
+        issueDate: data.issueDate,
+        dueDate: data.dueDate,
+        status: data.status,
+        taxRate: data.taxRate,
+        items: data.items,
+        notes: data.notes,
+        updatedAt: sql`(unixepoch())`
+    }).where(eq(invoices.id, invoiceId))
+
+    return c.json({ message: "Invoice Updated" }, 200)
 })
 
 export default invoiceRouteV1;
