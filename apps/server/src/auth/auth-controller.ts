@@ -169,13 +169,31 @@ authRouteV1.get("/refresh-token", async (c) => {
         secret,
     );
 
-    const response = {
-        message: "Token refreshed",
-        accessToken: accessToken,
+    return c.json({ message: "Token refreshed", accessToken: accessToken })
+});
+
+authRouteV1.get("/verify-setup-completed", async (c) => {
+    const db = drizzle(c.env.DB);
+
+    const refreshToken = getCookie(c, "refresh_token");
+    if (!refreshToken) return c.json({ message: "No refresh token" }, 401);
+
+    const secret = c.env.JWT_SECRET;
+    if (!secret) {
+        console.error("JWT secret not configured");
+        return c.json({ message: "Internal server error" }, 500);
     }
 
-    return c.json(response);
-});
+    // TODO: Handle verification failure
+    const decoded = (await verify(refreshToken, secret, "HS256")) as ResponsePayload;
+
+    // verify setupCompleted
+    const result = await db.select({ setCompleted: users.setupCompleted }).from(users).where(eq(users.id, decoded.userId)).get()
+    if (!result) return c.json({ message: "User not found" }, 404)
+    if (!result.setCompleted) return c.json({ message: "Profile setup required" }, 400)
+
+    return c.json({ message: "Setup completed" }, 200)
+})
 
 authRouteV1.get("/logout", (c) => {
     deleteCookie(c, "refresh_token");

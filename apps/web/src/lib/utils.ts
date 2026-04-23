@@ -32,6 +32,23 @@ export async function authenticateUser(context: Context): Promise<boolean> {
     }
 }
 
+export async function verifySetupCompleted(): Promise<boolean> {
+    const API_URL = import.meta.env.VITE_API_URL
+    try {
+        const response = await fetch(`${API_URL}/api/v1/auth/verify-setup-completed`, {
+            method: "GET",
+            credentials: "include"
+        })
+
+        if (!response.ok) return false
+
+        return true
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
 export function calculateTotalAmount(items: InvoiceItem[], taxRate: number): number {
     const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0)
     const taxAmount = subtotal * ((taxRate) / 100)
