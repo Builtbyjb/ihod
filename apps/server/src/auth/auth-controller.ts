@@ -115,14 +115,9 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
     const user = await db.select().from(users).where(eq(users.id, decoded.userId)).get();
     if (!user) return c.json({ message: "User not found" }, 404);
 
-    // Verify user is part of an organization
-    const organization = await db.select().from(members).where(eq(members.userId, decoded.userId)).get()
-    if (!organization) return c.json({ message: "User organization not found" }, 404);
-
     const exp = 60 * 60 * 24 * 90; // Token expires in 90 days
     const payload: ResponsePayload = {
         userId: decoded.userId,
-        organizationId: organization.id,
         exp: Math.floor(Date.now() / 1000) + exp,
     };
 
@@ -139,7 +134,6 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
     const accessToken = await sign(
         {
             userId: decoded.userId,
-            organizationId: organization.id,
             exp: Math.floor(Date.now() / 1000) + 60 * 30, // 30 minutes
         },
         secret,
@@ -154,8 +148,9 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
 
 authRouteV1.get("/refresh-token", async (c) => {
     const db = drizzle(c.env.DB);
+
     const refreshToken = getCookie(c, "refresh_token");
-    if (!refreshToken) return c.json({ message: "No refresh token" }, 400);
+    if (!refreshToken) return c.json({ message: "No refresh token" }, 401);
 
     const secret = c.env.JWT_SECRET;
     if (!secret) {
@@ -166,26 +161,39 @@ authRouteV1.get("/refresh-token", async (c) => {
     // TODO: Handle verification failure
     const decoded = (await verify(refreshToken, secret, "HS256")) as ResponsePayload;
 
-    // Get organization id
-    const organization = await db.select().from(members).where(eq(members.userId, decoded.userId)).get()
-    if (!organization) return c.json({ message: "User organization not found" }, 404);
-
     const accessToken = await sign(
         {
             userId: decoded.userId,
-            organizationId: organization.id,
             exp: Math.floor(Date.now() / 1000) + 60 * 30, // 30 minutes
         },
         secret,
     );
 
-    const response = {
-        message: "Token refreshed",
-        accessToken: accessToken,
+    return c.json({ message: "Token refreshed", accessToken: accessToken })
+});
+
+authRouteV1.get("/verify-setup-completed", async (c) => {
+    const db = drizzle(c.env.DB);
+
+    const refreshToken = getCookie(c, "refresh_token");
+    if (!refreshToken) return c.json({ message: "No refresh token" }, 401);
+
+    const secret = c.env.JWT_SECRET;
+    if (!secret) {
+        console.error("JWT secret not configured");
+        return c.json({ message: "Internal server error" }, 500);
     }
 
-    return c.json(response);
-});
+    // TODO: Handle verification failure
+    const decoded = (await verify(refreshToken, secret, "HS256")) as ResponsePayload;
+
+    // verify setupCompleted
+    const result = await db.select({ setCompleted: users.setupCompleted }).from(users).where(eq(users.id, decoded.userId)).get()
+    if (!result) return c.json({ message: "User not found" }, 404)
+    if (!result.setCompleted) return c.json({ message: "Profile setup required" }, 400)
+
+    return c.json({ message: "Setup completed" }, 200)
+})
 
 authRouteV1.get("/logout", (c) => {
     deleteCookie(c, "refresh_token");

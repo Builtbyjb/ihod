@@ -11,7 +11,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
 
 function RouteComponent() {
   return (
@@ -103,7 +102,7 @@ function RouteComponent() {
           </CardContent>
         </Card>
 
-        <Card>
+        {/*<Card>
           <CardHeader>
             <CardTitle>Data Management</CardTitle>
             <CardDescription>Manage your application data</CardDescription>
@@ -119,7 +118,7 @@ function RouteComponent() {
               <Button variant="destructive">Clear All Data</Button>
             </div>
           </CardContent>
-        </Card>
+        </Card>*/}
 
         <div className="flex justify-end">
           <Button>Save Settings</Button>

@@ -23,57 +23,50 @@ const setupProfileSchema = z.object({
 
 const userRouteV1 = new Hono<{ Bindings: Bindings }>().basePath("/user");
 
-userRouteV1.post(
-    "/setup-profile",
-    zValidator("json", setupProfileSchema),
-    async (c) => {
-        const data = c.req.valid("json");
-        const db = drizzle(c.env.DB);
-        const refreshToken = getCookie(c, "refresh_token");
-        if (!refreshToken) return c.json({ message: "No refresh token" }, 401);
+userRouteV1.post("/setup-profile", zValidator("json", setupProfileSchema), async (c) => {
+    const data = c.req.valid("json");
+    const db = drizzle(c.env.DB);
 
-        const secret = c.env.JWT_SECRET;
-        if (!secret) {
-            console.error("JWT secret not configured");
-            return c.json({ message: "Internal server error" }, 500);
-        }
+    const refreshToken = getCookie(c, "refresh_token");
+    if (!refreshToken) return c.json({ message: "No refresh token" }, 401);
 
-        // TODO: Handle verification failure
-        const decoded = (await verify(
-            refreshToken,
-            secret,
-            "HS256",
-        )) as ResponsePayload;
+    const secret = c.env.JWT_SECRET;
+    if (!secret) {
+        console.error("JWT secret not configured");
+        return c.json({ message: "Internal server error" }, 500);
+    }
 
-        // TODO: Check if setupCompleted is already true
+    // TODO: Handle verification failure
+    const decoded = (await verify(refreshToken, secret, "HS256",)) as ResponsePayload;
+    // TODO: Check if setupCompleted is already true
 
-        // update user table
-        await db.update(users).set({
-            firstname: data.firstname,
-            lastname: data.lastname,
-            username: data.username,
-            setupCompleted: true,
-        }).where(eq(users.id, decoded.userId));
+    // update user table
+    await db.update(users).set({
+        firstname: data.firstname,
+        lastname: data.lastname,
+        username: data.username,
+        setupCompleted: true,
+    }).where(eq(users.id, decoded.userId));
 
-        // Create organization
-        const organization = await db.insert(organizations).values({
-            name: data.businessName,
-            type: data.businessType,
-            address: data.businessAddress,
-            city: data.city,
-            country: data.country,
-            currency: data.currency,
-        }).returning({ id: organizations.id }).get();
+    // Create organization
+    const organization = await db.insert(organizations).values({
+        name: data.businessName,
+        type: data.businessType,
+        address: data.businessAddress,
+        city: data.city,
+        country: data.country,
+        currency: data.currency,
+    }).returning({ id: organizations.id }).get();
 
-        // Create member
-        await db.insert(members).values({
-            userId: decoded.userId,
-            organizationId: organization.id,
-            roleId: 1,
-        });
+    // Create member
+    await db.insert(members).values({
+        userId: decoded.userId,
+        organizationId: organization.id,
+        roleId: 1,
+    });
 
-        return c.json({ message: "Profile setup completed" });
-    },
+    return c.json({ message: "Profile setup completed" });
+},
 );
 
 export default userRouteV1;
