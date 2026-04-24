@@ -1,5 +1,6 @@
 export interface Client {
     id: string;
+    organizationId: number;
     name: string;
     email: string;
     phone: string;
@@ -10,24 +11,21 @@ export interface Client {
 }
 
 export interface InvoiceItem {
-    id: string;
     description: string;
     quantity: number;
     unitPrice: number;
-    total: number;
 }
 
+export type InvoiceStatus = "draft" | "sent" | "paid" | "overdue";
+
 export interface Invoice {
-    id: string;
+    id: number;
     invoiceNumber: string;
     clientId: string;
     client: Client;
     items: InvoiceItem[];
-    subtotal: number;
     taxRate: number;
-    taxAmount: number;
-    total: number;
-    status: "draft" | "sent" | "paid" | "overdue";
+    status: InvoiceStatus;
     issueDate: string;
     dueDate: string;
     notes: string;
@@ -42,9 +40,10 @@ export interface DashboardStats {
 }
 
 export interface User {
-    id: string;
     username: string;
     email: string;
+    currency: string,
+    organizationName: string
 }
 
 export interface AuthState {
@@ -53,7 +52,7 @@ export interface AuthState {
     login: (email: string) => Promise<boolean>;
     logout: () => void;
     refreshToken: () => Promise<AuthResponse>;
-    verifyOtp: (otp: string) => Promise<OTPResponse>;
+    verifyOtp: (otp: string) => Promise<boolean>;
 }
 
 export interface Context {
@@ -62,8 +61,5 @@ export interface Context {
 
 export interface AuthResponse {
     accessToken: string;
-}
-
-export interface OTPResponse extends AuthResponse {
-    setupCompleted: boolean;
+    user: User
 }

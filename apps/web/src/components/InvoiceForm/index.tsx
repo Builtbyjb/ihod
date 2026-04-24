@@ -1,121 +1,138 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useRouter } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Plus, Trash2 } from "lucide-react";
-import type { Client, Invoice, InvoiceItem } from "@/lib/types";
-import { v4 as uuidv4 } from "uuid";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup } from "@/components/ui/select";
+import { Plus, Trash2, ChevronDownIcon } from "lucide-react";
+import type { Client, Invoice, InvoiceStatus } from "@/lib/types";
+import { useForm } from "@tanstack/react-form";
+import { toast } from "sonner";
+import * as z from "zod";
+import { Field, FieldLabel, FieldError, FieldContent, FieldTitle } from "@/components/ui/field";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { calculateTotalAmount, calculateTaxAmount } from "@/lib/utils";
+
+const API_URL = import.meta.env.VITE_API_URL;
+
+const invoiceFormSchema = z.object({
+  issueDate: z.date(),
+  dueDate: z.date(),
+  taxRate: z.number().min(0).max(100),
+  status: z.enum(["draft", "sent", "paid", "overdue"]),
+  items: z.array(
+    z.object({
+      description: z.string(),
+      quantity: z.number().positive(),
+      unitPrice: z.number().positive(),
+    }),
+  ),
+  notes: z.string(),
+});
 
 interface InvoiceFormProps {
-  clients: Client[];
-  invoiceNumber: string;
-  onSubmit: (invoice: Invoice) => void;
+  clientInfo: Client | null;
   existingInvoice?: Invoice | null;
+  invoiceId?: string,
 }
 
-export default function InvoiceForm({
-  clients,
-  invoiceNumber,
-  onSubmit,
-  existingInvoice,
-}: InvoiceFormProps) {
-  const navigate = useNavigate();
+type InvoiceForm = z.infer<typeof invoiceFormSchema>;
+
+const status = [
+  { label: "Draft", value: "draft" },
+  { label: "Sent", value: "sent" },
+  { label: "Paid", value: "paid" },
+  { label: "Overdue", value: "overdue" }
+]
+
+export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: InvoiceFormProps) {
   const router = useRouter();
 
-  const [clientId, setClientId] = useState(existingInvoice?.clientId || "");
-  const [issueDate, setIssueDate] = useState(
-    existingInvoice?.issueDate || new Date().toISOString().split("T")[0],
-  );
-  const [dueDate, setDueDate] = useState(existingInvoice?.dueDate || "");
-  const [taxRate, setTaxRate] = useState(
-    existingInvoice?.taxRate?.toString() || "10",
-  );
-  const [notes, setNotes] = useState(existingInvoice?.notes || "");
-  const [items, setItems] = useState<InvoiceItem[]>(
-    existingInvoice?.items || [
-      { id: uuidv4(), description: "", quantity: 1, unitPrice: 0, total: 0 },
-    ],
-  );
+  const handleCreate = async (value: InvoiceForm) => {
+    try {
+      if (!clientInfo) throw new Error("Client Id not found")
+
+      const payload = { ...value, clientId: clientInfo.id }
+
+      const response = await fetch(`${API_URL}/api/v1/clients/${clientInfo.id}/invoices/create`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+
+      if (!response.ok) throw new Error("Failed to create invoice")
+
+      toast.success("Invoice created")
+      form.reset()
+    } catch (error) {
+      console.log(error)
+      toast.error("Failed to create invoice: " + error.message);
+    }
+  }
+
+  const handleUpdate = async (value: InvoiceForm) => {
+    try {
+      if (!clientInfo) throw new Error("Client Id not found")
+      if (!invoiceId) throw new Error("Invoice Id not found")
+
+      const payload = { ...value, clientId: clientInfo.id }
+
+      const response = await fetch(`${API_URL}/api/v1/clients/${clientInfo.id}/invoices/${invoiceId}/edit`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+
+      if (!response.ok) throw new Error("Failed to create invoice")
+
+      toast.success("Invoice Edited")
+    } catch (error) {
+      console.log(error)
+      toast.error("Failed to create invoice: " + error.message);
+    }
+  }
+
+  const form = useForm({
+    defaultValues: {
+      issueDate: new Date(),
+      dueDate: new Date(),
+      taxRate: 0,
+      status: "draft" as InvoiceStatus,
+      items: [
+        {
+          description: "",
+          quantity: 0,
+          unitPrice: 0,
+        },
+      ],
+      notes: "",
+    },
+    validators: {
+      onSubmit: invoiceFormSchema,
+    },
+    onSubmit: async ({ value }) => {
+      if (!existingInvoice) await handleCreate(value)
+      else await handleUpdate(value)
+    },
+  });
 
   useEffect(() => {
-    if (issueDate && !dueDate) {
-      const date = new Date(issueDate);
-      date.setDate(date.getDate() + 30);
-      setDueDate(date.toISOString().split("T")[0]);
+    /* Set default values for invoice update  */
+    if (existingInvoice) {
+      form.setFieldValue("issueDate", new Date(existingInvoice.issueDate));
+      form.setFieldValue("dueDate", new Date(existingInvoice.dueDate));
+      form.setFieldValue("status", existingInvoice.status);
+      form.setFieldValue("items", existingInvoice.items);
+      form.setFieldValue("taxRate", existingInvoice.taxRate);
+      form.setFieldValue("items", existingInvoice.items);
+      form.setFieldValue("notes", existingInvoice.notes);
     }
-  }, [issueDate, dueDate]);
-
-  const addItem = () => {
-    setItems([
-      ...items,
-      { id: uuidv4(), description: "", quantity: 1, unitPrice: 0, total: 0 },
-    ]);
-  };
-
-  const removeItem = (id: string) => {
-    if (items.length > 1) {
-      setItems(items.filter((item) => item.id !== id));
-    }
-  };
-
-  const updateItem = (
-    id: string,
-    field: keyof InvoiceItem,
-    value: string | number,
-  ) => {
-    setItems(
-      items.map((item) => {
-        if (item.id === id) {
-          const updated = { ...item, [field]: value };
-          if (field === "quantity" || field === "unitPrice") {
-            updated.total = updated.quantity * updated.unitPrice;
-          }
-          return updated;
-        }
-        return item;
-      }),
-    );
-  };
-
-  const subtotal = items.reduce((sum, item) => sum + item.total, 0);
-  const taxAmount = subtotal * (parseFloat(taxRate) / 100);
-  const total = subtotal + taxAmount;
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const client = clients.find((c) => c.id === clientId);
-    if (!client) return;
-
-    const invoice: Invoice = {
-      id: existingInvoice?.id || uuidv4(),
-      invoiceNumber: existingInvoice?.invoiceNumber || invoiceNumber,
-      clientId,
-      client,
-      items,
-      subtotal,
-      taxRate: parseFloat(taxRate),
-      taxAmount,
-      total,
-      status: existingInvoice?.status || "draft",
-      issueDate,
-      dueDate,
-      notes,
-      createdAt: existingInvoice?.createdAt || new Date().toISOString(),
-    };
-
-    onSubmit(invoice);
-    navigate({ to: "/invoices" });
-  };
+  }, [existingInvoice, form])
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -125,223 +142,390 @@ export default function InvoiceForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form
+      id="create-invoice-form"
+      onSubmit={(e) => {
+        e.preventDefault();
+        form.handleSubmit();
+      }}
+      className="space-y-6"
+    >
       <div className="grid gap-6 lg:grid-cols-3">
+        {/* Invoice details card */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Invoice Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="invoiceNumber">Invoice Number</Label>
-                <Input
-                  id="invoiceNumber"
-                  value={existingInvoice?.invoiceNumber || invoiceNumber}
-                  disabled
-                  className="bg-muted"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="client">Client</Label>
-                <Select
-                  value={clientId}
-                  onValueChange={() => setClientId}
-                  required
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a client" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {clients.map((client) => (
-                      <SelectItem key={client.id} value={client.id}>
-                        {client.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            {/* Select client */}
+            <div className="flex gap-4">
+              <Field>
+                <FieldContent>
+                  <h1 className="text-lg">{clientInfo?.name}</h1>
+                  <p className="text-muted-foreground">{clientInfo?.email}</p>
+                  <p className="text-muted-foreground">{clientInfo?.phone}</p>
+                </FieldContent>
+              </Field>
+              <form.Field
+                name="status"
+                children={(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor="invoice-status-select">Invoice Status</FieldLabel>
+                      <Select
+                        name={field.name}
+                        value={field.state.value}
+                        onValueChange={(e) => {
+                          if (e) field.handleChange(e);
+                        }}
+                        required
+                      >
+                        <SelectTrigger id="status-select" aria-invalid={isInvalid} >
+                          <SelectValue placeholder="Select Status">
+                            {status.find(c => c.value === field.state.value)?.label}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {status.map((status) => (
+                              <SelectItem key={status.value} value={status.value}>
+                                {status.label}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                    </Field>
+                  );
+                }}
+              />
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="issueDate">Issue Date</Label>
-                <Input
-                  id="issueDate"
-                  type="date"
-                  value={issueDate}
-                  onChange={(e) => setIssueDate(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="dueDate">Due Date</Label>
-                <Input
-                  id="dueDate"
-                  type="date"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  required
-                />
-              </div>
+            <div className="grid gap-8 sm:grid-cols-2">
+              {/* Issue Date */}
+              <form.Field
+                name="issueDate"
+                children={(field) => {
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor="issue-date-input">
+                        Issue Date
+                      </FieldLabel>
+                      <Popover>
+                        <PopoverTrigger id="issue-date-input"
+                          className="flex border border-border items-center p-2 w-44 rounded-lg m-0 justify-between data-[empty=true]:text-muted-foreground"
+                        >
+                          {format(field.state.value, "PPP")}
+                          <ChevronDownIcon />
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.state.value}
+                            onSelect={(e) => { if (e) field.handleChange(e); }} />
+                        </PopoverContent>
+                      </Popover>
+                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                    </Field>
+                  );
+                }}
+              />
+              {/* Due date */}
+              <form.Field
+                name="dueDate"
+                children={(field) => {
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor="issue-date-input">
+                        Due Date
+                      </FieldLabel>
+                      <Popover>
+                        <PopoverTrigger id="issue-date-input"
+                          className="flex border border-border rounded-lg p-2 w-44 m-0 justify-between data-[empty=true]:text-muted-foreground"
+                        >
+                          {format(field.state.value, "PPP")}
+                          <ChevronDownIcon />
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.state.value}
+                            onSelect={(e) => { if (e) field.handleChange(e); }}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                    </Field>
+                  );
+                }}
+              />
             </div>
           </CardContent>
         </Card>
 
+        {/* Summary card */}
         <Card>
           <CardHeader>
             <CardTitle>Summary</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span>{formatCurrency(subtotal)}</span>
-            </div>
+            <form.Subscribe
+              selector={(s) => {
+                const subtotal = s.values.items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0)
+                return subtotal
+              }}
+              children={(subtotal) => {
+                return (
+                  <div className="flex justify-between pt-4 border-t border-border">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span>{formatCurrency(subtotal)}</span>
+                  </div>
+                )
+              }}
+            />
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground">Tax</span>
-                <Input
-                  type="number"
-                  value={taxRate}
-                  onChange={(e) => setTaxRate(e.target.value)}
-                  className="w-16 h-8 text-center"
-                  min="0"
-                  max="100"
+                {/* Tax Rate */}
+                <form.Field
+                  name="taxRate"
+                  children={(field) => {
+                    const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+                    return (
+                      <Field data-invalid={isInvalid} className="w-16">
+                        <Input
+                          id="tax-rate-input"
+                          name={field.name}
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(Number(e.target.value))}
+                          className="w-16 h-8 text-center"
+                          min="0"
+                          max="100"
+                        />
+                        {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                      </Field>
+                    );
+                  }}
                 />
                 <span className="text-muted-foreground">%</span>
               </div>
-              <span>{formatCurrency(taxAmount)}</span>
+              {/* Tax amount */}
+              <div>
+                <form.Subscribe
+                  selector={(s) => calculateTaxAmount(s.values.items, s.values.taxRate)}
+                  children={(taxAmount) => {
+                    return (
+                      <Field>
+                        <FieldContent>
+                          <span>{formatCurrency(taxAmount)}</span>
+                        </FieldContent>
+                      </Field>
+                    )
+                  }}
+                />
+              </div>
             </div>
-            <div className="flex justify-between pt-4 border-t border-border font-semibold">
-              <span>Total</span>
-              <span className="text-lg">{formatCurrency(total)}</span>
-            </div>
+            {/* Total amount to pay */}
+            <form.Subscribe
+              selector={(s) => calculateTotalAmount(s.values.items, s.values.taxRate)}
+              children={(total) => {
+                return (
+                  <div className="flex justify-between pt-4 border-t border-border">
+                    <div>
+                      <FieldLabel>Total</FieldLabel>
+                    </div>
+                    <div>
+                      <FieldContent>
+                        <span className="font-medium">
+                          {formatCurrency(total)}
+                        </span>
+                      </FieldContent>
+                    </div>
+                  </div>
+                )
+              }}
+            />
           </CardContent>
         </Card>
       </div>
-
+      {/* Line Items */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Line Items</CardTitle>
-          <Button type="button" variant="outline" size="sm" onClick={addItem}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Item
-          </Button>
-        </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="hidden sm:grid sm:grid-cols-12 gap-4 text-sm font-medium text-muted-foreground">
-              <div className="col-span-5">Description</div>
-              <div className="col-span-2 text-center">Quantity</div>
-              <div className="col-span-2 text-right">Unit Price</div>
-              <div className="col-span-2 text-right">Total</div>
-              <div className="col-span-1"></div>
-            </div>
-            {items.map((item) => (
-              <div
-                key={item.id}
-                className="grid sm:grid-cols-12 gap-4 items-start"
-              >
-                <div className="sm:col-span-5">
-                  <Label className="sm:hidden text-muted-foreground mb-1">
-                    Description
-                  </Label>
-                  <Input
-                    value={item.description}
-                    onChange={(e) =>
-                      updateItem(item.id, "description", e.target.value)
-                    }
-                    placeholder="Item description"
-                    required
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <Label className="sm:hidden text-muted-foreground mb-1">
-                    Quantity
-                  </Label>
-                  <Input
-                    type="number"
-                    value={item.quantity}
-                    onChange={(e) =>
-                      updateItem(
-                        item.id,
-                        "quantity",
-                        parseInt(e.target.value) || 0,
-                      )
-                    }
-                    min="1"
-                    className="text-center"
-                    required
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <Label className="sm:hidden text-muted-foreground mb-1">
-                    Unit Price
-                  </Label>
-                  <Input
-                    type="number"
-                    value={item.unitPrice}
-                    onChange={(e) =>
-                      updateItem(
-                        item.id,
-                        "unitPrice",
-                        parseFloat(e.target.value) || 0,
-                      )
-                    }
-                    min="0"
-                    step="0.01"
-                    className="text-right"
-                    required
-                  />
-                </div>
-                <div className="sm:col-span-2 flex items-center justify-end">
-                  <span className="font-medium">
-                    {formatCurrency(item.total)}
-                  </span>
-                </div>
-                <div className="sm:col-span-1 flex justify-end">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeItem(item.id)}
-                    disabled={items.length === 1}
-                    className="h-9 w-9"
-                  >
-                    <Trash2 className="h-4 w-4 text-muted-foreground" />
-                  </Button>
-                </div>
-              </div>
-            ))}
+            <form.Field name="items" mode="array">
+              {(field) => (
+                <>
+                  <div className="flex flex-row items-center justify-between mb-8">
+                    <FieldTitle className="text-lg">Line Items</FieldTitle>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => field.pushValue({ description: "", quantity: 0, unitPrice: 0 })}
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add Item
+                    </Button>
+                  </div>
+                  {field.state.value.map((_, idx) => (
+                    <Field key={idx} orientation="responsive" className="grid md:grid-cols-12 gap-4" >
+                      <form.Field
+                        name={`items[${idx}].description`}
+                        children={(field) => {
+                          const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+                          return (
+                            <Field data-invalid={isInvalid} className="col-span-5">
+                              <FieldLabel htmlFor={`line-item-description-${idx}`}>
+                                Description
+                              </FieldLabel>
+                              <Input
+                                className="w-auto"
+                                required
+                                id={`line-item-description-${idx}`}
+                                name={field.name}
+                                value={field.state.value}
+                                onBlur={field.handleBlur}
+                                onChange={(e) => field.handleChange(e.target.value)}
+                                aria-invalid={isInvalid}
+                                placeholder="Item description"
+                                autoComplete="off"
+                              />
+                              {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                            </Field>
+                          );
+                        }}
+                      />
+                      <form.Field
+                        name={`items[${idx}].quantity`}
+                        children={(field) => {
+                          const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+                          return (
+                            <Field data-invalid={isInvalid} className="col-span-2">
+                              <FieldLabel htmlFor={`line-item-quantity-${idx}`}>
+                                Quantity
+                              </FieldLabel>
+                              <Input
+                                className="w-auto"
+                                required
+                                id={`line-item-quantity-${idx}`}
+                                name={field.name}
+                                value={field.state.value}
+                                onBlur={field.handleBlur}
+                                onChange={(e) => field.handleChange(Number(e.target.value))}
+                                aria-invalid={isInvalid}
+                              />
+                              {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                            </Field>
+                          );
+                        }}
+                      />
+                      <form.Field
+                        name={`items[${idx}].unitPrice`}
+                        children={(field) => {
+                          const isInvalid =
+                            field.state.meta.isTouched && !field.state.meta.isValid;
+                          return (
+                            <Field data-invalid={isInvalid} className="col-span-2">
+                              <FieldLabel htmlFor={`line-item-unit-price-${idx}`}>
+                                Unit Price
+                              </FieldLabel>
+                              <Input
+                                className="w-auto"
+                                required
+                                id={`line-item-unit-price-${idx}`}
+                                name={field.name}
+                                value={field.state.value}
+                                onBlur={field.handleBlur}
+                                onChange={(e) => field.handleChange(Number(e.target.value))}
+                                aria-invalid={isInvalid}
+                              />
+                              {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                            </Field>
+                          );
+                        }}
+                      />
+                      <form.Subscribe
+                        selector={(s) => {
+                          const item = s.values.items[idx]
+                          if (item && item.quantity && item.unitPrice) return item.quantity * item.unitPrice
+                          else return 0
+                        }}
+                        children={(total) => {
+                          return (
+                            <Field className="col-span-2">
+                              <FieldLabel>Total</FieldLabel>
+                              <FieldContent>
+                                <span className="font-medium">
+                                  {formatCurrency(total)}
+                                </span>
+                              </FieldContent>
+                            </Field>
+                          )
+                        }}
+                      />
+                      <Field className="col-span-1">
+                        <FieldContent>
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            onClick={() => field.removeValue(idx)}
+                            disabled={field.state.value.length === 1}
+                            className="h-9 w-9"
+                          >
+                            <Trash2 className="h-4 w-4 " />
+                          </Button>
+                        </FieldContent>
+                      </Field>
+                    </Field>
+                  ))}
+                </>
+              )}
+            </form.Field>
           </div>
         </CardContent>
       </Card>
 
+      {/* Notes card */}
       <Card>
         <CardHeader>
           <CardTitle>Notes</CardTitle>
         </CardHeader>
         <CardContent>
-          <Textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Additional notes or payment instructions..."
-            rows={3}
+          <form.Field
+            name="notes"
+            children={(field) => {
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <Textarea
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder="Additional notes or payment instructions..."
+                    aria-invalid={isInvalid}
+                    rows={4}
+                  />
+                </Field>
+              );
+            }}
           />
         </CardContent>
       </Card>
 
       <div className="flex gap-4 justify-end">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.history.back()}
-        >
+        <Button type="button" variant="outline" onClick={() => router.history.back()} >
           Cancel
         </Button>
-        <Button type="submit" disabled={!clientId}>
+        <Button type="submit" form="create-invoice-form">
           {existingInvoice ? "Update Invoice" : "Create Invoice"}
         </Button>
       </div>
-    </form>
+    </form >
   );
 }

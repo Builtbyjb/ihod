@@ -7,11 +7,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -24,29 +24,45 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { MoreHorizontal, Pencil, Trash2, Mail, Phone } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, Mail, Phone, Eye } from "lucide-react";
 import type { Client } from "@/lib/types";
 import { format } from "date-fns";
+import { toast } from "sonner";
+import { Link } from "@tanstack/react-router";
 
 interface ClientsTableProps {
-  clients: Client[];
   onEdit: (client: Client) => void;
-  onDelete: (id: string) => void;
+  clients: Client[];
+  deleteClient: (clientId: string) => void;
 }
 
-export default function ClientsTable({
-  clients,
-  onEdit,
-  onDelete,
-}: ClientsTableProps) {
+const API_URL = import.meta.env.VITE_API_URL
+export default function ClientsTable({ onEdit, clients, deleteClient }: ClientsTableProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (deleteId) {
-      onDelete(deleteId);
-      setDeleteId(null);
-    }
-  };
+      try {
+        const response = await fetch(`${API_URL}/api/v1/clients/delete/${deleteId}`, {
+          method: "DELETE",
+          credentials: "include",
+        })
+
+        if (!response.ok) {
+          throw new Error("Failed to delete client")
+        }
+
+        deleteClient(deleteId)
+        toast.success("Client deleted")
+
+      } catch (error) {
+        console.log(error)
+        toast.error("Failed to delete client")
+      } finally {
+        setDeleteId(null);
+      }
+    };
+  }
 
   return (
     <>
@@ -58,7 +74,7 @@ export default function ClientsTable({
               <TableHead className="hidden sm:table-cell">Contact</TableHead>
               <TableHead className="hidden md:table-cell">Location</TableHead>
               <TableHead className="hidden lg:table-cell">Added</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
+              <TableHead className="w-12.5"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -110,16 +126,21 @@ export default function ClientsTable({
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Open menu</span>
-                        </Button>
+                        <MoreHorizontal className="h-4 w-4" />
+                        <span className="sr-only">Open menu</span>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        <Link to="/clients/$clientId" params={{ clientId: client.id }}>
+                          <DropdownMenuItem >
+                            <Eye className="mr-2 h-4 w-4" />
+                            View
+                          </DropdownMenuItem>
+                        </Link>
                         <DropdownMenuItem onClick={() => onEdit(client)}>
                           <Pencil className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem
                           onClick={() => setDeleteId(client.id)}
                           className="text-destructive"
@@ -133,9 +154,10 @@ export default function ClientsTable({
                 </TableRow>
               ))
             )}
+
           </TableBody>
         </Table>
-      </div>
+      </div >
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
@@ -146,7 +168,7 @@ export default function ClientsTable({
               undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="bg-background">
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}

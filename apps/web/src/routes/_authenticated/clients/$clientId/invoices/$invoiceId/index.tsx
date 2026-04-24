@@ -1,9 +1,5 @@
-import {
-  createFileRoute,
-  useNavigate,
-  useRouter,
-  useParams,
-} from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,23 +12,40 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useInvoices } from "@/lib/store";
-import { Spinner } from "@/components/ui/spinner";
 import { ArrowLeft, Download, Pencil, Send, CheckCircle } from "lucide-react";
 import { format } from "date-fns";
-import type { Invoice } from "@/lib/types";
+import type { Client, Invoice } from "@/lib/types";
 import { pdf } from "@react-pdf/renderer";
 import InvoicePDF from "@/components/InvoicePDF";
-import { Link } from "@tanstack/react-router";
+import { calculateSubTotal, calculateTaxAmount, calculateTotalAmount } from "@/lib/utils";
 
+const API_URL = import.meta.env.VITE_API_URL
 function RouteComponent() {
-  const { id } = useParams({ from: "/_authenticated/invoices/$id/" });
+  const { clientId, invoiceId } = Route.useParams()
   const navigate = useNavigate();
   const router = useRouter();
+  const [invoice, setInvoice] = useState<Invoice | null>(null)
+  const [client, setClient] = useState<Client | null>(null)
 
-  const { invoices, loading, updateInvoice } = useInvoices();
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/v1/clients/${clientId}/invoices/${invoiceId}`, {
+          method: "GET",
+          credentials: "include",
+        })
 
-  const invoice = invoices.find((inv) => inv.id === id);
+        if (!response.ok) throw new Error("Failed to get invoice")
+
+        // TODO: Zod validate
+        const result = await response.json()
+        setInvoice(result.invoice)
+        setClient(result.client)
+      } catch (error) {
+        console.log(error)
+      }
+    })()
+  }, [clientId, invoiceId])
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -57,8 +70,8 @@ function RouteComponent() {
   };
 
   const handleDownload = async () => {
-    if (!invoice) return;
-    const blob = await pdf(<InvoicePDF invoice={invoice} />).toBlob();
+    if (!invoice || !client) return;
+    const blob = await pdf(<InvoicePDF invoice={invoice} client={client} />).toBlob();
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -69,19 +82,20 @@ function RouteComponent() {
     URL.revokeObjectURL(url);
   };
 
-  const handleStatusChange = (status: Invoice["status"]) => {
-    if (invoice) {
-      updateInvoice(invoice.id, { status });
-    }
-  };
+  // const handleStatusChange = (status: Invoice["status"]) => {
+  //   if (invoice) {
+  //     // updateInvoice(invoice.id, { status });
+  //     console.log(invoice, status)
+  //   }
+  // };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner className="h-8 w-8" />
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="flex items-center justify-center min-h-screen">
+  //       <Spinner className="h-8 w-8" />
+  //     </div>
+  //   );
+  // }
 
   if (!invoice) {
     return (
@@ -93,7 +107,7 @@ function RouteComponent() {
             <p className="text-muted-foreground mb-4">
               The invoice you&apos;re looking for doesn&apos;t exist.
             </p>
-            <Button onClick={() => navigate({ to: "/invoices" })}>
+            <Button onClick={() => navigate({ to: "/clients/$clientId", params: { clientId } })}>
               Back to Invoices
             </Button>
           </div>
@@ -101,7 +115,6 @@ function RouteComponent() {
       </div>
     );
   }
-
   return (
     <div className="flex flex-col min-h-screen">
       <Header title={invoice.invoiceNumber} />
@@ -116,7 +129,7 @@ function RouteComponent() {
             Back
           </Button>
           <div className="flex flex-wrap gap-2">
-            {invoice.status === "draft" && (
+            {/*{invoice.status === "draft" && (
               <Button
                 variant="outline"
                 onClick={() => handleStatusChange("sent")}
@@ -133,12 +146,15 @@ function RouteComponent() {
                 <CheckCircle className="mr-2 h-4 w-4" />
                 Mark as Paid
               </Button>
-            )}
-            <Button variant="outline">
-              <Link to="/invoices/$id/edit" params={{ id: invoice.id }}>
-                <Pencil className="mr-2 h-4 w-4" />
-                Edit
-              </Link>
+            )}*/}
+            <Button
+              variant="outline"
+              onClick={() => navigate({
+                to: "/clients/$clientId/invoices/$invoiceId/edit",
+                params: { invoiceId, clientId }
+              })}>
+              <Pencil className="mr-2 h-4 w-4" />
+              Edit
             </Button>
             <Button onClick={handleDownload}>
               <Download className="mr-2 h-4 w-4" />
@@ -172,22 +188,22 @@ function RouteComponent() {
                   <h3 className="text-sm font-medium text-muted-foreground mb-2">
                     Bill To
                   </h3>
-                  <p className="font-semibold">{invoice.client.name}</p>
+                  <p className="font-semibold">{client?.name}</p>
                   <p className="text-sm text-muted-foreground">
-                    {invoice.client.email}
+                    {client?.email}
                   </p>
-                  {invoice.client.phone && (
+                  {client?.phone && (
                     <p className="text-sm text-muted-foreground">
-                      {invoice.client.phone}
+                      {client.phone}
                     </p>
                   )}
-                  {invoice.client.address && (
+                  {client?.address && (
                     <p className="text-sm text-muted-foreground">
-                      {invoice.client.address}
+                      {client.address}
                     </p>
                   )}
                   <p className="text-sm text-muted-foreground">
-                    {invoice.client.city}, {invoice.client.country}
+                    {client?.city}, {client?.country}
                   </p>
                 </div>
                 <div className="sm:text-right">
@@ -211,8 +227,8 @@ function RouteComponent() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {invoice.items.map((item) => (
-                      <TableRow key={item.id}>
+                    {invoice.items.map((item, idx) => (
+                      <TableRow key={idx}>
                         <TableCell className="font-medium">
                           {item.description}
                         </TableCell>
@@ -223,7 +239,7 @@ function RouteComponent() {
                           {formatCurrency(item.unitPrice)}
                         </TableCell>
                         <TableCell className="text-right">
-                          {formatCurrency(item.total)}
+                          {formatCurrency(item.unitPrice)}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -232,7 +248,7 @@ function RouteComponent() {
               </div>
 
               {invoice.notes && (
-                <div className="bg-muted p-4 rounded-lg">
+                <div className="bg-background p-4 rounded-lg">
                   <h3 className="text-sm font-medium mb-2">Notes</h3>
                   <p className="text-sm text-muted-foreground">
                     {invoice.notes}
@@ -249,18 +265,18 @@ function RouteComponent() {
             <CardContent className="space-y-4">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span>{formatCurrency(invoice.subtotal)}</span>
+                <span>{formatCurrency(calculateSubTotal(invoice.items))}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">
                   Tax ({invoice.taxRate}%)
                 </span>
-                <span>{formatCurrency(invoice.taxAmount)}</span>
+                <span>{formatCurrency(calculateTaxAmount(invoice.items, invoice.taxRate))}</span>
               </div>
               <div className="flex justify-between pt-4 border-t border-border">
                 <span className="font-semibold">Total</span>
                 <span className="text-xl font-bold">
-                  {formatCurrency(invoice.total)}
+                  {formatCurrency(calculateTotalAmount(invoice.items, invoice.taxRate))}
                 </span>
               </div>
             </CardContent>
@@ -268,9 +284,9 @@ function RouteComponent() {
         </div>
       </main>
     </div>
-  );
+  )
 }
 
-export const Route = createFileRoute("/_authenticated/invoices/$id/")({
+export const Route = createFileRoute('/_authenticated/clients/$clientId/invoices/$invoiceId/')({
   component: RouteComponent,
-});
+})

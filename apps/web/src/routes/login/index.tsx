@@ -1,27 +1,16 @@
 import { useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import * as z from "zod";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { ArrowLeft } from "lucide-react";
 import OTP from "@/components/OTP";
 import { useAuth } from "@/hooks/auth";
+import { authenticateUser } from "@/lib/utils";
 
 const emailFormSchema = z.object({
   email: z.string().email(),
@@ -42,21 +31,18 @@ function RouteComponent() {
     onSubmit: async ({ value }) => {
       try {
         const success = await login(value.email);
+        toast.success("Verification email sent");
         if (success) setIsVerified(true);
       } catch (error) {
         toast.error("Login failed: " + error.message);
         console.error(error);
       }
-      toast.success("Verification email sent");
     },
   });
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      <ArrowLeft
-        className="mb-8 w-12 h-12 hover:scale-110"
-        onClick={() => navigate({ to: "/" })}
-      />
+      <ArrowLeft className="mb-8 w-12 h-12 hover:scale-110" onClick={() => navigate({ to: "/" })} />
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-xl">Login</CardTitle>
@@ -74,11 +60,12 @@ function RouteComponent() {
               <form.Field
                 name="email"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor="email-input">Email</FieldLabel>
+                      <FieldLabel htmlFor="email-input">
+                        Email <span className="text-destructive">*</span>
+                      </FieldLabel>
                       <Input
                         required
                         id="email-input"
@@ -89,9 +76,7 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         autoComplete="email"
                       />
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
                     </Field>
                   );
                 }}
@@ -101,11 +86,7 @@ function RouteComponent() {
         </CardContent>
         <CardFooter className="bg-background">
           <Field orientation="horizontal">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => form.reset()}
-            >
+            <Button type="button" variant="outline" onClick={() => form.reset()}>
               Reset
             </Button>
             <Button type="submit" form="login-form">
@@ -115,7 +96,7 @@ function RouteComponent() {
         </CardFooter>
       </Card>
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 mt-4">
-        By clicking continue, you agree to our{" "}
+        By clicking Submit, you agree to our{" "}
         <Link to="/terms-of-service">Terms of Service</Link> and{" "}
         <Link to="/privacy-policy">Privacy Policy</Link>.
       </div>
@@ -127,5 +108,13 @@ function RouteComponent() {
 }
 
 export const Route = createFileRoute("/login/")({
+  beforeLoad: async ({ context }) => {
+    const isAuthenticated = await authenticateUser(context);
+    if (isAuthenticated) {
+      throw redirect({
+        to: "/dashboard",
+      });
+    }
+  },
   component: RouteComponent,
 });

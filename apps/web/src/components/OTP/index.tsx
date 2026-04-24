@@ -1,17 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/auth";
 
@@ -25,11 +15,7 @@ export default function OTP() {
     if (value.length == 8) {
       try {
         const response = await verifyOtp(value);
-        if (!response.setupCompleted) {
-          navigate({ to: "/setup-profile" });
-        } else {
-          navigate({ to: "/dashboard" });
-        }
+        if (response) navigate({ to: "/dashboard" });
       } catch (error) {
         toast.error("Error verifying OTP: " + error.message);
         console.error(error);
