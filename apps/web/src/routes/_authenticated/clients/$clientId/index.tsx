@@ -18,7 +18,7 @@ function RouteComponent() {
   const navigate = useNavigate();
 
   const handleInvoiceDelete = (invoiceId: number) => {
-    console.log(invoiceId)
+    setInvoices((prev) => prev.filter(i => i.id !== invoiceId))
   }
 
   const handleDownload = (invoice: Invoice) => {

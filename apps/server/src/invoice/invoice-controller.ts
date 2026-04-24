@@ -150,4 +150,26 @@ invoiceRouteV1.put("/:invoiceId/edit", zValidator("json", invoiceFormSchema), as
     return c.json({ message: "Invoice Updated" }, 200)
 })
 
+invoiceRouteV1.delete("/:invoiceId/delete", async (c) => {
+    const invoiceId = c.req.param("invoiceId")
+    const db = drizzle(c.env.DB)
+
+    const refreshToken = getCookie(c, "refresh_token");
+    if (!refreshToken) return c.json({ message: "No refresh token" }, 401)
+
+    const secret = c.env.JWT_SECRET;
+    if (!secret) {
+        console.log("JWT secret not configured")
+        return c.json({ message: "Internal Server Error" }, 500)
+    }
+
+    // TODO: Better error handling
+    (await verify(refreshToken, secret, "HS256")) as ResponsePayload
+
+    // TODO: Better error handling
+    await db.update(invoices).set({ deleted: false }).where(eq(invoices.id, invoiceId))
+
+    return c.json({ message: "Invoice deleted" }, 200)
+})
+
 export default invoiceRouteV1;

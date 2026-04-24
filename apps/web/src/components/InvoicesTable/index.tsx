@@ -49,6 +49,7 @@ interface InvoicesTableProps {
   onDownload: (invoice: Invoice) => void;
 }
 
+const API_URL = import.meta.env.VITE_API_URL
 export default function InvoicesTable({ invoices, onDelete, onStatusChange, onDownload, clientId }: InvoicesTableProps) {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const navigate = useNavigate();
@@ -75,10 +76,22 @@ export default function InvoicesTable({ invoices, onDelete, onStatusChange, onDo
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (deleteId) {
-      onDelete(deleteId);
-      setDeleteId(null);
+      try {
+        const response = await fetch(`${API_URL}/api/v1/clients/${clientId}/invoices/${deleteId}/delete`, {
+          method: "GET",
+          credentials: "include",
+        })
+
+        if (!response.ok) throw new Error("An error occurred while deleting the invoice")
+
+        onDelete(deleteId);
+      } catch (error) {
+        console.log(error)
+      } finally {
+        setDeleteId(null);
+      }
     }
   };
 
