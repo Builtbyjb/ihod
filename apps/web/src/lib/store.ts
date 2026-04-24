@@ -1,5 +1,11 @@
 import type { Client, Invoice, DashboardStats } from "./types";
 
+export const CURRENCIES = [
+    { name: "Naira (NGN)", value: "NGN" },
+    { name: "Canadian Dollar (CAD)", value: "CAD" },
+    { name: "US Dollar (USD)", value: "USD" },
+]
+
 export function useDashboardStats(
     invoices: Invoice[],
     clients: Client[],
@@ -19,7 +25,7 @@ export function useDashboardStats(
     return { totalRevenue, paidInvoices, pendingAmount, totalClients };
 }
 
-const months = [
+export const months = [
     "Jan",
     "Feb",
     "Mar",

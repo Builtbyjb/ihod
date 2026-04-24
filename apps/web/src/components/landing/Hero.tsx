@@ -30,7 +30,7 @@ export default function Hero() {
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button
               className="w-full sm:w-auto px-8"
-              onClick={() => navigate({ to: "/login" })}
+              onClick={() => navigate({ to: "/signup" })}
             >
               Start for free
               <ArrowRight className="ml-2 h-4 w-4" />

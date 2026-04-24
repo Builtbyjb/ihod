@@ -40,9 +40,10 @@ export interface DashboardStats {
 }
 
 export interface User {
-    id: number;
     username: string;
     email: string;
+    currency: string,
+    organizationName: string
 }
 
 export interface AuthState {
@@ -51,7 +52,7 @@ export interface AuthState {
     login: (email: string) => Promise<boolean>;
     logout: () => void;
     refreshToken: () => Promise<AuthResponse>;
-    verifyOtp: (otp: string) => Promise<OTPResponse>;
+    verifyOtp: (otp: string) => Promise<boolean>;
 }
 
 export interface Context {
@@ -60,8 +61,5 @@ export interface Context {
 
 export interface AuthResponse {
     accessToken: string;
-}
-
-export interface OTPResponse extends AuthResponse {
-    setupCompleted: boolean;
+    user: User
 }

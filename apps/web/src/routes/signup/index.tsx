@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,12 +7,12 @@ import { toast } from "sonner";
 import * as z from "zod";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from "react";
+import OTP from "@/components/OTP";
+import { authenticateUser } from "@/lib/utils";
+import { CURRENCIES } from "@/lib/store";
+import { ArrowLeft } from "lucide-react";
 
-const currencies = [
-  { name: "Naira (NGN)", value: "NGN" },
-  { name: "Canadian Dollar (CAD)", value: "CAD" },
-  { name: "US Dollar (USD)", value: "USD" },
-];
 
 const schema = z.object({
   firstname: z.string().min(2),
@@ -30,7 +30,8 @@ const schema = z.object({
 const API_URL = import.meta.env.VITE_API_URL;
 
 function RouteComponent() {
-  const navigate = useNavigate();
+  const [isVerified, setIsVerified] = useState<boolean>(false)
+  const navigate = useNavigate()
 
   const form = useForm({
     defaultValues: {
@@ -59,7 +60,7 @@ function RouteComponent() {
 
         if (!response.ok) throw new Error("Error setting profile");
 
-        navigate({ to: "/dashboard" });
+        setIsVerified(true)
       } catch (error) {
         console.error(error);
         toast.error(error.message);
@@ -69,7 +70,8 @@ function RouteComponent() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      <Card className="w-full max-w-sm">
+      <ArrowLeft className="mb-8 w-12 h-12 hover:scale-110" onClick={() => navigate({ to: "/" })} />
+      <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-xl">Sign Up</CardTitle>
           <CardDescription>
@@ -85,54 +87,57 @@ function RouteComponent() {
             }}
           >
             <FieldGroup>
-              <form.Field
-                name="firstname"
-                children={(field) => {
-                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-                  return (
-                    <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor="first-name-input">
-                        First Name
-                      </FieldLabel>
-                      <Input
-                        required
-                        id="first-name-input"
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        aria-invalid={isInvalid}
-                        autoComplete="off"
-                      />
-                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
-                    </Field>
-                  );
-                }}
-              />
-              <form.Field
-                name="lastname"
-                children={(field) => {
-                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-                  return (
-                    <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor="last-name-input">
-                        Last Name
-                      </FieldLabel>
-                      <Input
-                        required
-                        id="last-name-input"
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        aria-invalid={isInvalid}
-                        autoComplete="off"
-                      />
-                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
-                    </Field>
-                  );
-                }}
-              />
+              <Field orientation="horizontal">
+
+                <form.Field
+                  name="firstname"
+                  children={(field) => {
+                    const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+                    return (
+                      <Field data-invalid={isInvalid}>
+                        <FieldLabel htmlFor="first-name-input">
+                          First Name <span className="text-destructive">*</span>
+                        </FieldLabel>
+                        <Input
+                          required
+                          id="first-name-input"
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          aria-invalid={isInvalid}
+                          autoComplete="off"
+                        />
+                        {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                      </Field>
+                    );
+                  }}
+                />
+                <form.Field
+                  name="lastname"
+                  children={(field) => {
+                    const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+                    return (
+                      <Field data-invalid={isInvalid}>
+                        <FieldLabel htmlFor="last-name-input">
+                          Last Name <span className="text-destructive">*</span>
+                        </FieldLabel>
+                        <Input
+                          required
+                          id="last-name-input"
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          aria-invalid={isInvalid}
+                          autoComplete="off"
+                        />
+                        {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                      </Field>
+                    );
+                  }}
+                />
+              </Field>
               <form.Field
                 name="email"
                 children={(field) => {
@@ -140,7 +145,7 @@ function RouteComponent() {
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor="email-input">
-                        Email
+                        Email <span className="text-destructive">*</span>
                       </FieldLabel>
                       <Input
                         required
@@ -164,7 +169,7 @@ function RouteComponent() {
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor="username-input">
-                        What should we call you?
+                        What should we call you? <span className="text-destructive">*</span>
                       </FieldLabel>
                       <Input
                         required
@@ -188,7 +193,7 @@ function RouteComponent() {
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor="business-name-input">
-                        Business Name
+                        Business Name <span className="text-destructive">*</span>
                       </FieldLabel>
                       <Input
                         required
@@ -212,7 +217,7 @@ function RouteComponent() {
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor="business-type-input">
-                        Business Type
+                        Business Type <span className="text-destructive">*</span>
                       </FieldLabel>
                       <Input
                         required
@@ -236,11 +241,11 @@ function RouteComponent() {
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor="currency-input">
-                        Preferred Currency
+                        Preferred Currency <span className="text-destructive">*</span>
                       </FieldLabel>
                       <Select
                         name={field.name}
-                        value={field.state.value}
+                        value={CURRENCIES.find(c => c.value === field.state.value)?.name}
                         onValueChange={(e) => { if (e) field.handleChange(e) }}
                       >
                         <SelectTrigger id="select-currency" aria-invalid={isInvalid} className="min-w-30" >
@@ -248,8 +253,8 @@ function RouteComponent() {
                         </SelectTrigger>
                         <SelectContent>
                           {/*<SelectItem value="auto">Auto</SelectItem>*/}
-                          {currencies.map((currency) => (
-                            <SelectItem key={currency.value} value={currency.name}>
+                          {CURRENCIES.map((currency) => (
+                            <SelectItem key={currency.value} value={currency.value}>
                               {currency.name}
                             </SelectItem>
                           ))}
@@ -267,7 +272,7 @@ function RouteComponent() {
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor="business-address-input">
-                        Business Address
+                        Business Address <span className="text-destructive">*</span>
                       </FieldLabel>
                       <Input
                         required
@@ -292,7 +297,7 @@ function RouteComponent() {
                     return (
                       <Field data-invalid={isInvalid}>
                         <FieldLabel htmlFor="business-city-input">
-                          City
+                          City <span className="text-destructive">*</span>
                         </FieldLabel>
                         <Input
                           required
@@ -316,7 +321,7 @@ function RouteComponent() {
                     return (
                       <Field data-invalid={isInvalid}>
                         <FieldLabel htmlFor="business-address-input">
-                          Country
+                          Country <span className="text-destructive">*</span>
                         </FieldLabel>
                         <Input
                           required
@@ -348,10 +353,26 @@ function RouteComponent() {
           </Field>
         </CardFooter>
       </Card>
+      <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 mt-4">
+        By clicking Submit, you agree to our{" "}
+        <Link to="/terms-of-service">Terms of Service</Link> and{" "}
+        <Link to="/privacy-policy">Privacy Policy</Link>.
+      </div>
+      <br />
+      <br />
+      {isVerified && <OTP />}
     </div>
   );
 }
 
-export const Route = createFileRoute("/setup-profile/")({
+export const Route = createFileRoute("/signup/")({
+  beforeLoad: async ({ context }) => {
+    const isAuthenticated = await authenticateUser(context);
+    if (isAuthenticated) {
+      throw redirect({
+        to: "/dashboard",
+      });
+    }
+  },
   component: RouteComponent,
 });

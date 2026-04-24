@@ -12,7 +12,7 @@ function isTokenExpired(accessToken: string): boolean {
     const { exp } = jwtDecode(accessToken);
     const now = Date.now() / 1000;
     if (!exp) return true;
-    // Return true if expired, false otherwise
+    // Returns true if expired, false otherwise
     return exp < now;
 }
 
@@ -29,23 +29,6 @@ export async function authenticateUser(context: Context): Promise<boolean> {
     } catch (error) {
         console.error(error);
         return false;
-    }
-}
-
-export async function verifySetupCompleted(): Promise<boolean> {
-    const API_URL = import.meta.env.VITE_API_URL
-    try {
-        const response = await fetch(`${API_URL}/api/v1/auth/verify-setup-completed`, {
-            method: "GET",
-            credentials: "include"
-        })
-
-        if (!response.ok) return false
-
-        return true
-    } catch (error) {
-        console.log(error)
-        return false
     }
 }
 

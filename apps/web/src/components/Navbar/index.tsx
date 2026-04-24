@@ -49,7 +49,7 @@ export default function Navbar() {
             <Link to="/login">Log in</Link>
           </Button>
           <Button>
-            <Link to="/login">Start for free</Link>
+            <Link to="/signup">Start for free</Link>
           </Button>
         </div>
 
