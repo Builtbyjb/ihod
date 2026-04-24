@@ -1,30 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import * as z from "zod";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const currencies = [
   { name: "Naira (NGN)", value: "NGN" },
@@ -35,6 +17,7 @@ const currencies = [
 const schema = z.object({
   firstname: z.string().min(2),
   lastname: z.string().min(2),
+  email: z.string().email(),
   username: z.string().min(2),
   businessName: z.string().min(2),
   businessType: z.string().min(2),
@@ -53,6 +36,7 @@ function RouteComponent() {
     defaultValues: {
       firstname: "",
       lastname: "",
+      email: "",
       username: "",
       businessName: "",
       businessType: "",
@@ -65,39 +49,36 @@ function RouteComponent() {
       onSubmit: schema,
     },
     onSubmit: async ({ value }) => {
-      const payload = { ...value };
       try {
-        const response = await fetch(`${API_URL}/api/v1/user/setup-profile`, {
+        const response = await fetch(`${API_URL}/api/v1/auth/signup`, {
           method: "POST",
           credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(value),
         });
-        if (!response.ok) {
-          throw new Error("Error setting profile");
-        }
 
-        toast.success("Setup complete");
+        if (!response.ok) throw new Error("Error setting profile");
+
         navigate({ to: "/dashboard" });
       } catch (error) {
         console.error(error);
+        toast.error(error.message);
       }
     },
   });
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-xl">Setup Profile</CardTitle>
+          <CardTitle className="text-xl">Sign Up</CardTitle>
           <CardDescription>
             Tell us about yourself and your business
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form
-            id="setup-info-form"
+            id="signup-form"
             onSubmit={(e) => {
               e.preventDefault();
               form.handleSubmit();
@@ -107,8 +88,7 @@ function RouteComponent() {
               <form.Field
                 name="firstname"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor="first-name-input">
@@ -124,9 +104,7 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         autoComplete="off"
                       />
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
                     </Field>
                   );
                 }}
@@ -134,8 +112,7 @@ function RouteComponent() {
               <form.Field
                 name="lastname"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor="last-name-input">
@@ -151,9 +128,31 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         autoComplete="off"
                       />
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                    </Field>
+                  );
+                }}
+              />
+              <form.Field
+                name="email"
+                children={(field) => {
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor="email-input">
+                        Email
+                      </FieldLabel>
+                      <Input
+                        required
+                        id="email-input"
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        aria-invalid={isInvalid}
+                        autoComplete="off"
+                      />
+                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
                     </Field>
                   );
                 }}
@@ -161,8 +160,7 @@ function RouteComponent() {
               <form.Field
                 name="username"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor="username-input">
@@ -178,9 +176,7 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         autoComplete="off"
                       />
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
                     </Field>
                   );
                 }}
@@ -188,8 +184,7 @@ function RouteComponent() {
               <form.Field
                 name="businessName"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor="business-name-input">
@@ -205,9 +200,7 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         autoComplete="off"
                       />
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
                     </Field>
                   );
                 }}
@@ -215,8 +208,7 @@ function RouteComponent() {
               <form.Field
                 name="businessType"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor="business-type-input">
@@ -232,9 +224,7 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         autoComplete="off"
                       />
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
                     </Field>
                   );
                 }}
@@ -242,8 +232,7 @@ function RouteComponent() {
               <form.Field
                 name="currency"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor="currency-input">
@@ -252,32 +241,21 @@ function RouteComponent() {
                       <Select
                         name={field.name}
                         value={field.state.value}
-                        onValueChange={(e) => {
-                          if (e) field.handleChange(e);
-                        }}
+                        onValueChange={(e) => { if (e) field.handleChange(e) }}
                       >
-                        <SelectTrigger
-                          id="select-currency"
-                          aria-invalid={isInvalid}
-                          className="min-w-30"
-                        >
+                        <SelectTrigger id="select-currency" aria-invalid={isInvalid} className="min-w-30" >
                           <SelectValue placeholder="Select currency" />
                         </SelectTrigger>
                         <SelectContent>
                           {/*<SelectItem value="auto">Auto</SelectItem>*/}
                           {currencies.map((currency) => (
-                            <SelectItem
-                              key={currency.value}
-                              value={currency.name}
-                            >
+                            <SelectItem key={currency.value} value={currency.name}>
                               {currency.name}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
                     </Field>
                   );
                 }}
@@ -285,8 +263,7 @@ function RouteComponent() {
               <form.Field
                 name="businessAddress"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor="business-address-input">
@@ -302,9 +279,7 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         placeholder="Street Address"
                       />
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
+                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
                     </Field>
                   );
                 }}
@@ -313,8 +288,7 @@ function RouteComponent() {
                 <form.Field
                   name="city"
                   children={(field) => {
-                    const isInvalid =
-                      field.state.meta.isTouched && !field.state.meta.isValid;
+                    const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                     return (
                       <Field data-invalid={isInvalid}>
                         <FieldLabel htmlFor="business-city-input">
@@ -330,9 +304,7 @@ function RouteComponent() {
                           aria-invalid={isInvalid}
                           placeholder="City, State ZIP"
                         />
-                        {isInvalid && (
-                          <FieldError errors={field.state.meta.errors} />
-                        )}
+                        {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
                       </Field>
                     );
                   }}
@@ -340,8 +312,7 @@ function RouteComponent() {
                 <form.Field
                   name="country"
                   children={(field) => {
-                    const isInvalid =
-                      field.state.meta.isTouched && !field.state.meta.isValid;
+                    const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                     return (
                       <Field data-invalid={isInvalid}>
                         <FieldLabel htmlFor="business-address-input">
@@ -357,9 +328,7 @@ function RouteComponent() {
                           aria-invalid={isInvalid}
                           placeholder="Country"
                         />
-                        {isInvalid && (
-                          <FieldError errors={field.state.meta.errors} />
-                        )}
+                        {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
                       </Field>
                     );
                   }}
@@ -370,14 +339,10 @@ function RouteComponent() {
         </CardContent>
         <CardFooter className="bg-background">
           <Field orientation="horizontal">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => form.reset()}
-            >
+            <Button type="button" variant="outline" onClick={() => form.reset()} >
               Reset
             </Button>
-            <Button type="submit" form="setup-info-form">
+            <Button type="submit" form="signup-form">
               Submit
             </Button>
           </Field>
