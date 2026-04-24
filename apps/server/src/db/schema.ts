@@ -5,10 +5,10 @@ import { InvoiceItem } from "@/lib/types";
 export const users = sqliteTable("users", {
     id: int("id").primaryKey({ autoIncrement: true }),
     email: text("email").notNull().unique(),
+    currentOrgId: int("currency_organization_id").references(() => organizations.id).notNull(),
     firstname: text("firstname"),
     lastname: text("lastname"),
-    username: text("username"),
-    setupCompleted: int("setup_completed", { mode: "boolean" }).notNull().default(false),
+    username: text("username").notNull(),
     deleted: int("deleted", { mode: "boolean" }).notNull().default(false),
     createdAt: int("created_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
     updatedAt: int("updated_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
@@ -16,10 +16,10 @@ export const users = sqliteTable("users", {
 
 export const organizations = sqliteTable("organizations", {
     id: int("id").primaryKey({ autoIncrement: true }),
-    name: text("name").notNull(),
+    name: text("name").notNull().unique(),
     type: text("type").notNull(),
     address: text("address"),
-    currency: text("address"),
+    currency: text("currency").notNull(),
     city: text("city"),
     country: text("country"),
     deleted: int("deleted", { mode: "boolean" }).notNull().default(false),

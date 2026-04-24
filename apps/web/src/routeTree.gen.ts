@@ -11,7 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as GuestRouteImport } from './routes/_guest'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as SetupProfileIndexRouteImport } from './routes/signup/index'
+import { Route as SignupIndexRouteImport } from './routes/signup/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as GuestIndexRouteImport } from './routes/_guest/index'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -27,150 +27,150 @@ import { Route as AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRouteImport 
 import { Route as AuthenticatedClientsClientIdInvoicesInvoiceIdEditIndexRouteImport } from './routes/_authenticated/clients/$clientId/invoices/$invoiceId/edit/index'
 
 const GuestRoute = GuestRouteImport.update({
-    id: '/_guest',
-    getParentRoute: () => rootRouteImport,
+  id: '/_guest',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
-    id: '/_authenticated',
-    getParentRoute: () => rootRouteImport,
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const SetupProfileIndexRoute = SetupProfileIndexRouteImport.update({
-    id: '/setup-profile/',
-    path: '/setup-profile/',
-    getParentRoute: () => rootRouteImport,
+const SignupIndexRoute = SignupIndexRouteImport.update({
+  id: '/signup/',
+  path: '/signup/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const LoginIndexRoute = LoginIndexRouteImport.update({
-    id: '/login/',
-    path: '/login/',
-    getParentRoute: () => rootRouteImport,
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const GuestIndexRoute = GuestIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => GuestRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => GuestRoute,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
-    id: '/settings',
-    path: '/settings',
-    getParentRoute: () => AuthenticatedRoute,
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-    id: '/dashboard',
-    path: '/dashboard',
-    getParentRoute: () => AuthenticatedRoute,
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const GuestTermsOfServiceIndexRoute =
-    GuestTermsOfServiceIndexRouteImport.update({
-        id: '/terms-of-service/',
-        path: '/terms-of-service/',
-        getParentRoute: () => GuestRoute,
-    } as any)
-const GuestPrivacyPolicyIndexRoute = GuestPrivacyPolicyIndexRouteImport.update({
-    id: '/privacy-policy/',
-    path: '/privacy-policy/',
+  GuestTermsOfServiceIndexRouteImport.update({
+    id: '/terms-of-service/',
+    path: '/terms-of-service/',
     getParentRoute: () => GuestRoute,
+  } as any)
+const GuestPrivacyPolicyIndexRoute = GuestPrivacyPolicyIndexRouteImport.update({
+  id: '/privacy-policy/',
+  path: '/privacy-policy/',
+  getParentRoute: () => GuestRoute,
 } as any)
 const GuestPricingIndexRoute = GuestPricingIndexRouteImport.update({
-    id: '/pricing/',
-    path: '/pricing/',
-    getParentRoute: () => GuestRoute,
+  id: '/pricing/',
+  path: '/pricing/',
+  getParentRoute: () => GuestRoute,
 } as any)
 const AuthenticatedClientsIndexRoute =
-    AuthenticatedClientsIndexRouteImport.update({
-        id: '/clients/',
-        path: '/clients/',
-        getParentRoute: () => AuthenticatedRoute,
-    } as any)
+  AuthenticatedClientsIndexRouteImport.update({
+    id: '/clients/',
+    path: '/clients/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedClientsClientIdIndexRoute =
-    AuthenticatedClientsClientIdIndexRouteImport.update({
-        id: '/clients/$clientId/',
-        path: '/clients/$clientId/',
-        getParentRoute: () => AuthenticatedRoute,
-    } as any)
+  AuthenticatedClientsClientIdIndexRouteImport.update({
+    id: '/clients/$clientId/',
+    path: '/clients/$clientId/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedClientsClientIdInvoicesIndexRoute =
-    AuthenticatedClientsClientIdInvoicesIndexRouteImport.update({
-        id: '/clients/$clientId/invoices/',
-        path: '/clients/$clientId/invoices/',
-        getParentRoute: () => AuthenticatedRoute,
-    } as any)
+  AuthenticatedClientsClientIdInvoicesIndexRouteImport.update({
+    id: '/clients/$clientId/invoices/',
+    path: '/clients/$clientId/invoices/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedClientsClientIdInvoicesNewIndexRoute =
-    AuthenticatedClientsClientIdInvoicesNewIndexRouteImport.update({
-        id: '/clients/$clientId/invoices/new/',
-        path: '/clients/$clientId/invoices/new/',
-        getParentRoute: () => AuthenticatedRoute,
-    } as any)
+  AuthenticatedClientsClientIdInvoicesNewIndexRouteImport.update({
+    id: '/clients/$clientId/invoices/new/',
+    path: '/clients/$clientId/invoices/new/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRoute =
-    AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRouteImport.update({
-        id: '/clients/$clientId/invoices/$invoiceId/',
-        path: '/clients/$clientId/invoices/$invoiceId/',
-        getParentRoute: () => AuthenticatedRoute,
-    } as any)
+  AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRouteImport.update({
+    id: '/clients/$clientId/invoices/$invoiceId/',
+    path: '/clients/$clientId/invoices/$invoiceId/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedClientsClientIdInvoicesInvoiceIdEditIndexRoute =
-    AuthenticatedClientsClientIdInvoicesInvoiceIdEditIndexRouteImport.update({
-        id: '/clients/$clientId/invoices/$invoiceId/edit/',
-        path: '/clients/$clientId/invoices/$invoiceId/edit/',
-        getParentRoute: () => AuthenticatedRoute,
-    } as any)
+  AuthenticatedClientsClientIdInvoicesInvoiceIdEditIndexRouteImport.update({
+    id: '/clients/$clientId/invoices/$invoiceId/edit/',
+    path: '/clients/$clientId/invoices/$invoiceId/edit/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-    '/': typeof GuestIndexRoute
-    '/dashboard': typeof AuthenticatedDashboardRoute
-    '/settings': typeof AuthenticatedSettingsRoute
-    '/login/': typeof LoginIndexRoute
-    '/setup-profile/': typeof SetupProfileIndexRoute
-    '/clients/': typeof AuthenticatedClientsIndexRoute
-    '/pricing/': typeof GuestPricingIndexRoute
-    '/privacy-policy/': typeof GuestPrivacyPolicyIndexRoute
-    '/terms-of-service/': typeof GuestTermsOfServiceIndexRoute
-    '/clients/$clientId/': typeof AuthenticatedClientsClientIdIndexRoute
-    '/clients/$clientId/invoices/': typeof AuthenticatedClientsClientIdInvoicesIndexRoute
-    '/clients/$clientId/invoices/$invoiceId/': typeof AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRoute
-    '/clients/$clientId/invoices/new/': typeof AuthenticatedClientsClientIdInvoicesNewIndexRoute
-    '/clients/$clientId/invoices/$invoiceId/edit/': typeof AuthenticatedClientsClientIdInvoicesInvoiceIdEditIndexRoute
+  '/': typeof GuestIndexRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/login/': typeof LoginIndexRoute
+  '/signup/': typeof SignupIndexRoute
+  '/clients/': typeof AuthenticatedClientsIndexRoute
+  '/pricing/': typeof GuestPricingIndexRoute
+  '/privacy-policy/': typeof GuestPrivacyPolicyIndexRoute
+  '/terms-of-service/': typeof GuestTermsOfServiceIndexRoute
+  '/clients/$clientId/': typeof AuthenticatedClientsClientIdIndexRoute
+  '/clients/$clientId/invoices/': typeof AuthenticatedClientsClientIdInvoicesIndexRoute
+  '/clients/$clientId/invoices/$invoiceId/': typeof AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRoute
+  '/clients/$clientId/invoices/new/': typeof AuthenticatedClientsClientIdInvoicesNewIndexRoute
+  '/clients/$clientId/invoices/$invoiceId/edit/': typeof AuthenticatedClientsClientIdInvoicesInvoiceIdEditIndexRoute
 }
 export interface FileRoutesByTo {
-    '/': typeof GuestIndexRoute
-    '/dashboard': typeof AuthenticatedDashboardRoute
-    '/settings': typeof AuthenticatedSettingsRoute
-    '/login': typeof LoginIndexRoute
-    '/setup-profile': typeof SetupProfileIndexRoute
-    '/clients': typeof AuthenticatedClientsIndexRoute
-    '/pricing': typeof GuestPricingIndexRoute
-    '/privacy-policy': typeof GuestPrivacyPolicyIndexRoute
-    '/terms-of-service': typeof GuestTermsOfServiceIndexRoute
-    '/clients/$clientId': typeof AuthenticatedClientsClientIdIndexRoute
-    '/clients/$clientId/invoices': typeof AuthenticatedClientsClientIdInvoicesIndexRoute
-    '/clients/$clientId/invoices/$invoiceId': typeof AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRoute
-    '/clients/$clientId/invoices/new': typeof AuthenticatedClientsClientIdInvoicesNewIndexRoute
-    '/clients/$clientId/invoices/$invoiceId/edit': typeof AuthenticatedClientsClientIdInvoicesInvoiceIdEditIndexRoute
+  '/': typeof GuestIndexRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/login': typeof LoginIndexRoute
+  '/signup': typeof SignupIndexRoute
+  '/clients': typeof AuthenticatedClientsIndexRoute
+  '/pricing': typeof GuestPricingIndexRoute
+  '/privacy-policy': typeof GuestPrivacyPolicyIndexRoute
+  '/terms-of-service': typeof GuestTermsOfServiceIndexRoute
+  '/clients/$clientId': typeof AuthenticatedClientsClientIdIndexRoute
+  '/clients/$clientId/invoices': typeof AuthenticatedClientsClientIdInvoicesIndexRoute
+  '/clients/$clientId/invoices/$invoiceId': typeof AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRoute
+  '/clients/$clientId/invoices/new': typeof AuthenticatedClientsClientIdInvoicesNewIndexRoute
+  '/clients/$clientId/invoices/$invoiceId/edit': typeof AuthenticatedClientsClientIdInvoicesInvoiceIdEditIndexRoute
 }
 export interface FileRoutesById {
-    __root__: typeof rootRouteImport
-    '/_authenticated': typeof AuthenticatedRouteWithChildren
-    '/_guest': typeof GuestRouteWithChildren
-    '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-    '/_authenticated/settings': typeof AuthenticatedSettingsRoute
-    '/_guest/': typeof GuestIndexRoute
-    '/login/': typeof LoginIndexRoute
-    '/setup-profile/': typeof SetupProfileIndexRoute
-    '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
-    '/_guest/pricing/': typeof GuestPricingIndexRoute
-    '/_guest/privacy-policy/': typeof GuestPrivacyPolicyIndexRoute
-    '/_guest/terms-of-service/': typeof GuestTermsOfServiceIndexRoute
-    '/_authenticated/clients/$clientId/': typeof AuthenticatedClientsClientIdIndexRoute
-    '/_authenticated/clients/$clientId/invoices/': typeof AuthenticatedClientsClientIdInvoicesIndexRoute
-    '/_authenticated/clients/$clientId/invoices/$invoiceId/': typeof AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRoute
-    '/_authenticated/clients/$clientId/invoices/new/': typeof AuthenticatedClientsClientIdInvoicesNewIndexRoute
-    '/_authenticated/clients/$clientId/invoices/$invoiceId/edit/': typeof AuthenticatedClientsClientIdInvoicesInvoiceIdEditIndexRoute
+  __root__: typeof rootRouteImport
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/_guest': typeof GuestRouteWithChildren
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_guest/': typeof GuestIndexRoute
+  '/login/': typeof LoginIndexRoute
+  '/signup/': typeof SignupIndexRoute
+  '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
+  '/_guest/pricing/': typeof GuestPricingIndexRoute
+  '/_guest/privacy-policy/': typeof GuestPrivacyPolicyIndexRoute
+  '/_guest/terms-of-service/': typeof GuestTermsOfServiceIndexRoute
+  '/_authenticated/clients/$clientId/': typeof AuthenticatedClientsClientIdIndexRoute
+  '/_authenticated/clients/$clientId/invoices/': typeof AuthenticatedClientsClientIdInvoicesIndexRoute
+  '/_authenticated/clients/$clientId/invoices/$invoiceId/': typeof AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRoute
+  '/_authenticated/clients/$clientId/invoices/new/': typeof AuthenticatedClientsClientIdInvoicesNewIndexRoute
+  '/_authenticated/clients/$clientId/invoices/$invoiceId/edit/': typeof AuthenticatedClientsClientIdInvoicesInvoiceIdEditIndexRoute
 }
 export interface FileRouteTypes {
-    fileRoutesByFullPath: FileRoutesByFullPath
-    fullPaths:
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
     | '/'
     | '/dashboard'
     | '/settings'
     | '/login/'
-    | '/setup-profile/'
+    | '/signup/'
     | '/clients/'
     | '/pricing/'
     | '/privacy-policy/'
@@ -180,13 +180,13 @@ export interface FileRouteTypes {
     | '/clients/$clientId/invoices/$invoiceId/'
     | '/clients/$clientId/invoices/new/'
     | '/clients/$clientId/invoices/$invoiceId/edit/'
-    fileRoutesByTo: FileRoutesByTo
-    to:
+  fileRoutesByTo: FileRoutesByTo
+  to:
     | '/'
     | '/dashboard'
     | '/settings'
     | '/login'
-    | '/setup-profile'
+    | '/signup'
     | '/clients'
     | '/pricing'
     | '/privacy-policy'
@@ -196,7 +196,7 @@ export interface FileRouteTypes {
     | '/clients/$clientId/invoices/$invoiceId'
     | '/clients/$clientId/invoices/new'
     | '/clients/$clientId/invoices/$invoiceId/edit'
-    id:
+  id:
     | '__root__'
     | '/_authenticated'
     | '/_guest'
@@ -204,7 +204,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_guest/'
     | '/login/'
-    | '/setup-profile/'
+    | '/signup/'
     | '/_authenticated/clients/'
     | '/_guest/pricing/'
     | '/_guest/privacy-policy/'
@@ -214,185 +214,185 @@ export interface FileRouteTypes {
     | '/_authenticated/clients/$clientId/invoices/$invoiceId/'
     | '/_authenticated/clients/$clientId/invoices/new/'
     | '/_authenticated/clients/$clientId/invoices/$invoiceId/edit/'
-    fileRoutesById: FileRoutesById
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-    AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-    GuestRoute: typeof GuestRouteWithChildren
-    LoginIndexRoute: typeof LoginIndexRoute
-    SetupProfileIndexRoute: typeof SetupProfileIndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  GuestRoute: typeof GuestRouteWithChildren
+  LoginIndexRoute: typeof LoginIndexRoute
+  SignupIndexRoute: typeof SignupIndexRoute
 }
 
 declare module '@tanstack/react-router' {
-    interface FileRoutesByPath {
-        '/_guest': {
-            id: '/_guest'
-            path: ''
-            fullPath: '/'
-            preLoaderRoute: typeof GuestRouteImport
-            parentRoute: typeof rootRouteImport
-        }
-        '/_authenticated': {
-            id: '/_authenticated'
-            path: ''
-            fullPath: '/'
-            preLoaderRoute: typeof AuthenticatedRouteImport
-            parentRoute: typeof rootRouteImport
-        }
-        '/setup-profile/': {
-            id: '/setup-profile/'
-            path: '/setup-profile'
-            fullPath: '/setup-profile/'
-            preLoaderRoute: typeof SetupProfileIndexRouteImport
-            parentRoute: typeof rootRouteImport
-        }
-        '/login/': {
-            id: '/login/'
-            path: '/login'
-            fullPath: '/login/'
-            preLoaderRoute: typeof LoginIndexRouteImport
-            parentRoute: typeof rootRouteImport
-        }
-        '/_guest/': {
-            id: '/_guest/'
-            path: '/'
-            fullPath: '/'
-            preLoaderRoute: typeof GuestIndexRouteImport
-            parentRoute: typeof GuestRoute
-        }
-        '/_authenticated/settings': {
-            id: '/_authenticated/settings'
-            path: '/settings'
-            fullPath: '/settings'
-            preLoaderRoute: typeof AuthenticatedSettingsRouteImport
-            parentRoute: typeof AuthenticatedRoute
-        }
-        '/_authenticated/dashboard': {
-            id: '/_authenticated/dashboard'
-            path: '/dashboard'
-            fullPath: '/dashboard'
-            preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-            parentRoute: typeof AuthenticatedRoute
-        }
-        '/_guest/terms-of-service/': {
-            id: '/_guest/terms-of-service/'
-            path: '/terms-of-service'
-            fullPath: '/terms-of-service/'
-            preLoaderRoute: typeof GuestTermsOfServiceIndexRouteImport
-            parentRoute: typeof GuestRoute
-        }
-        '/_guest/privacy-policy/': {
-            id: '/_guest/privacy-policy/'
-            path: '/privacy-policy'
-            fullPath: '/privacy-policy/'
-            preLoaderRoute: typeof GuestPrivacyPolicyIndexRouteImport
-            parentRoute: typeof GuestRoute
-        }
-        '/_guest/pricing/': {
-            id: '/_guest/pricing/'
-            path: '/pricing'
-            fullPath: '/pricing/'
-            preLoaderRoute: typeof GuestPricingIndexRouteImport
-            parentRoute: typeof GuestRoute
-        }
-        '/_authenticated/clients/': {
-            id: '/_authenticated/clients/'
-            path: '/clients'
-            fullPath: '/clients/'
-            preLoaderRoute: typeof AuthenticatedClientsIndexRouteImport
-            parentRoute: typeof AuthenticatedRoute
-        }
-        '/_authenticated/clients/$clientId/': {
-            id: '/_authenticated/clients/$clientId/'
-            path: '/clients/$clientId'
-            fullPath: '/clients/$clientId/'
-            preLoaderRoute: typeof AuthenticatedClientsClientIdIndexRouteImport
-            parentRoute: typeof AuthenticatedRoute
-        }
-        '/_authenticated/clients/$clientId/invoices/': {
-            id: '/_authenticated/clients/$clientId/invoices/'
-            path: '/clients/$clientId/invoices'
-            fullPath: '/clients/$clientId/invoices/'
-            preLoaderRoute: typeof AuthenticatedClientsClientIdInvoicesIndexRouteImport
-            parentRoute: typeof AuthenticatedRoute
-        }
-        '/_authenticated/clients/$clientId/invoices/new/': {
-            id: '/_authenticated/clients/$clientId/invoices/new/'
-            path: '/clients/$clientId/invoices/new'
-            fullPath: '/clients/$clientId/invoices/new/'
-            preLoaderRoute: typeof AuthenticatedClientsClientIdInvoicesNewIndexRouteImport
-            parentRoute: typeof AuthenticatedRoute
-        }
-        '/_authenticated/clients/$clientId/invoices/$invoiceId/': {
-            id: '/_authenticated/clients/$clientId/invoices/$invoiceId/'
-            path: '/clients/$clientId/invoices/$invoiceId'
-            fullPath: '/clients/$clientId/invoices/$invoiceId/'
-            preLoaderRoute: typeof AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRouteImport
-            parentRoute: typeof AuthenticatedRoute
-        }
-        '/_authenticated/clients/$clientId/invoices/$invoiceId/edit/': {
-            id: '/_authenticated/clients/$clientId/invoices/$invoiceId/edit/'
-            path: '/clients/$clientId/invoices/$invoiceId/edit'
-            fullPath: '/clients/$clientId/invoices/$invoiceId/edit/'
-            preLoaderRoute: typeof AuthenticatedClientsClientIdInvoicesInvoiceIdEditIndexRouteImport
-            parentRoute: typeof AuthenticatedRoute
-        }
+  interface FileRoutesByPath {
+    '/_guest': {
+      id: '/_guest'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof GuestRouteImport
+      parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup/': {
+      id: '/signup/'
+      path: '/signup'
+      fullPath: '/signup/'
+      preLoaderRoute: typeof SignupIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login/': {
+      id: '/login/'
+      path: '/login'
+      fullPath: '/login/'
+      preLoaderRoute: typeof LoginIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_guest/': {
+      id: '/_guest/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof GuestIndexRouteImport
+      parentRoute: typeof GuestRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_guest/terms-of-service/': {
+      id: '/_guest/terms-of-service/'
+      path: '/terms-of-service'
+      fullPath: '/terms-of-service/'
+      preLoaderRoute: typeof GuestTermsOfServiceIndexRouteImport
+      parentRoute: typeof GuestRoute
+    }
+    '/_guest/privacy-policy/': {
+      id: '/_guest/privacy-policy/'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy/'
+      preLoaderRoute: typeof GuestPrivacyPolicyIndexRouteImport
+      parentRoute: typeof GuestRoute
+    }
+    '/_guest/pricing/': {
+      id: '/_guest/pricing/'
+      path: '/pricing'
+      fullPath: '/pricing/'
+      preLoaderRoute: typeof GuestPricingIndexRouteImport
+      parentRoute: typeof GuestRoute
+    }
+    '/_authenticated/clients/': {
+      id: '/_authenticated/clients/'
+      path: '/clients'
+      fullPath: '/clients/'
+      preLoaderRoute: typeof AuthenticatedClientsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/clients/$clientId/': {
+      id: '/_authenticated/clients/$clientId/'
+      path: '/clients/$clientId'
+      fullPath: '/clients/$clientId/'
+      preLoaderRoute: typeof AuthenticatedClientsClientIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/clients/$clientId/invoices/': {
+      id: '/_authenticated/clients/$clientId/invoices/'
+      path: '/clients/$clientId/invoices'
+      fullPath: '/clients/$clientId/invoices/'
+      preLoaderRoute: typeof AuthenticatedClientsClientIdInvoicesIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/clients/$clientId/invoices/new/': {
+      id: '/_authenticated/clients/$clientId/invoices/new/'
+      path: '/clients/$clientId/invoices/new'
+      fullPath: '/clients/$clientId/invoices/new/'
+      preLoaderRoute: typeof AuthenticatedClientsClientIdInvoicesNewIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/clients/$clientId/invoices/$invoiceId/': {
+      id: '/_authenticated/clients/$clientId/invoices/$invoiceId/'
+      path: '/clients/$clientId/invoices/$invoiceId'
+      fullPath: '/clients/$clientId/invoices/$invoiceId/'
+      preLoaderRoute: typeof AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/clients/$clientId/invoices/$invoiceId/edit/': {
+      id: '/_authenticated/clients/$clientId/invoices/$invoiceId/edit/'
+      path: '/clients/$clientId/invoices/$invoiceId/edit'
+      fullPath: '/clients/$clientId/invoices/$invoiceId/edit/'
+      preLoaderRoute: typeof AuthenticatedClientsClientIdInvoicesInvoiceIdEditIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+  }
 }
 
 interface AuthenticatedRouteChildren {
-    AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-    AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
-    AuthenticatedClientsIndexRoute: typeof AuthenticatedClientsIndexRoute
-    AuthenticatedClientsClientIdIndexRoute: typeof AuthenticatedClientsClientIdIndexRoute
-    AuthenticatedClientsClientIdInvoicesIndexRoute: typeof AuthenticatedClientsClientIdInvoicesIndexRoute
-    AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRoute: typeof AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRoute
-    AuthenticatedClientsClientIdInvoicesNewIndexRoute: typeof AuthenticatedClientsClientIdInvoicesNewIndexRoute
-    AuthenticatedClientsClientIdInvoicesInvoiceIdEditIndexRoute: typeof AuthenticatedClientsClientIdInvoicesInvoiceIdEditIndexRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedClientsIndexRoute: typeof AuthenticatedClientsIndexRoute
+  AuthenticatedClientsClientIdIndexRoute: typeof AuthenticatedClientsClientIdIndexRoute
+  AuthenticatedClientsClientIdInvoicesIndexRoute: typeof AuthenticatedClientsClientIdInvoicesIndexRoute
+  AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRoute: typeof AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRoute
+  AuthenticatedClientsClientIdInvoicesNewIndexRoute: typeof AuthenticatedClientsClientIdInvoicesNewIndexRoute
+  AuthenticatedClientsClientIdInvoicesInvoiceIdEditIndexRoute: typeof AuthenticatedClientsClientIdInvoicesInvoiceIdEditIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-    AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-    AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
-    AuthenticatedClientsIndexRoute: AuthenticatedClientsIndexRoute,
-    AuthenticatedClientsClientIdIndexRoute:
-        AuthenticatedClientsClientIdIndexRoute,
-    AuthenticatedClientsClientIdInvoicesIndexRoute:
-        AuthenticatedClientsClientIdInvoicesIndexRoute,
-    AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRoute:
-        AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRoute,
-    AuthenticatedClientsClientIdInvoicesNewIndexRoute:
-        AuthenticatedClientsClientIdInvoicesNewIndexRoute,
-    AuthenticatedClientsClientIdInvoicesInvoiceIdEditIndexRoute:
-        AuthenticatedClientsClientIdInvoicesInvoiceIdEditIndexRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedClientsIndexRoute: AuthenticatedClientsIndexRoute,
+  AuthenticatedClientsClientIdIndexRoute:
+    AuthenticatedClientsClientIdIndexRoute,
+  AuthenticatedClientsClientIdInvoicesIndexRoute:
+    AuthenticatedClientsClientIdInvoicesIndexRoute,
+  AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRoute:
+    AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRoute,
+  AuthenticatedClientsClientIdInvoicesNewIndexRoute:
+    AuthenticatedClientsClientIdInvoicesNewIndexRoute,
+  AuthenticatedClientsClientIdInvoicesInvoiceIdEditIndexRoute:
+    AuthenticatedClientsClientIdInvoicesInvoiceIdEditIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-    AuthenticatedRouteChildren,
+  AuthenticatedRouteChildren,
 )
 
 interface GuestRouteChildren {
-    GuestIndexRoute: typeof GuestIndexRoute
-    GuestPricingIndexRoute: typeof GuestPricingIndexRoute
-    GuestPrivacyPolicyIndexRoute: typeof GuestPrivacyPolicyIndexRoute
-    GuestTermsOfServiceIndexRoute: typeof GuestTermsOfServiceIndexRoute
+  GuestIndexRoute: typeof GuestIndexRoute
+  GuestPricingIndexRoute: typeof GuestPricingIndexRoute
+  GuestPrivacyPolicyIndexRoute: typeof GuestPrivacyPolicyIndexRoute
+  GuestTermsOfServiceIndexRoute: typeof GuestTermsOfServiceIndexRoute
 }
 
 const GuestRouteChildren: GuestRouteChildren = {
-    GuestIndexRoute: GuestIndexRoute,
-    GuestPricingIndexRoute: GuestPricingIndexRoute,
-    GuestPrivacyPolicyIndexRoute: GuestPrivacyPolicyIndexRoute,
-    GuestTermsOfServiceIndexRoute: GuestTermsOfServiceIndexRoute,
+  GuestIndexRoute: GuestIndexRoute,
+  GuestPricingIndexRoute: GuestPricingIndexRoute,
+  GuestPrivacyPolicyIndexRoute: GuestPrivacyPolicyIndexRoute,
+  GuestTermsOfServiceIndexRoute: GuestTermsOfServiceIndexRoute,
 }
 
 const GuestRouteWithChildren = GuestRoute._addFileChildren(GuestRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
-    AuthenticatedRoute: AuthenticatedRouteWithChildren,
-    GuestRoute: GuestRouteWithChildren,
-    LoginIndexRoute: LoginIndexRoute,
-    SetupProfileIndexRoute: SetupProfileIndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  GuestRoute: GuestRouteWithChildren,
+  LoginIndexRoute: LoginIndexRoute,
+  SignupIndexRoute: SignupIndexRoute,
 }
 export const routeTree = rootRouteImport
-    ._addFileChildren(rootRouteChildren)
-    ._addFileTypes<FileRouteTypes>()
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()

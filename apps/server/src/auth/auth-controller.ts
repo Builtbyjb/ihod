@@ -1,30 +1,17 @@
 import { Hono } from "hono";
-import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
 import { Bindings } from "@/lib/types";
 import { drizzle } from "drizzle-orm/d1";
-import { DrizzleQueryError, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { members, organizations, users } from "@/db/schema";
-import { generateOTP } from "@/lib/utils";
-import { sign, verify } from "hono/jwt";
-import { setCookie, getCookie, deleteCookie } from "hono/cookie";
-import type { JWTPayload } from "hono/utils/jwt/types";
-import type { ResponsePayload } from "@/lib/types";
+import { parseToken, signToken, sendOTPEmail } from "@/lib/utils";
+import { setCookie, deleteCookie } from "hono/cookie";
+import type { OTPPayload, TokenPayload } from "@/lib/types";
+import { ErrorResult } from "@/lib/types";
+import { ACCESS_TOKEN_EXP, ACCESS_TOKEN_MAX_AGE, REFRESH_TOKEN_EXP, REFRESH_TOKEN_MAX_AGE } from "@/lib/constants";
+import { loginSchema, otpSchema, signupSchema } from "./auth-zod-schema";
 
 const authRouteV1 = new Hono<{ Bindings: Bindings }>().basePath("/auth");
-
-type OTPPayload = JWTPayload & {
-    userId: number;
-    otp: string;
-};
-
-const loginSchema = z.object({
-    email: z.string().email(),
-});
-
-const otpSchema = z.object({
-    otp: z.string().length(8),
-});
 
 // TODO: Improved error handling
 
@@ -32,168 +19,193 @@ authRouteV1.post("/login", zValidator("json", loginSchema), async (c) => {
     const { email } = c.req.valid("json");
     const db = drizzle(c.env.DB);
 
-    // Create user
-    let result;
-    try {
-        result = await db.insert(users).values({ email: email }).returning({ id: users.id }).get();
-    } catch (error) {
-        // Fetch existing user if insert fails
-        if (error instanceof DrizzleQueryError) {
-            result = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).get();
-        }
+    let user = await db.select().from(users).where(eq(users.email, email)).get();
+    if (!user) {
+        console.log("Error finding user")
+        return c.json({ message: "User not found" }, 404);
     }
 
-    if (!result) {
-        console.log("Error creating or finding user")
-        return c.json({ message: "Internal server error" }, 500);
-    }
+    const otp = await sendOTPEmail(c, email)
+    if (otp instanceof Error) return c.json({ message: "Internal server error" }, 500);
 
-    // Generate a OTP
-    const otp = generateOTP();
-    const sender = c.env.EMAIL_DOMAIN;
-    if (!sender) {
-        console.error("EMAIL_DOMAIN not configured");
-        return c.json({ message: "Internal server error" }, 500);
-    }
-
-    // Send OTP to user name
-    await c.env.SEND_EMAIL.send({
-        from: sender,
-        to: email,
-        subject: "Your OTP code",
-        text: `Your OTP code is: ${otp}`,
-    });
-
-    const exp = 60 * 30; // Token expires in 30 minutes
     const payload: OTPPayload = {
-        userId: result.id,
+        userId: user.id,
+        currentOrgId: user.currentOrgId,
         otp: otp,
-        exp: Math.floor(Date.now() / 1000) + exp,
+        exp: ACCESS_TOKEN_EXP
     };
 
-    const secret = c.env.JWT_SECRET;
-    if (!secret) {
-        console.error("JWT secret not configured");
-        return c.json({ message: "Internal server error" }, 500);
-    }
+    const signResult = await signToken(c, payload)
+    if (signResult instanceof Error) return c.json({ message: signResult.message }, 500)
 
-    const token = await sign(payload, secret);
-
-    setCookie(c, "otp_token", token, {
+    setCookie(c, "otp_token", signResult, {
         httpOnly: true,
         secure: true,
         sameSite: "lax",
         path: "/",
-        maxAge: exp
+        maxAge: ACCESS_TOKEN_MAX_AGE
     });
 
     return c.json({ message: "OTP sent to your email" }, 200);
 });
 
-authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
+authRouteV1.post("/signup", zValidator("json", signupSchema), async (c) => {
+    const data = c.req.valid("json");
     const db = drizzle(c.env.DB);
 
+    try {
+        // Create organization
+        const organization = await db.insert(organizations).values({
+            name: data.businessName,
+            type: data.businessType,
+            address: data.businessAddress,
+            city: data.city,
+            country: data.country,
+            currency: data.currency,
+        }).returning({ id: organizations.id }).get();
+
+        // Create user
+        const user = await db.insert(users).values({
+            email: data.email,
+            firstname: data.firstname,
+            lastname: data.lastname,
+            username: data.username,
+            currentOrgId: organization.id
+        }).returning({ id: users.id }).get()
+
+        // Create member
+        await db.insert(members).values({
+            userId: user.id,
+            organizationId: organization.id,
+            roleId: 1
+        });
+
+        const otp = await sendOTPEmail(c, data.email)
+        if (otp instanceof Error) return c.json({ message: "Internal server error" }, 500);
+
+        const payload: OTPPayload = {
+            userId: user.id,
+            currentOrgId: organization.id,
+            otp: otp,
+            exp: ACCESS_TOKEN_EXP
+        };
+
+        const signResult = await signToken(c, payload)
+        if (signResult instanceof Error) return c.json({ message: signResult.message }, 500)
+
+        setCookie(c, "otp_token", signResult, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "lax",
+            path: "/",
+            maxAge: ACCESS_TOKEN_MAX_AGE
+        });
+
+        return c.json({ message: "Sign up completed" }, 200);
+
+    } catch (error) {
+        console.log(error)
+        return c.json({ message: "An error occurred while signing up user" }, 500)
+    }
+});
+
+authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
+    const db = drizzle(c.env.DB);
     const { otp } = c.req.valid("json");
-    const otpToken = getCookie(c, "otp_token");
-    if (!otpToken) {
-        return c.json({ message: "OTP token not found" }, 400);
-    }
 
-    const secret = c.env.JWT_SECRET;
-    if (!secret) {
-        console.error("JWT secret not configured");
-        return c.json({ message: "Internal server error" }, 500);
-    }
+    const parsed = await parseToken(c, "otp_token")
+    if (parsed instanceof ErrorResult) return c.json({ message: parsed.message }, parsed.code)
 
-    // TODO: Handle verification failure
-    const decoded: OTPPayload = (await verify(otpToken, secret, "HS256")) as OTPPayload;
-    if (decoded.otp !== otp) {
-        return c.json({ message: "Invalid OTP" }, 400);
-    }
+    // Verify OTP code
+    if (!parsed.otp) return c.json({ message: "OTP not found" }, 400)
+    if (parsed.otp !== otp) return c.json({ message: "Invalid OTP" }, 400)
 
     // Verify user exists
-    const user = await db.select().from(users).where(eq(users.id, decoded.userId)).get();
+    const user = await db.select().from(users).where(eq(users.id, parsed.userId)).get();
     if (!user) return c.json({ message: "User not found" }, 404);
 
-    const exp = 60 * 60 * 24 * 90; // Token expires in 90 days
-    const payload: ResponsePayload = {
-        userId: decoded.userId,
-        exp: Math.floor(Date.now() / 1000) + exp,
+    // Get organization details
+    const organization = await db.select().from(organizations).where(eq(organizations.id, parsed.currentOrgId)).get()
+    if (!organization) return c.json({ message: "User organization not found" }, 404)
+
+    const refreshPayload: TokenPayload = {
+        userId: parsed.userId,
+        username: user.username,
+        email: user.email,
+        currentOrgId: parsed.currentOrgId,
+        currency: organization.currency,
+        organizationName: organization.name,
+        exp: REFRESH_TOKEN_EXP,
     };
 
-    const refreshToken = await sign(payload, secret);
+    const refreshToken = await signToken(c, refreshPayload);
+    if (refreshToken instanceof Error) return c.json({ message: refreshToken.message }, 500)
 
     setCookie(c, "refresh_token", refreshToken, {
         httpOnly: true,
         secure: true,
         sameSite: "Lax",
         path: "/",
-        maxAge: exp
+        maxAge: REFRESH_TOKEN_MAX_AGE
     });
 
-    const accessToken = await sign(
-        {
-            userId: decoded.userId,
-            exp: Math.floor(Date.now() / 1000) + 60 * 30, // 30 minutes
-        },
-        secret,
-    );
+    const accessPayload: TokenPayload = {
+        userId: parsed.userId,
+        username: user.username,
+        email: user.email,
+        currentOrgId: parsed.currentOrgId,
+        currency: organization.currency,
+        organizationName: organization.name,
+        exp: ACCESS_TOKEN_EXP
+    }
+
+    const accessToken = await signToken(c, accessPayload);
+    if (accessToken instanceof Error) c.json({ message: accessToken.message }, 500)
 
     return c.json({
-        message: "OTP verified",
-        setupCompleted: user.setupCompleted,
         accessToken: accessToken,
-    });
+        user: {
+            username: user.username,
+            organizationName: organization.name,
+            email: user.email,
+            currency: organization.currency
+        }
+    }, 200);
 });
 
 authRouteV1.get("/refresh-token", async (c) => {
     const db = drizzle(c.env.DB);
 
-    const refreshToken = getCookie(c, "refresh_token");
-    if (!refreshToken) return c.json({ message: "No refresh token" }, 401);
+    const parsed = await parseToken(c, "refresh_token")
+    if (parsed instanceof ErrorResult) return c.json({ message: parsed.message }, parsed.code)
 
-    const secret = c.env.JWT_SECRET;
-    if (!secret) {
-        console.error("JWT secret not configured");
-        return c.json({ message: "Internal server error" }, 500);
+    // Get organization details
+    const organization = await db.select().from(organizations).where(eq(organizations.id, parsed.currentOrgId)).get()
+    if (!organization) return c.json({ message: "User organization not found" }, 404)
+
+    const accessPayload: TokenPayload = {
+        userId: parsed.userId,
+        username: parsed.username,
+        email: parsed.email,
+        currentOrgId: parsed.currentOrgId,
+        currency: organization.currency,
+        organizationName: organization.name,
+        exp: ACCESS_TOKEN_EXP
     }
 
-    // TODO: Handle verification failure
-    const decoded = (await verify(refreshToken, secret, "HS256")) as ResponsePayload;
+    const accessToken = await signToken(c, accessPayload);
+    if (accessToken instanceof Error) c.json({ message: accessToken.message }, 500)
 
-    const accessToken = await sign(
-        {
-            userId: decoded.userId,
-            exp: Math.floor(Date.now() / 1000) + 60 * 30, // 30 minutes
-        },
-        secret,
-    );
-
-    return c.json({ message: "Token refreshed", accessToken: accessToken })
+    return c.json({
+        accessToken: accessToken,
+        user: {
+            username: parsed.username,
+            organizationName: organization.name,
+            email: parsed.email,
+            currency: organization.currency
+        }
+    })
 });
-
-authRouteV1.get("/verify-setup-completed", async (c) => {
-    const db = drizzle(c.env.DB);
-
-    const refreshToken = getCookie(c, "refresh_token");
-    if (!refreshToken) return c.json({ message: "No refresh token" }, 401);
-
-    const secret = c.env.JWT_SECRET;
-    if (!secret) {
-        console.error("JWT secret not configured");
-        return c.json({ message: "Internal server error" }, 500);
-    }
-
-    // TODO: Handle verification failure
-    const decoded = (await verify(refreshToken, secret, "HS256")) as ResponsePayload;
-
-    // verify setupCompleted
-    const result = await db.select({ setCompleted: users.setupCompleted }).from(users).where(eq(users.id, decoded.userId)).get()
-    if (!result) return c.json({ message: "User not found" }, 404)
-    if (!result.setCompleted) return c.json({ message: "Profile setup required" }, 400)
-
-    return c.json({ message: "Setup completed" }, 200)
-})
 
 authRouteV1.get("/logout", (c) => {
     deleteCookie(c, "refresh_token");
