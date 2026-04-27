@@ -4,15 +4,10 @@ export const CURRENCIES = [
     { name: "Naira (NGN)", value: "NGN" },
     { name: "Canadian Dollar (CAD)", value: "CAD" },
     { name: "US Dollar (USD)", value: "USD" },
-]
+];
 
-export function useDashboardStats(
-    invoices: Invoice[],
-    clients: Client[],
-): DashboardStats {
-    const totalRevenue = invoices
-        .filter((inv) => inv.status === "paid")
-        .reduce((sum, inv) => sum + inv.taxRate, 0);
+export function useDashboardStats(invoices: Invoice[], clients: Client[]): DashboardStats {
+    const totalRevenue = invoices.filter((inv) => inv.status === "paid").reduce((sum, inv) => sum + inv.taxRate, 0);
 
     const paidInvoices = invoices.filter((inv) => inv.status === "paid").length;
 
@@ -25,20 +20,7 @@ export function useDashboardStats(
     return { totalRevenue, paidInvoices, pendingAmount, totalClients };
 }
 
-export const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-];
+export const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export function getMonthlyRevenue(invoices: Invoice[]) {
     const monthlyData: { [key: string]: number } = {};
@@ -48,7 +30,7 @@ export function getMonthlyRevenue(invoices: Invoice[]) {
         .forEach((inv) => {
             const date = new Date(inv.issueDate);
             const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-            monthlyData[monthKey] = (monthlyData[monthKey] || 0);
+            monthlyData[monthKey] = monthlyData[monthKey] || 0;
         });
 
     const currentYear = new Date().getFullYear();

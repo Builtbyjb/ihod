@@ -204,7 +204,7 @@ authRouteV1.get("/refresh-token", async (c) => {
             email: parsed.email,
             currency: organization.currency
         }
-    })
+    }, 200)
 });
 
 authRouteV1.get("/logout", (c) => {

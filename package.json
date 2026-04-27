@@ -7,7 +7,9 @@
     "deploy-server": "npx turbo deploy --filter=@ihod/server",
     "build-web": "npx turbo build --filter=@ihod/web",
     "build-server": "npx turbo build --filter=@ihod/server",
-    "lint-web": "npx turbo lint --filter=@ihod/web"
+    "lint-web": "npx turbo lint --filter=@ihod/web",
+    "c-mig": "npx turbo run create-migrations --filter=@ihod/server",
+    "a-mig": "npx turbo run apply-migrations --filter=@ihod/server"
   },
   "devDependencies": {
     "drizzle-kit": "^0.31.10",
