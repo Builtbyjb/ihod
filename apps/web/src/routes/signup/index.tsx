@@ -28,8 +28,8 @@ const schema = z.object({
 const API_URL = import.meta.env.VITE_API_URL;
 
 function RouteComponent() {
-  const [isVerified, setIsVerified] = useState<boolean>(false)
-  const navigate = useNavigate()
+  const [isVerified, setIsVerified] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const form = useForm({
     defaultValues: {
@@ -58,7 +58,7 @@ function RouteComponent() {
 
         if (!response.ok) throw new Error("Error setting profile");
 
-        setIsVerified(true)
+        setIsVerified(true);
       } catch (error) {
         console.error(error);
         toast.error(error.message);
@@ -72,9 +72,7 @@ function RouteComponent() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-xl">Sign Up</CardTitle>
-          <CardDescription>
-            Tell us about yourself and your business
-          </CardDescription>
+          <CardDescription>Tell us about yourself and your business</CardDescription>
         </CardHeader>
         <CardContent>
           <form
@@ -86,7 +84,6 @@ function RouteComponent() {
           >
             <FieldGroup>
               <Field orientation="horizontal">
-
                 <form.Field
                   name="firstname"
                   children={(field) => {
@@ -106,7 +103,7 @@ function RouteComponent() {
                           aria-invalid={isInvalid}
                           autoComplete="off"
                         />
-                        {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                        {isInvalid && <FieldError errors={field.state.meta.errors} />}
                       </Field>
                     );
                   }}
@@ -130,7 +127,7 @@ function RouteComponent() {
                           aria-invalid={isInvalid}
                           autoComplete="off"
                         />
-                        {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                        {isInvalid && <FieldError errors={field.state.meta.errors} />}
                       </Field>
                     );
                   }}
@@ -155,7 +152,7 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         autoComplete="off"
                       />
-                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
                     </Field>
                   );
                 }}
@@ -179,7 +176,7 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         autoComplete="off"
                       />
-                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
                     </Field>
                   );
                 }}
@@ -203,7 +200,7 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         autoComplete="off"
                       />
-                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
                     </Field>
                   );
                 }}
@@ -227,7 +224,7 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         autoComplete="off"
                       />
-                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
                     </Field>
                   );
                 }}
@@ -243,10 +240,12 @@ function RouteComponent() {
                       </FieldLabel>
                       <Select
                         name={field.name}
-                        value={CURRENCIES.find(c => c.value === field.state.value)?.name}
-                        onValueChange={(e) => { if (e) field.handleChange(e) }}
+                        value={CURRENCIES.find((c) => c.value === field.state.value)?.name}
+                        onValueChange={(e) => {
+                          if (e) field.handleChange(e);
+                        }}
                       >
-                        <SelectTrigger id="select-currency" aria-invalid={isInvalid} className="min-w-30" >
+                        <SelectTrigger id="select-currency" aria-invalid={isInvalid} className="min-w-30">
                           <SelectValue placeholder="Select currency" />
                         </SelectTrigger>
                         <SelectContent>
@@ -258,7 +257,7 @@ function RouteComponent() {
                           ))}
                         </SelectContent>
                       </Select>
-                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
                     </Field>
                   );
                 }}
@@ -282,7 +281,7 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         placeholder="Street Address"
                       />
-                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
                     </Field>
                   );
                 }}
@@ -307,7 +306,7 @@ function RouteComponent() {
                           aria-invalid={isInvalid}
                           placeholder="City, State ZIP"
                         />
-                        {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                        {isInvalid && <FieldError errors={field.state.meta.errors} />}
                       </Field>
                     );
                   }}
@@ -331,7 +330,7 @@ function RouteComponent() {
                           aria-invalid={isInvalid}
                           placeholder="Country"
                         />
-                        {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                        {isInvalid && <FieldError errors={field.state.meta.errors} />}
                       </Field>
                     );
                   }}
@@ -342,7 +341,7 @@ function RouteComponent() {
         </CardContent>
         <CardFooter className="bg-background">
           <Field orientation="horizontal">
-            <Button type="button" variant="outline" onClick={() => form.reset()} >
+            <Button type="button" variant="outline" onClick={() => form.reset()}>
               Reset
             </Button>
             <Button type="submit" form="signup-form">
@@ -352,8 +351,7 @@ function RouteComponent() {
         </CardFooter>
       </Card>
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 mt-4">
-        By clicking Submit, you agree to our{" "}
-        <Link to="/terms-of-service">Terms of Service</Link> and{" "}
+        By clicking Submit, you agree to our <Link to="/terms-of-service">Terms of Service</Link> and{" "}
         <Link to="/privacy-policy">Privacy Policy</Link>.
       </div>
       <br />
