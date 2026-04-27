@@ -9,10 +9,8 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 import OTP from "@/components/OTP";
-import { authenticateUser } from "@/lib/utils";
 import { CURRENCIES } from "@/lib/store";
 import { ArrowLeft } from "lucide-react";
-
 
 const schema = z.object({
   firstname: z.string().min(2),
@@ -367,7 +365,7 @@ function RouteComponent() {
 
 export const Route = createFileRoute("/signup/")({
   beforeLoad: async ({ context }) => {
-    const isAuthenticated = await authenticateUser(context);
+    const isAuthenticated: boolean = context.auth ? await context.auth.authenticate() : false;
     if (isAuthenticated) {
       throw redirect({
         to: "/dashboard",

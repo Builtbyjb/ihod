@@ -1,36 +1,11 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { type Context } from "./types";
-import { jwtDecode } from "jwt-decode";
 import type { InvoiceItem } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-function isTokenExpired(accessToken: string): boolean {
-    const { exp } = jwtDecode(accessToken);
-    const now = Date.now() / 1000;
-    if (!exp) return true;
-    // Returns true if expired, false otherwise
-    return exp < now;
-}
-
-export async function authenticateUser(context: Context): Promise<boolean> {
-    if (!context.auth) return false;
-
-    try {
-        if (context.auth.accessToken) {
-            if (isTokenExpired(context.auth.accessToken)) await context.auth.refreshToken();
-        } else {
-            await context.auth.refreshToken();
-        }
-        return true;
-    } catch (error) {
-        console.error(error);
-        return false;
-    }
-}
 
 export function calculateTotalAmount(items: InvoiceItem[], taxRate: number): number {
     const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0)

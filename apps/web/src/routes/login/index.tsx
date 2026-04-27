@@ -10,7 +10,6 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 import { ArrowLeft } from "lucide-react";
 import OTP from "@/components/OTP";
 import { useAuth } from "@/hooks/auth";
-import { authenticateUser } from "@/lib/utils";
 
 const emailFormSchema = z.object({
   email: z.string().email(),
@@ -102,6 +101,7 @@ function RouteComponent() {
       </div>
       <br />
       <br />
+      {/* Display OTP input */}
       {isVerified && <OTP />}
     </div>
   );
@@ -109,7 +109,7 @@ function RouteComponent() {
 
 export const Route = createFileRoute("/login/")({
   beforeLoad: async ({ context }) => {
-    const isAuthenticated = await authenticateUser(context);
+    const isAuthenticated = context.auth ? await context.auth.authenticate() : false;
     if (isAuthenticated) {
       throw redirect({
         to: "/dashboard",

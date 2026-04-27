@@ -1,17 +1,14 @@
 import { createFileRoute, redirect, Outlet } from "@tanstack/react-router";
 import Sidebar from "@/components/Sidebar";
-import { authenticateUser } from "@/lib/utils";
 
 function AuthenticatedLayout() {
   return (
-    <>
-      <div>
-        <Sidebar />
-        <div className="md:pl-64">
-          <Outlet />
-        </div>
+    <div>
+      <Sidebar />
+      <div className="md:pl-64">
+        <Outlet />
       </div>
-    </>
+    </div>
   );
 }
 
@@ -20,7 +17,7 @@ function AuthenticatedLayout() {
  */
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ context, location }) => {
-    const isAuthenticated = await authenticateUser(context);
+    const isAuthenticated = context.auth ? await context.auth.authenticate() : false;
     if (!isAuthenticated) {
       throw redirect({
         to: "/login",
