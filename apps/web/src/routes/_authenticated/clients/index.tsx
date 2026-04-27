@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import Header from "@/components/Header";
 import ClientsTable from "@/components/ClientsTable";
 import ClientForm from "@/components/ClientForm";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import type { Client } from "@/lib/types";
 import * as z from "zod";
+import { useLayout } from "@/hooks/useLayout";
 
 const clientsResponseSchema = z.array(
   z.object({
@@ -19,12 +19,15 @@ const clientsResponseSchema = z.array(
     city: z.string(),
     country: z.string(),
     createdAt: z.string(),
-  })
-)
+  }),
+);
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function RouteComponent() {
+  const { setTitle } = useLayout();
+  setTitle("Clients");
+
   const [formOpen, setFormOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [clients, setClients] = useState<Client[]>([]);
@@ -40,20 +43,16 @@ function RouteComponent() {
   };
 
   const handleClientEdit = (editedClient: Client) => {
-    setClients((prev) =>
-      prev.map((client) =>
-        client.id === editedClient.id ? editedClient : client
-      )
-    );
-  }
+    setClients((prev) => prev.map((client) => (client.id === editedClient.id ? editedClient : client)));
+  };
 
   const handleClientAdd = (client: Client) => {
-    setClients((prev) => [...prev, client])
-  }
+    setClients((prev) => [...prev, client]);
+  };
 
   const handleClientDelete = (clientId: string) => {
-    setClients((prev) => prev.filter(c => c.id !== clientId))
-  }
+    setClients((prev) => prev.filter((c) => c.id !== clientId));
+  };
 
   useEffect(() => {
     (async () => {
@@ -62,29 +61,26 @@ function RouteComponent() {
           method: "GET",
           credentials: "include",
           headers: {
-            "Content-Type": "application/json"
-          }
-        })
+            "Content-Type": "application/json",
+          },
+        });
 
-        if (!response.ok) throw new Error("Failed to fetch clients")
+        if (!response.ok) throw new Error("Failed to fetch clients");
 
-        const data = await response.json()
-        const parsedClients = clientsResponseSchema.parse(data.clients)
+        const data = await response.json();
+        const parsedClients = clientsResponseSchema.parse(data.clients);
 
-        setClients(parsedClients)
-
+        setClients(parsedClients);
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
-    })()
-  }, [])
+    })();
+  }, []);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header title="Clients" />
-      <main className="flex-1 p-4 md:p-6 space-y-4">
-        <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
-          {/*<div className="relative w-full sm:w-64">
+    <main className="space-y-4">
+      <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+        {/*<div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
@@ -94,23 +90,22 @@ function RouteComponent() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>*/}
-          <Button onClick={() => setFormOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Client
-          </Button>
-        </div>
+        <Button onClick={() => setFormOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add Client
+        </Button>
+      </div>
 
-        <ClientsTable onEdit={handleEdit} clients={clients} deleteClient={handleClientDelete} />
+      <ClientsTable onEdit={handleEdit} clients={clients} deleteClient={handleClientDelete} />
 
-        <ClientForm
-          open={formOpen}
-          onOpenChange={handleFormClose}
-          client={editingClient}
-          addClient={handleClientAdd}
-          editClient={handleClientEdit}
-        />
-      </main>
-    </div>
+      <ClientForm
+        open={formOpen}
+        onOpenChange={handleFormClose}
+        client={editingClient}
+        addClient={handleClientAdd}
+        editClient={handleClientEdit}
+      />
+    </main>
   );
 }
 

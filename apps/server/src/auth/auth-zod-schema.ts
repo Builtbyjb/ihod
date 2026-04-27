@@ -19,4 +19,5 @@ export const signupSchema = z.object({
     businessAddress: z.string().min(2),
     city: z.string().min(2),
     country: z.string().min(2),
+    website: z.string(),
 });

@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,7 +29,7 @@ interface ClientsTableProps {
   deleteClient: (clientId: string) => void;
 }
 
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL;
 export default function ClientsTable({ onEdit, clients, deleteClient }: ClientsTableProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
@@ -46,23 +39,22 @@ export default function ClientsTable({ onEdit, clients, deleteClient }: ClientsT
         const response = await fetch(`${API_URL}/api/v1/clients/delete/${deleteId}`, {
           method: "DELETE",
           credentials: "include",
-        })
+        });
 
         if (!response.ok) {
-          throw new Error("Failed to delete client")
+          throw new Error("Failed to delete client");
         }
 
-        deleteClient(deleteId)
-        toast.success("Client deleted")
-
+        deleteClient(deleteId);
+        toast.success("Client deleted");
       } catch (error) {
-        console.log(error)
-        toast.error("Failed to delete client")
+        console.log(error);
+        toast.error("Failed to delete client");
       } finally {
         setDeleteId(null);
       }
-    };
-  }
+    }
+  };
 
   return (
     <>
@@ -80,10 +72,7 @@ export default function ClientsTable({ onEdit, clients, deleteClient }: ClientsT
           <TableBody>
             {clients.length === 0 ? (
               <TableRow>
-                <TableCell
-                  colSpan={5}
-                  className="h-32 text-center text-muted-foreground"
-                >
+                <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
                   No clients found. Add your first client to get started.
                 </TableCell>
               </TableRow>
@@ -93,9 +82,7 @@ export default function ClientsTable({ onEdit, clients, deleteClient }: ClientsT
                   <TableCell>
                     <div className="flex flex-col">
                       <span className="font-medium">{client.name}</span>
-                      <span className="text-sm text-muted-foreground sm:hidden">
-                        {client.email}
-                      </span>
+                      <span className="text-sm text-muted-foreground sm:hidden">{client.email}</span>
                     </div>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">
@@ -115,9 +102,7 @@ export default function ClientsTable({ onEdit, clients, deleteClient }: ClientsT
                   <TableCell className="hidden md:table-cell">
                     <div className="flex flex-col text-sm">
                       <span>{client.city}</span>
-                      <span className="text-muted-foreground">
-                        {client.country}
-                      </span>
+                      <span className="text-muted-foreground">{client.country}</span>
                     </div>
                   </TableCell>
                   <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">
@@ -131,7 +116,7 @@ export default function ClientsTable({ onEdit, clients, deleteClient }: ClientsT
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <Link to="/clients/$clientId" params={{ clientId: client.id }}>
-                          <DropdownMenuItem >
+                          <DropdownMenuItem>
                             <Eye className="mr-2 h-4 w-4" />
                             View
                           </DropdownMenuItem>
@@ -141,10 +126,7 @@ export default function ClientsTable({ onEdit, clients, deleteClient }: ClientsT
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() => setDeleteId(client.id)}
-                          className="text-destructive"
-                        >
+                        <DropdownMenuItem onClick={() => setDeleteId(client.id)} className="text-destructive">
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete
                         </DropdownMenuItem>
@@ -154,26 +136,21 @@ export default function ClientsTable({ onEdit, clients, deleteClient }: ClientsT
                 </TableRow>
               ))
             )}
-
           </TableBody>
         </Table>
-      </div >
+      </div>
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Client</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this client? This action cannot be
-              undone.
+              Are you sure you want to delete this client? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="bg-background">
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              className="bg-destructive text-white hover:bg-destructive/90"
-            >
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-white hover:bg-destructive/90">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

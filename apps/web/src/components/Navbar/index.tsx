@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { FileText, Menu, X } from "lucide-react";
 import { useState } from "react";
@@ -6,6 +6,7 @@ import { APP_NAME } from "@/lib/constant";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
@@ -53,64 +54,66 @@ export default function Navbar() {
           </Button>
         </div>
 
-        <button
-          type="button"
-          className="md:hidden p-2 -m-2"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? (
-            <X className="h-6 w-6" />
-          ) : (
-            <Menu className="h-6 w-6" />
-          )}
+        <button type="button" className="md:hidden p-2 -m-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </nav>
 
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-border bg-background">
-          {/*<div className="flex flex-col gap-4 px-6 py-6">
-            <Link
+          <div className="flex flex-col gap-4 px-6 py-6">
+            {/*<Link
               to="/features"
               className="text-sm font-medium text-muted-foreground"
               onClick={() => setMobileMenuOpen(false)}
             >
               Features
-            </Link>
-            <Link
+            </Link>*/}
+            {/*<Link
               to="/how-it-works"
               className="text-sm font-medium text-muted-foreground"
               onClick={() => setMobileMenuOpen(false)}
             >
               How it works
-            </Link>
+            </Link>*/}
             <Link
               to="/pricing"
               className="text-sm font-medium text-muted-foreground"
-              onClick={() => setMobileMenuOpen(false)}
+              onClick={() => {
+                setMobileMenuOpen(false);
+                navigate({ to: "/pricing" });
+              }}
             >
               Pricing
             </Link>
-            <Link
+            {/*<Link
               to="/testimonials"
               className="text-sm font-medium text-muted-foreground"
               onClick={() => setMobileMenuOpen(false)}
             >
               Testimonials
-            </Link>
+            </Link>*/}
             <div className="flex flex-col gap-3 pt-4 border-t border-border">
               <Button
-                variant="ghost"
-                size="sm"
+                variant="outline"
                 className="justify-start"
-                asChild
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  navigate({ to: "/login" });
+                }}
               >
-                <Link to="/dashboard">Log in</Link>
+                Log in
               </Button>
-              <Button size="sm" asChild>
-                <Link to="/dashboard">Start for free</Link>
+              <Button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  navigate({ to: "/signup" });
+                }}
+              >
+                Start for free
               </Button>
             </div>
-          </div>*/}
+          </div>
         </div>
       )}
     </header>
