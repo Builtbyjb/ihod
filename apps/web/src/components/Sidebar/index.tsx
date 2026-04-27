@@ -43,7 +43,7 @@ const navItems = [
     icon: Settings,
     items: [
       {
-        title: "User",
+        title: "Profile",
         url: "/settings",
         icon: User,
       },
