@@ -1,91 +1,160 @@
-import { Link } from "@tanstack/react-router";
-import { useLocation } from "@tanstack/react-router";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { LayoutDashboard, Users, Settings, Receipt, LogOut } from "lucide-react";
+import * as React from "react";
+import { ChevronRight, CreditCard, LayoutDashboard, LogOut, Settings, User, UserPlus, Users } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarGroup,
+  SidebarMenuSub,
+  useSidebar,
+} from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/auth";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "../ui/separator";
+import { Badge } from "@/components/ui/badge";
+
+type SidebarProps = {
+  businessName?: string;
+  username?: string;
+  email?: string;
+};
 
 const navItems = [
   {
     title: "Dashboard",
-    href: "/dashboard",
+    url: "/dashboard",
     icon: LayoutDashboard,
+    isActive: true,
   },
   {
     title: "Clients",
-    href: "/clients",
+    url: "/Clients",
     icon: Users,
+  },
+  {
+    title: "Settings",
+    url: "/settings",
+    icon: Settings,
+    items: [
+      {
+        title: "User",
+        url: "/settings",
+        icon: User,
+      },
+      {
+        title: "Billing",
+        url: "/settings/billing",
+        icon: CreditCard,
+      },
+      {
+        title: "Referral",
+        url: "/settings/referral",
+        icon: UserPlus,
+      },
+    ],
   },
 ];
 
-type SidebarProps = {
-  businessName?: string
-  username?: string
-}
-
-export default function Sidebar({ businessName }: SidebarProps) {
-  const pathname = useLocation({ select: (location) => location.pathname });
+export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar> & SidebarProps) {
+  const navigate = useNavigate();
   const { logout } = useAuth();
-
+  const { setOpenMobile } = useSidebar();
   return (
-    <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 border-r border-border bg-card">
-      <div className="flex flex-col min-h-0">
-        <div className="flex items-center h-16 px-6 border-b border-border">
-          <Link to="/dashboard" className="flex items-center gap-2">
-            <Receipt className="h-6 w-6" />
-            <span className="text-xl font-bold flex items-center">
-              {businessName}
-              <Badge variant="outline" className="bg-blue-100 text-blue-600">
-                beta
-              </Badge>
-            </span>
-            {/*<p>{username}</p>*/}
-          </Link>
-        </div>
-        <nav className="flex-1 px-3 py-4 space-y-1">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
-            return (
-              <Link
-                key={item.href}
-                to={item.href}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors",
-                  isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                )}
+    <Sidebar variant="inset" {...props}>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem
+            className="mt-4"
+            onClick={() => {
+              setOpenMobile(false);
+              navigate({ to: "/dashboard" });
+            }}
+          >
+            <div className="flex gap-2 text-sm leading-tight">
+              <Avatar className="w-8 h-8">
+                <AvatarImage src="https://picsum.photos/id/15/200/300" alt="user avatar" className="" />
+                <AvatarFallback>{props.username?.charAt(0).toUpperCase()}</AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col">
+                <span className="truncate font-medium text-xl">{props.businessName}</span>
+                <span className="truncate text-xs">{props.username}</span>
+                <span className="truncate text-xs">{props.email}</span>
+              </div>
+            </div>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+      <Badge className="bg-blue-100 text-blue-700/80">Beta</Badge>
+      <Separator className="mt-2 mb-2" />
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarMenu className="space-y-2">
+            {navItems.map((item) => (
+              <Collapsible key={item.title} defaultOpen={item.isActive} className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger className="w-full">
+                    <SidebarMenuButton
+                      tooltip={item.title}
+                      className="hover:bg-accent flex gap-4 items-center hover:cursor-pointer"
+                      onClick={() => {
+                        if (item.items === undefined) {
+                          navigate({ to: item.url });
+                          setOpenMobile(false);
+                        }
+                      }}
+                    >
+                      <item.icon />
+                      <span>{item.title}</span>
+                      {item.items && (
+                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                      )}
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    {item.items?.length ? (
+                      <>
+                        <SidebarMenuSub className="">
+                          {item.items?.map((subItem) => (
+                            <SidebarMenuItem key={subItem.title}>
+                              <SidebarMenuButton
+                                tooltip={subItem.title}
+                                className="hover:bg-accent flex gap-4 items-center hover:cursor-pointer"
+                                onClick={() => {
+                                  setOpenMobile(false);
+                                  navigate({ to: subItem.url });
+                                }}
+                              >
+                                <subItem.icon />
+                                <span>{subItem.title}</span>
+                              </SidebarMenuButton>
+                            </SidebarMenuItem>
+                          ))}
+                        </SidebarMenuSub>
+                      </>
+                    ) : null}
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+            ))}
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                className="text-destructive hover:bg-red-200 hover:text-destructive hover:cursor-pointer"
+                onClick={() => logout()}
               >
-                <item.icon className="h-5 w-5" />
-                {item.title}
-              </Link>
-            );
-          })}
-          <div>
-            <Link
-              to="/settings"
-              className={cn(
-                "flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors",
-                pathname === "/settings"
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
-              )}
-            >
-              <Settings className="h-5 w-5" />
-              Settings
-            </Link>
-            <Button
-              variant="ghost"
-              className="text-red-600"
-              onClick={() => logout()}
-            >
-              <LogOut className="h-5 w-5" />
-              Logout
-            </Button>
-          </div>
-        </nav>
-      </div>
-    </aside>
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter>{/*Footer*/}</SidebarFooter>
+    </Sidebar>
   );
 }

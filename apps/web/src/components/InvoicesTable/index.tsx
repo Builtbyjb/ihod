@@ -1,13 +1,6 @@
 import { useState } from "react";
 // import { Link } from "@tanstack/react-router";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -27,30 +20,28 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  MoreHorizontal,
-  Eye,
-  Pencil,
-  Trash2,
-  Download,
-  Send,
-  CheckCircle,
-} from "lucide-react";
+import { MoreHorizontal, Eye, Pencil, Trash2, Download, Send, CheckCircle } from "lucide-react";
 import type { Invoice } from "@/lib/types";
 import { format } from "date-fns";
 import { useNavigate } from "@tanstack/react-router";
 import { calculateTotalAmount } from "@/lib/utils";
 
 interface InvoicesTableProps {
-  clientId: string
+  clientId: string;
   invoices: Invoice[];
   onDelete: (id: number) => void;
   onStatusChange: (id: number, status: Invoice["status"]) => void;
   onDownload: (invoice: Invoice) => void;
 }
 
-const API_URL = import.meta.env.VITE_API_URL
-export default function InvoicesTable({ invoices, onDelete, onStatusChange, onDownload, clientId }: InvoicesTableProps) {
+const API_URL = import.meta.env.VITE_API_URL;
+export default function InvoicesTable({
+  invoices,
+  onDelete,
+  onStatusChange,
+  onDownload,
+  clientId,
+}: InvoicesTableProps) {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const navigate = useNavigate();
 
@@ -82,13 +73,13 @@ export default function InvoicesTable({ invoices, onDelete, onStatusChange, onDo
         const response = await fetch(`${API_URL}/api/v1/clients/${clientId}/invoices/${deleteId}/delete`, {
           method: "GET",
           credentials: "include",
-        })
+        });
 
-        if (!response.ok) throw new Error("An error occurred while deleting the invoice")
+        if (!response.ok) throw new Error("An error occurred while deleting the invoice");
 
         onDelete(deleteId);
       } catch (error) {
-        console.log(error)
+        console.log(error);
       } finally {
         setDeleteId(null);
       }
@@ -115,10 +106,7 @@ export default function InvoicesTable({ invoices, onDelete, onStatusChange, onDo
               <>
                 {invoices.length === 0 ? (
                   <TableRow>
-                    <TableCell
-                      colSpan={7}
-                      className="h-32 text-center text-muted-foreground"
-                    >
+                    <TableCell colSpan={7} className="h-32 text-center text-muted-foreground">
                       No invoices found. Create your first invoice to get started.
                     </TableCell>
                   </TableRow>
@@ -127,9 +115,7 @@ export default function InvoicesTable({ invoices, onDelete, onStatusChange, onDo
                     <TableRow key={invoice.id}>
                       <TableCell>
                         <div className="flex flex-col">
-                          <span className="font-medium">
-                            {invoice.id}
-                          </span>
+                          <span className="font-medium">{invoice.id}</span>
                         </div>
                       </TableCell>
                       {/*<TableCell className="hidden sm:table-cell">*/}
@@ -145,10 +131,7 @@ export default function InvoicesTable({ invoices, onDelete, onStatusChange, onDo
                         {formatCurrency(calculateTotalAmount(invoice.items, invoice.taxRate))}
                       </TableCell>
                       <TableCell>
-                        <Badge
-                          variant={getStatusVariant(invoice.status)}
-                          className="capitalize"
-                        >
+                        <Badge variant={getStatusVariant(invoice.status)} className="capitalize">
                           {invoice.status}
                         </Badge>
                       </TableCell>
@@ -204,10 +187,7 @@ export default function InvoicesTable({ invoices, onDelete, onStatusChange, onDo
                                 </DropdownMenuItem>
                               )}*/}
                             {/*<DropdownMenuSeparator />*/}
-                            <DropdownMenuItem
-                              onClick={() => setDeleteId(invoice.id)}
-                              className="text-destructive"
-                            >
+                            <DropdownMenuItem onClick={() => setDeleteId(invoice.id)} className="text-destructive">
                               <Trash2 className="mr-2 h-4 w-4" />
                               Delete
                             </DropdownMenuItem>
@@ -217,7 +197,6 @@ export default function InvoicesTable({ invoices, onDelete, onStatusChange, onDo
                     </TableRow>
                   ))
                 )}
-
               </>
             )}
           </TableBody>
@@ -229,16 +208,12 @@ export default function InvoicesTable({ invoices, onDelete, onStatusChange, onDo
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Invoice</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this invoice? This action cannot
-              be undone.
+              Are you sure you want to delete this invoice? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              className="bg-destructive text-white hover:bg-destructive/90"
-            >
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-white hover:bg-destructive/90">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

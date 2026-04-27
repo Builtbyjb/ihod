@@ -1,8 +1,8 @@
-import { useRouter, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useRouter, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Home } from "lucide-react";
 
-export default function NotFound() {
+function RouteComponent() {
   const router = useRouter();
   const navigate = useNavigate();
 
@@ -11,8 +11,7 @@ export default function NotFound() {
       <h1 className="text-7xl font-bold">404</h1>
       <h2 className="text-2xl font-medium text-foreground">Page not found</h2>
       <p className="leading-relaxed">
-        Looks like you&apos;ve wandered into uncharted territory. The page
-        you&apos;re looking for doesn&apos;t exist.
+        Looks like you&apos;ve wandered into uncharted territory. The page you&apos;re looking for doesn&apos;t exist.
       </p>
 
       <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -36,3 +35,7 @@ export default function NotFound() {
     </main>
   );
 }
+
+export const Route = createFileRoute("/$")({
+  component: RouteComponent,
+});

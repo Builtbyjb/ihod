@@ -5,7 +5,9 @@ import { InvoiceItem } from "@/lib/types";
 export const users = sqliteTable("users", {
     id: int("id").primaryKey({ autoIncrement: true }),
     email: text("email").notNull().unique(),
-    currentOrgId: int("currency_organization_id").references(() => organizations.id).notNull(),
+    currentOrgId: int("currency_organization_id")
+        .references(() => organizations.id)
+        .notNull(),
     firstname: text("firstname"),
     lastname: text("lastname"),
     username: text("username").notNull(),
@@ -30,9 +32,15 @@ export const organizations = sqliteTable("organizations", {
 
 export const members = sqliteTable("members", {
     id: int("id").primaryKey({ autoIncrement: true }),
-    organizationId: int("organization_id").references(() => organizations.id).notNull(),
-    userId: int("user_id").references(() => users.id).notNull(),
-    roleId: int("role_id").references(() => roles.id).notNull(),
+    organizationId: int("organization_id")
+        .references(() => organizations.id)
+        .notNull(),
+    userId: int("user_id")
+        .references(() => users.id)
+        .notNull(),
+    roleId: int("role_id")
+        .references(() => roles.id)
+        .notNull(),
     startDate: int("start_date", { mode: "timestamp" }).default(sql`(unixepoch())`),
     endDate: int("end_date", { mode: "timestamp" }),
     deleted: int("deleted", { mode: "boolean" }).notNull().default(false),

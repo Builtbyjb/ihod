@@ -22,16 +22,12 @@ export default function Hero() {
           </h1>
 
           <p className="mt-6 leading-relaxed">
-            The simplest way to create professional invoices. Designed for
-            freelancers and small businesses who want to spend less time on
-            paperwork and more time doing what they love.
+            The simplest way to create professional invoices. Designed for freelancers and small businesses who want to
+            spend less time on paperwork and more time doing what they love.
           </p>
 
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button
-              className="w-full sm:w-auto px-8"
-              onClick={() => navigate({ to: "/signup" })}
-            >
+            <Button className="w-full sm:w-auto px-8" onClick={() => navigate({ to: "/signup" })}>
               Start for free
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
@@ -45,8 +41,8 @@ export default function Hero() {
         <div className="mt-16 lg:mt-24">
           <div className="relative mx-auto max-w-5xl">
             <div className="absolute inset-0 bg-linear-to-t from-background via-transparent to-transparent z-10 pointer-events-none" />
-            <div className="rounded-2xl border border-border bg-card p-2 shadow-2xl shadow-primary/5">
-              <div className="rounded-xl bg-muted/50 p-6 lg:p-8">
+            <div className="rounded-lg border border-border bg-card p-2 shadow-2xl shadow-primary/5">
+              <div className="bg-muted/50 p-6 lg:p-8">
                 <InvoicePreview />
               </div>
             </div>
@@ -59,7 +55,7 @@ export default function Hero() {
 
 function InvoicePreview() {
   return (
-    <div className="bg-white/70 rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
+    <div className="bg-white/70 shadow-lg p-8 max-w-2xl mx-auto">
       <div className="flex justify-between items-start mb-8">
         <div>
           <h3 className="text-2xl font-bold text-foreground">INVOICE</h3>
@@ -73,20 +69,14 @@ function InvoicePreview() {
 
       <div className="grid grid-cols-2 gap-8 mb-8">
         <div>
-          <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">
-            Bill to
-          </p>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Bill to</p>
           <p className="font-medium text-foreground">Acme Corporation</p>
           <p className="text-sm text-muted-foreground">contact@acme.com</p>
         </div>
         <div className="text-right">
-          <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">
-            Invoice date
-          </p>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Invoice date</p>
           <p className="font-medium text-foreground">April 17, 2026</p>
-          <p className="text-xs uppercase tracking-wide text-muted-foreground mt-3 mb-1">
-            Due date
-          </p>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground mt-3 mb-1">Due date</p>
           <p className="font-medium text-foreground">May 17, 2026</p>
         </div>
       </div>
@@ -101,24 +91,14 @@ function InvoicePreview() {
         <div className="grid grid-cols-12 gap-4 py-3 border-t border-border">
           <div className="col-span-6 text-foreground">Website Design</div>
           <div className="col-span-2 text-right text-muted-foreground">1</div>
-          <div className="col-span-2 text-right text-muted-foreground">
-            $2,500
-          </div>
-          <div className="col-span-2 text-right font-medium text-foreground">
-            $2,500
-          </div>
+          <div className="col-span-2 text-right text-muted-foreground">$2,500</div>
+          <div className="col-span-2 text-right font-medium text-foreground">$2,500</div>
         </div>
         <div className="grid grid-cols-12 gap-4 py-3 border-t border-border">
-          <div className="col-span-6 text-foreground">
-            Development (40 hours)
-          </div>
+          <div className="col-span-6 text-foreground">Development (40 hours)</div>
           <div className="col-span-2 text-right text-muted-foreground">40</div>
-          <div className="col-span-2 text-right text-muted-foreground">
-            $150
-          </div>
-          <div className="col-span-2 text-right font-medium text-foreground">
-            $6,000
-          </div>
+          <div className="col-span-2 text-right text-muted-foreground">$150</div>
+          <div className="col-span-2 text-right font-medium text-foreground">$6,000</div>
         </div>
       </div>
 
