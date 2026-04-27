@@ -58,3 +58,4 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .wrangler
 .turbo
 drizzle/
+.qodo

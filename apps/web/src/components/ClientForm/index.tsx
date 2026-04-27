@@ -16,7 +16,7 @@ import * as z from "zod";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { useEffect } from "react";
 
-interface ClientFormProps {
+type ClientFormProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   client?: Client | null;
@@ -31,6 +31,22 @@ const clientFormSchema = z.object({
   address: z.string(),
   city: z.string(),
   country: z.string(),
+})
+
+// Create client response schema
+const clientResponseSchema = z.object({
+  message: z.string(),
+  client: z.object({
+    id: z.string(),
+    organizationId: z.number(),
+    name: z.string(),
+    email: z.string().email(),
+    phone: z.string(),
+    address: z.string(),
+    city: z.string(),
+    country: z.string(),
+    createdAt: z.string(),
+  })
 })
 
 type ClientFormType = z.infer<typeof clientFormSchema>;
@@ -49,8 +65,10 @@ export default function ClientForm({ open, onOpenChange, client, addClient, edit
 
       if (!response.ok) throw new Error("Failed to add client")
 
-      const newValue = { ...value, createdAt: new Date().toString() }
-      addClient(newValue as Client)
+      const result = await response.json()
+      const parsedResult = clientResponseSchema.parse(result)
+
+      addClient(parsedResult.client)
       onOpenChange(false)
       toast.success("Client data added")
     } catch (error) {

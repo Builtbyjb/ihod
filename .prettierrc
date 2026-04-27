@@ -1,0 +1,18 @@
+{
+  "overrides": [
+    {
+      "files": "*.tsx",
+      "options": {
+        "printWidth": 120,
+        "tabWidth": 2
+      }
+    },
+    {
+      "files": "*.ts",
+      "options": {
+        "printWidth": 120,
+        "tabWidth": 4
+      }
+    }
+  ]
+}

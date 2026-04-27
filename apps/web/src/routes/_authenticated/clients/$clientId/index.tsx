@@ -1,33 +1,36 @@
-import { useState, useEffect } from 'react';
-import { createFileRoute } from '@tanstack/react-router'
-import { Button } from '@/components/ui/button';
-import Header from '@/components/Header';
-import { Plus } from 'lucide-react';
-import InvoicesTable from '@/components/InvoicesTable';
-import type { Client, Invoice, InvoiceStatus } from '@/lib/types';
-import { useNavigate } from '@tanstack/react-router';
-import { toast } from "sonner"
+import { useState, useEffect } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import InvoicesTable from "@/components/InvoicesTable";
+import type { Client, Invoice, InvoiceStatus } from "@/lib/types";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { useLayout } from "@/hooks/useLayout";
 
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL;
 function RouteComponent() {
   const [clientInfo, setClientInfo] = useState<Client>();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
 
   const { clientId } = Route.useParams();
 
+  const { setTitle } = useLayout();
+  if (clientInfo?.name) setTitle(clientInfo.name);
+
   const navigate = useNavigate();
 
   const handleInvoiceDelete = (invoiceId: number) => {
-    setInvoices((prev) => prev.filter(i => i.id !== invoiceId))
-  }
+    setInvoices((prev) => prev.filter((i) => i.id !== invoiceId));
+  };
 
   const handleDownload = (invoice: Invoice) => {
-    console.log(invoice)
-  }
+    console.log(invoice);
+  };
 
   const handleStatusChange = (invoiceId: number, status: InvoiceStatus) => {
-    console.log(invoiceId, status)
-  }
+    console.log(invoiceId, status);
+  };
 
   useEffect(() => {
     const handleInvoiceFetch = async () => {
@@ -35,29 +38,27 @@ function RouteComponent() {
         const response = await fetch(`${API_URL}/api/v1/clients/${clientId}`, {
           method: "GET",
           credentials: "include",
-          headers: { "Content-Type": "application/json" }
-        })
+          headers: { "Content-Type": "application/json" },
+        });
 
-        if (!response.ok) throw new Error("Failed to fetch client")
+        if (!response.ok) throw new Error("Failed to fetch client");
 
-        const result = await response.json()
+        const result = await response.json();
         // console.log(result)
         // TODO: Zod validate
-        setClientInfo(result.clientInfo)
-        setInvoices(result.invoices)
+        setClientInfo(result.clientInfo);
+        setInvoices(result.invoices);
       } catch (error) {
-        console.log(error)
-        toast.error("Failed to fetch invoices")
+        console.log(error);
+        toast.error("Failed to fetch invoices");
       }
-    }
+    };
 
     handleInvoiceFetch();
-  }, [clientId])
-
+  }, [clientId]);
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header title='Client' />
       {clientInfo && (
         <div>
           <h1>{clientInfo.name}</h1>
@@ -83,9 +84,9 @@ function RouteComponent() {
         />
       </div>
     </div>
-  )
+  );
 }
 
-export const Route = createFileRoute('/_authenticated/clients/$clientId/')({
+export const Route = createFileRoute("/_authenticated/clients/$clientId/")({
   component: RouteComponent,
-})
+});

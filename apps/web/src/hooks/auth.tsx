@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useContext, useState } from "react";
 import type { AnyRouter } from "@tanstack/react-router";
 import type { User, AuthState, AuthResponse } from "@/lib/types";
+import { jwtDecode } from "jwt-decode";
 import { z } from "zod";
 
 const responseSchema = z.object({
@@ -24,7 +25,6 @@ type AuthProviderProps = {
 export function AuthProvider({ children, router, }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   const logout = async () => {
     try {
@@ -40,7 +40,21 @@ export function AuthProvider({ children, router, }: AuthProviderProps) {
     }
   };
 
-  const refreshToken = useCallback(async () => {
+  const isTokenExpired = (accessToken: string): boolean => {
+    try {
+      const { exp } = jwtDecode(accessToken);
+
+      if (exp === undefined) return true;
+
+      const now = Date.now() / 1000;
+      return exp < now;
+    } catch {
+      // If the token can't be decoded, treat it as expired
+      return true;
+    }
+  };
+
+  const refreshToken = async (): Promise<AuthResponse> => {
     const response = await fetch(`${API_URL}/api/v1/auth/refresh-token`, {
       credentials: "include",
     });
@@ -49,35 +63,23 @@ export function AuthProvider({ children, router, }: AuthProviderProps) {
 
     const data: AuthResponse = await response.json();
     const parsed = responseSchema.parse(data);
+    setAccessToken(parsed.accessToken)
+    setUser(parsed.user)
     return parsed;
-  }, []);
+  };
 
-  // Restore auth state on app load
-  useEffect(() => {
-    (async () => {
-      setIsLoading(true);
-      try {
-        const data = await refreshToken();
+  const authenticate = async (): Promise<boolean> => {
 
-        setAccessToken(data.accessToken);
-        setUser(data.user);
-
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setIsLoading(false);
+    try {
+      if (!accessToken || isTokenExpired(accessToken)) {
+        // Refresh token is no access token or access token as expired
+        await refreshToken();
       }
-    })()
-
-  }, [refreshToken]);
-
-  // Show loading state while checking auth
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        Loading...
-      </div>
-    );
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   }
 
   const login = async (email: string): Promise<boolean> => {
@@ -112,7 +114,7 @@ export function AuthProvider({ children, router, }: AuthProviderProps) {
   };
 
   return (
-    <AuthContext.Provider value={{ accessToken, user, login, logout, refreshToken, verifyOtp }}>
+    <AuthContext.Provider value={{ accessToken, user, login, logout, refreshToken, verifyOtp, authenticate }}>
       {children}
     </AuthContext.Provider>
   );

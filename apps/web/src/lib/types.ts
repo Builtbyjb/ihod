@@ -53,6 +53,7 @@ export interface AuthState {
     logout: () => void;
     refreshToken: () => Promise<AuthResponse>;
     verifyOtp: (otp: string) => Promise<boolean>;
+    authenticate: () => Promise<boolean>;
 }
 
 export interface Context {
