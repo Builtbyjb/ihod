@@ -22,6 +22,7 @@ export const organizations = sqliteTable("organizations", {
     currency: text("currency").notNull(),
     city: text("city"),
     country: text("country"),
+    website: text("website"),
     deleted: int("deleted", { mode: "boolean" }).notNull().default(false),
     createdAt: int("created_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
     updatedAt: int("updated_at", { mode: "timestamp" }).default(sql`(unixepoch())`),

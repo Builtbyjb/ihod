@@ -8,19 +8,22 @@ import { Plus } from "lucide-react";
 import type { Client } from "@/lib/types";
 import * as z from "zod";
 
-const clientsResponseSchema = z.array(z.object({
-  id: z.string(),
-  organizationId: z.number(),
-  name: z.string(),
-  email: z.string().email(),
-  phone: z.string(),
-  address: z.string(),
-  city: z.string(),
-  country: z.string(),
-  createdAt: z.string(),
-}))
+const clientsResponseSchema = z.array(
+  z.object({
+    id: z.string(),
+    organizationId: z.number(),
+    name: z.string(),
+    email: z.string().email(),
+    phone: z.string(),
+    address: z.string(),
+    city: z.string(),
+    country: z.string(),
+    createdAt: z.string(),
+  })
+)
 
 const API_URL = import.meta.env.VITE_API_URL;
+
 function RouteComponent() {
   const [formOpen, setFormOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
@@ -53,7 +56,7 @@ function RouteComponent() {
   }
 
   useEffect(() => {
-    const handleFetch = async () => {
+    (async () => {
       try {
         const response = await fetch(`${API_URL}/api/v1/clients`, {
           method: "GET",
@@ -63,21 +66,17 @@ function RouteComponent() {
           }
         })
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch clients")
-        }
+        if (!response.ok) throw new Error("Failed to fetch clients")
 
         const data = await response.json()
-        const parsedClients = clientsResponseSchema.parse(data.data)
+        const parsedClients = clientsResponseSchema.parse(data.clients)
 
         setClients(parsedClients)
 
       } catch (error) {
         console.log(error)
       }
-    };
-
-    handleFetch();
+    })()
   }, [])
 
   return (

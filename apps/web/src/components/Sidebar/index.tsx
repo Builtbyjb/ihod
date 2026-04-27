@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LayoutDashboard, Users, Settings, Receipt, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/auth";
 
 const navItems = [
   {
@@ -17,9 +18,13 @@ const navItems = [
     icon: Users,
   },
 ];
-import { useAuth } from "@/hooks/auth";
 
-export default function Sidebar() {
+type SidebarProps = {
+  businessName?: string
+  username?: string
+}
+
+export default function Sidebar({ businessName }: SidebarProps) {
   const pathname = useLocation({ select: (location) => location.pathname });
   const { logout } = useAuth();
 
@@ -30,12 +35,12 @@ export default function Sidebar() {
           <Link to="/dashboard" className="flex items-center gap-2">
             <Receipt className="h-6 w-6" />
             <span className="text-xl font-bold flex items-center">
-              IHOD
-              <Badge variant="outline"
-                className="bg-blue-100 text-blue-600">
+              {businessName}
+              <Badge variant="outline" className="bg-blue-100 text-blue-600">
                 beta
               </Badge>
             </span>
+            {/*<p>{username}</p>*/}
           </Link>
         </div>
         <nav className="flex-1 px-3 py-4 space-y-1">

@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { Bindings, ResponsePayload } from "@/lib/types";
+import { Bindings, TokenPayload } from "@/lib/types";
 import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
 import { getCookie } from "hono/cookie";
@@ -8,29 +8,8 @@ import { eq, and, sql, like } from "drizzle-orm";
 import { clients, invoices, members } from "@/db/schema";
 import { verify } from "hono/utils/jwt/jwt";
 import invoiceRouteV1 from "@/invoice/invoice-controller";
+import { clientFormSchema, clientListSchema, clientSchema } from "./client-zod-schema";
 
-const clientFormSchema = z.object({
-    name: z.string().nonempty(),
-    email: z.string().email(),
-    phone: z.string(),
-    address: z.string(),
-    city: z.string(),
-    country: z.string(),
-})
-
-const allClientsFetchSchema = z.array(
-    z.object({
-        id: z.string(),
-        organizationId: z.number(),
-        name: z.string(),
-        email: z.string().email(),
-        phone: z.string(),
-        address: z.string(),
-        city: z.string(),
-        country: z.string(),
-        createdAt: z.date(),
-    })
-)
 
 const clientRouteV1 = new Hono<{ Bindings: Bindings }>().basePath("/clients")
 
@@ -47,7 +26,7 @@ clientRouteV1.get("/", async (c) => {
     }
 
     // TODO: Better error handling
-    const decoded = (await verify(refreshToken, secret, "HS256")) as ResponsePayload;
+    const decoded = (await verify(refreshToken, secret, "HS256")) as TokenPayload;
 
     const member = await db.select().from(members).where(eq(members.userId, decoded.userId))
     if (member.length == 0) return c.json("User is not part of an organization", 400)
@@ -61,9 +40,9 @@ clientRouteV1.get("/", async (c) => {
             )
         );
 
-    const parsedResult = allClientsFetchSchema.parse(result);
+    const parsedResult = clientListSchema.parse(result);
 
-    return c.json({ message: "All Clients", data: parsedResult }, 200)
+    return c.json({ message: "All Clients", clients: parsedResult }, 200)
 })
 
 clientRouteV1.get("/:id", async (c) => {
@@ -81,7 +60,7 @@ clientRouteV1.get("/:id", async (c) => {
     }
 
     //  TODO: Better error handling
-    (await verify(refreshToken, secret, "HS256")) as ResponsePayload;
+    (await verify(refreshToken, secret, "HS256")) as TokenPayload;
 
     // TODO: Improve and add pagination
     const client = await db.select().from(clients).where(
@@ -111,24 +90,26 @@ clientRouteV1.post("/create", zValidator("json", clientFormSchema), async (c) =>
     }
 
     //  TODO: Better error handling
-    const decoded = (await verify(refreshToken, secret, "HS256")) as ResponsePayload;
+    const decoded = (await verify(refreshToken, secret, "HS256")) as TokenPayload;
 
-    const result = await db.select().from(members).where(eq(members.userId, decoded.userId))
-    if (result.length == 0) return c.json("User is not part of an organization", 400)
+    const member = await db.select().from(members).where(eq(members.userId, decoded.userId))
+    if (member.length == 0) return c.json("User is not part of an organization", 400)
 
     //  TODO: Better error handling
-    await db.insert(clients).values({
+    const client = await db.insert(clients).values({
         id: crypto.randomUUID(),
-        organizationId: result[0].organizationId,
+        organizationId: member[0].organizationId,
         name: data.name,
         email: data.email,
         phone: data.phone,
         address: data.address,
         city: data.city,
         country: data.country
-    })
+    }).returning().get()
 
-    return c.json({ message: "Client created" }, 200)
+    const parsedClient = clientSchema.parse(client)
+
+    return c.json({ message: "Client created", client: parsedClient }, 200)
 })
 
 clientRouteV1.delete("/delete/:id", async (c) => {
@@ -146,7 +127,7 @@ clientRouteV1.delete("/delete/:id", async (c) => {
     }
 
     // TODO: Better error handling
-    (await verify(refreshToken, secret, "HS256")) as ResponsePayload
+    (await verify(refreshToken, secret, "HS256")) as TokenPayload
 
     // TODO: Better error handling
     await db.update(clients).set({ deleted: true }).where(eq(clients.id, id))
@@ -171,7 +152,7 @@ clientRouteV1.put("/edit/:id", zValidator("json", clientFormSchema), async (c) =
     }
 
     // TODO: Better error handling
-    (await verify(refreshToken, secret, "HS256")) as ResponsePayload
+    (await verify(refreshToken, secret, "HS256")) as TokenPayload
 
     await db.update(clients).set({
         name: data.name,
@@ -200,7 +181,7 @@ clientRouteV1.post("/search", async (c) => {
     }
 
     // TODO: Better error handling
-    const decoded = (await verify(refreshToken, secret, "HS256")) as ResponsePayload
+    const decoded = (await verify(refreshToken, secret, "HS256")) as TokenPayload
 
     const member = await db.select().from(members).where(eq(members.userId, decoded.userId))
     if (member.length == 0) return c.json("User is not part of an organization", 400)

@@ -1,10 +1,12 @@
 import { createFileRoute, redirect, Outlet } from "@tanstack/react-router";
 import Sidebar from "@/components/Sidebar";
+import { useAuth } from "@/hooks/auth";
 
 function AuthenticatedLayout() {
+  const { user } = useAuth()
   return (
     <div>
-      <Sidebar />
+      <Sidebar businessName={user?.organizationName} username={user?.username} />
       <div className="md:pl-64">
         <Outlet />
       </div>

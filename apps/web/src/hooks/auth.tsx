@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
 import type { AnyRouter } from "@tanstack/react-router";
-import type { User, AuthState, AuthResponse, Context } from "@/lib/types";
+import type { User, AuthState, AuthResponse } from "@/lib/types";
 import { jwtDecode } from "jwt-decode";
 import { z } from "zod";
 
