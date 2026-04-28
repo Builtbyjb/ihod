@@ -22,7 +22,7 @@ export function useDownloadPDF(filename = "document.pdf") {
         img.src = url;
         await new Promise((res) => (img.onload = res));
 
-        const pdf = new jsPDF({ orientation: "portrait", unit: "px", format: "a4" });
+        const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const imgHeight = (img.height * pdfWidth) / img.width;
 
