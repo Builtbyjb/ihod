@@ -46,12 +46,10 @@ export default function Navbar() {
         </div>
 
         <div className="hidden md:flex md:items-center md:gap-4">
-          <Button variant="outline">
-            <Link to="/login">Log in</Link>
+          <Button variant="outline" onClick={() => navigate({ to: "/login" })}>
+            Log in
           </Button>
-          <Button>
-            <Link to="/signup">Start for free</Link>
-          </Button>
+          <Button onClick={() => navigate({ to: "/signup" })}>Start for free</Button>
         </div>
 
         <button type="button" className="md:hidden p-2 -m-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>

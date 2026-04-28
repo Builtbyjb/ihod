@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import Header from "@/components/Header";
 import InvoiceForm from "@/components/InvoiceForm";
 import type { Client } from "@/lib/types";
 
@@ -28,12 +27,9 @@ function RouteComponent() {
   }, [clientId]);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header title="Create Invoice" />
-      <main className="flex-1 p-4 md:p-6">
-        <InvoiceForm clientInfo={clientInfo} />
-      </main>
-    </div>
+    <main>
+      <InvoiceForm clientInfo={clientInfo} />
+    </main>
   );
 }
 

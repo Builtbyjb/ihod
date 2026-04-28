@@ -1,9 +1,9 @@
 import type { Client, Invoice, DashboardStats } from "./types";
 
 export const CURRENCIES = [
-    { name: "Naira (NGN)", value: "NGN" },
-    { name: "Canadian Dollar (CAD)", value: "CAD" },
-    { name: "US Dollar (USD)", value: "USD" },
+    { name: "Naira (NGN)", value: "NGN", symbol: "₦" },
+    { name: "Canadian Dollar (CAD)", value: "CAD", symbol: "C$" },
+    { name: "US Dollar (USD)", value: "USD", symbol: "$" },
 ];
 
 export function useDashboardStats(invoices: Invoice[], clients: Client[]): DashboardStats {

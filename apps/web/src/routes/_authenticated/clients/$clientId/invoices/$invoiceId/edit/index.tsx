@@ -45,7 +45,7 @@ function RouteComponent() {
   }
 
   return (
-    <main className="flex-1 p-4 md:p-6">
+    <main className="">
       <InvoiceForm clientInfo={clientInfo} existingInvoice={invoice} invoiceId={invoiceId} />
     </main>
   );

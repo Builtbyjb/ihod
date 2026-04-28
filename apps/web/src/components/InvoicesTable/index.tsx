@@ -1,7 +1,6 @@
 import { useState } from "react";
 // import { Link } from "@tanstack/react-router";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -20,11 +19,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { MoreHorizontal, Eye, Pencil, Trash2, Download, Send, CheckCircle } from "lucide-react";
+import { MoreHorizontal, Eye, Pencil, Trash2, Download, Printer } from "lucide-react";
 import type { Invoice } from "@/lib/types";
 import { format } from "date-fns";
 import { useNavigate } from "@tanstack/react-router";
-import { calculateTotalAmount } from "@/lib/utils";
+import { calculateTotalAmount, formatCurrency, getStatusVariant } from "@/lib/utils";
 
 interface InvoicesTableProps {
   clientId: string;
@@ -35,37 +34,9 @@ interface InvoicesTableProps {
 }
 
 const API_URL = import.meta.env.VITE_API_URL;
-export default function InvoicesTable({
-  invoices,
-  onDelete,
-  onStatusChange,
-  onDownload,
-  clientId,
-}: InvoicesTableProps) {
+export default function InvoicesTable({ invoices, onDelete, onDownload, clientId }: InvoicesTableProps) {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const navigate = useNavigate();
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
-  };
-
-  const getStatusVariant = (status: Invoice["status"]) => {
-    switch (status) {
-      case "paid":
-        return "default";
-      case "sent":
-        return "secondary";
-      case "draft":
-        return "outline";
-      case "overdue":
-        return "destructive";
-      default:
-        return "secondary";
-    }
-  };
 
   const handleDelete = async () => {
     if (deleteId) {
@@ -93,7 +64,6 @@ export default function InvoicesTable({
           <TableHeader>
             <TableRow>
               <TableHead>Invoice</TableHead>
-              {/*<TableHead className="hidden sm:table-cell">Client</TableHead>*/}
               <TableHead className="hidden md:table-cell">Date</TableHead>
               <TableHead className="hidden lg:table-cell">Due Date</TableHead>
               <TableHead>Amount</TableHead>
@@ -118,9 +88,6 @@ export default function InvoicesTable({
                           <span className="font-medium">{invoice.id}</span>
                         </div>
                       </TableCell>
-                      {/*<TableCell className="hidden sm:table-cell">*/}
-                      {/*<span className="font-medium">{invoice.client.name}</span>*/}
-                      {/*</TableCell>*/}
                       <TableCell className="hidden md:table-cell text-sm">
                         {format(new Date(invoice.issueDate), "MMM d, yyyy")}
                       </TableCell>
@@ -131,13 +98,11 @@ export default function InvoicesTable({
                         {formatCurrency(calculateTotalAmount(invoice.items, invoice.taxRate))}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={getStatusVariant(invoice.status)} className="capitalize">
-                          {invoice.status}
-                        </Badge>
+                        <Badge className={`capitalize ${getStatusVariant(invoice.status)}`}>{invoice.status}</Badge>
                       </TableCell>
                       <TableCell>
                         <DropdownMenu>
-                          <DropdownMenuTrigger>
+                          <DropdownMenuTrigger className="cursor-pointer">
                             <MoreHorizontal className="h-4 w-4" />
                             <span className="sr-only">Open menu</span>
                           </DropdownMenuTrigger>
@@ -167,6 +132,10 @@ export default function InvoicesTable({
                             <DropdownMenuItem onClick={() => onDownload(invoice)}>
                               <Download className="mr-2 h-4 w-4" />
                               Download PDF
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onDownload(invoice)}>
+                              <Printer className="mr-2 h-4 w-4" />
+                              Print
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             {/*{invoice.status === "draft" && (
