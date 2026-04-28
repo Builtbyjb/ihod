@@ -105,7 +105,7 @@ function RouteComponent() {
     );
   }
   return (
-    <main className="flex-1 p-4 md:p-6 space-y-6">
+    <main className="space-y-6">
       <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
         <Button variant="ghost" onClick={() => router.history.back()} className="w-fit">
           <ArrowLeft className="mr-2 h-4 w-4" />

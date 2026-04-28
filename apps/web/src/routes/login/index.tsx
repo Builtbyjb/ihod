@@ -40,11 +40,13 @@ function RouteComponent() {
   });
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <ArrowLeft className="mb-8 w-12 h-12 hover:scale-110" onClick={() => navigate({ to: "/" })} />
+    <main className="flex flex-col items-center justify-center min-h-screen mx-auto w-[90%]">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-xl">Login</CardTitle>
+          <div className="flex gap-6 items-center mb-2">
+            <ArrowLeft className="w-8 h-8 hover:scale-110" onClick={() => navigate({ to: "/" })} />
+            <CardTitle className="text-xl">Login</CardTitle>
+          </div>
           <CardDescription>Login with your email</CardDescription>
         </CardHeader>
         <CardContent>
@@ -75,7 +77,7 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         autoComplete="email"
                       />
-                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
                     </Field>
                   );
                 }}
@@ -94,16 +96,22 @@ function RouteComponent() {
           </Field>
         </CardFooter>
       </Card>
-      <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 mt-4">
+      <div className="text-center text-xs text-muted-foreground w-full mt-4">
         By clicking Submit, you agree to our{" "}
-        <Link to="/terms-of-service">Terms of Service</Link> and{" "}
-        <Link to="/privacy-policy">Privacy Policy</Link>.
+        <Link to="/terms-of-service" className="hover:font-bold underline">
+          Terms of Service
+        </Link>{" "}
+        and{" "}
+        <Link to="/privacy-policy" className="hover:font-bold underline">
+          Privacy Policy
+        </Link>
+        .
       </div>
       <br />
       <br />
       {/* Display OTP input */}
       {isVerified && <OTP />}
-    </div>
+    </main>
   );
 }
 
