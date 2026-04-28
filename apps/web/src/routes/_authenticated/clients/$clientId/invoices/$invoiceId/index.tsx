@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,12 +7,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ArrowLeft, Download, Pencil, Printer } from "lucide-react";
 import { format } from "date-fns";
 import type { Client, Invoice } from "@/lib/types";
-import { pdf } from "@react-pdf/renderer";
-import { InvoicePDF } from "@/components/InvoiceView/PDF";
-import { InvoicePrint } from "@/components/InvoiceView/Print";
+import { DefaultInvoiceTemplate } from "@/components/InvoiceTemplates/DefaultTemplate";
 import { calculateSubTotal, calculateTaxAmount, calculateTotalAmount } from "@/lib/utils";
 import { useReactToPrint } from "react-to-print";
 import { formatCurrency, getStatusVariant } from "@/lib/utils";
+import { useAuth } from "@/hooks/auth";
+import { useDownloadPDF } from "@/hooks/useDownloadPDF";
 
 const API_URL = import.meta.env.VITE_API_URL;
 function RouteComponent() {
@@ -21,6 +21,8 @@ function RouteComponent() {
   const router = useRouter();
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [client, setClient] = useState<Client | null>(null);
+  const { user } = useAuth();
+  const { ref, download } = useDownloadPDF();
 
   useEffect(() => {
     (async () => {
@@ -42,41 +44,10 @@ function RouteComponent() {
     })();
   }, [clientId, invoiceId]);
 
-  const componentRef = useRef(null);
-
-  // 2. Pass the reference (contentRef) to the hook
   const handlePrint = useReactToPrint({
-    contentRef: componentRef, // Or 'content: () => componentRef.current' in older versions
+    contentRef: ref,
     documentTitle: "Invoice",
   });
-
-  const handleDownload = async () => {
-    if (!invoice || !client) return;
-    const blob = await pdf(<InvoicePDF invoice={invoice} client={client} />).toBlob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${invoice.invoiceNumber}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  // const handleStatusChange = (status: Invoice["status"]) => {
-  //   if (invoice) {
-  //     // updateInvoice(invoice.id, { status });
-  //     console.log(invoice, status)
-  //   }
-  // };
-
-  // if (loading) {
-  //   return (
-  //     <div className="flex items-center justify-center min-h-screen">
-  //       <Spinner className="h-8 w-8" />
-  //     </div>
-  //   );
-  // }
 
   if (!invoice) {
     return (
@@ -97,24 +68,6 @@ function RouteComponent() {
           Back
         </Button>
         <div className="flex flex-wrap gap-2">
-          {/*{invoice.status === "draft" && (
-              <Button
-                variant="outline"
-                onClick={() => handleStatusChange("sent")}
-              >
-                <Send className="mr-2 h-4 w-4" />
-                Mark as Sent
-              </Button>
-            )}
-            {(invoice.status === "sent" || invoice.status === "overdue") && (
-              <Button
-                variant="outline"
-                onClick={() => handleStatusChange("paid")}
-              >
-                <CheckCircle className="mr-2 h-4 w-4" />
-                Mark as Paid
-              </Button>
-            )}*/}
           <Button
             variant="outline"
             onClick={() =>
@@ -131,7 +84,7 @@ function RouteComponent() {
             <Printer className="mr-3 h-4 w-4" />
             Print
           </Button>
-          <Button onClick={handleDownload}>
+          <Button onClick={download}>
             <Download className="mr-2 h-4 w-4" />
             Download PDF
           </Button>
@@ -221,10 +174,8 @@ function RouteComponent() {
           </CardContent>
         </Card>
       </div>
-      <div style={{ display: "none" }}>
-        {" "}
-        {/* Hide it from the screen UI if needed */}
-        <InvoicePrint ref={componentRef} invoice={invoice} client={client} />
+      <div style={{ position: "fixed", top: "-9999px", left: "-9999px", width: "794px" }}>
+        <DefaultInvoiceTemplate ref={ref} invoice={invoice} client={client} bussinessname={user?.organizationName} />
       </div>
     </main>
   );

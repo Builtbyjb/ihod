@@ -19,7 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { MoreHorizontal, Eye, Pencil, Trash2, Download, Printer } from "lucide-react";
+import { MoreHorizontal, Eye, Pencil, Trash2 } from "lucide-react";
 import type { Invoice } from "@/lib/types";
 import { format } from "date-fns";
 import { useNavigate } from "@tanstack/react-router";
@@ -29,12 +29,10 @@ interface InvoicesTableProps {
   clientId: string;
   invoices: Invoice[];
   onDelete: (id: number) => void;
-  onStatusChange: (id: number, status: Invoice["status"]) => void;
-  onDownload: (invoice: Invoice) => void;
 }
 
 const API_URL = import.meta.env.VITE_API_URL;
-export default function InvoicesTable({ invoices, onDelete, onDownload, clientId }: InvoicesTableProps) {
+export default function InvoicesTable({ invoices, onDelete, clientId }: InvoicesTableProps) {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const navigate = useNavigate();
 
@@ -129,33 +127,7 @@ export default function InvoicesTable({ invoices, onDelete, onDownload, clientId
                               <Pencil className="mr-2 h-4 w-4" />
                               Edit
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onDownload(invoice)}>
-                              <Download className="mr-2 h-4 w-4" />
-                              Download PDF
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onDownload(invoice)}>
-                              <Printer className="mr-2 h-4 w-4" />
-                              Print
-                            </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            {/*{invoice.status === "draft" && (
-                              <DropdownMenuItem
-                                onClick={() => onStatusChange(invoice.id, "sent")}
-                              >
-                                <Send className="mr-2 h-4 w-4" />
-                                Mark as Sent
-                              </DropdownMenuItem>
-                            )}
-                            {(invoice.status === "sent" ||
-                              invoice.status === "overdue") && (
-                                <DropdownMenuItem
-                                  onClick={() => onStatusChange(invoice.id, "paid")}
-                                >
-                                  <CheckCircle className="mr-2 h-4 w-4" />
-                                  Mark as Paid
-                                </DropdownMenuItem>
-                              )}*/}
-                            {/*<DropdownMenuSeparator />*/}
                             <DropdownMenuItem onClick={() => setDeleteId(invoice.id)} className="text-destructive">
                               <Trash2 className="mr-2 h-4 w-4" />
                               Delete
