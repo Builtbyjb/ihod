@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Mail, MapPin, Phone, Plus, UserCircle } from "lucide-react";
 import InvoicesTable from "@/components/InvoicesTable";
-import type { Client, Invoice, InvoiceStatus } from "@/lib/types";
+import type { Client, Invoice } from "@/lib/types";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useLayout } from "@/hooks/useLayout";
@@ -23,14 +23,6 @@ function RouteComponent() {
 
   const handleInvoiceDelete = (invoiceId: number) => {
     setInvoices((prev) => prev.filter((i) => i.id !== invoiceId));
-  };
-
-  const handleDownload = (invoice: Invoice) => {
-    console.log(invoice);
-  };
-
-  const handleStatusChange = (invoiceId: number, status: InvoiceStatus) => {
-    console.log(invoiceId, status);
   };
 
   useEffect(() => {
@@ -111,13 +103,7 @@ function RouteComponent() {
           <Plus className="mr-2 h-4 w-4" />
           Create Invoice
         </Button>
-        <InvoicesTable
-          clientId={clientId}
-          invoices={invoices}
-          onDelete={handleInvoiceDelete}
-          onStatusChange={handleStatusChange}
-          onDownload={handleDownload}
-        />
+        <InvoicesTable clientId={clientId} invoices={invoices} onDelete={handleInvoiceDelete} />
       </div>
     </div>
   );

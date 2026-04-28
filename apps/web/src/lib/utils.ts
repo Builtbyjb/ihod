@@ -44,15 +44,3 @@ export const getStatusVariant = (status: Invoice["status"]) => {
             return "bg-secondary text-secondary dark:bg-secondary dark:text-secondary";
     }
 };
-
-// const handleDownload = async (invoice: Invoice, InvoicePDF) => {
-//     const blob = await pdf(<InvoicePDF invoice={ invoice } />).toBlob();
-//     const url = URL.createObjectURL(blob);
-//     const a = document.createElement("a");
-//     a.href = url;
-//     a.download = `${invoice.invoiceNumber}.pdf`;
-//     document.body.appendChild(a);
-//     a.click();
-//     document.body.removeChild(a);
-//     URL.revokeObjectURL(url);
-// };
