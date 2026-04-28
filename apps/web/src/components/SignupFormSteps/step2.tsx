@@ -1,0 +1,114 @@
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CURRENCIES } from "@/lib/store";
+
+export default function Step2({ form }) {
+  return (
+    <Field>
+      <form.Field
+        name="businessName"
+        children={(field) => {
+          const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+          return (
+            <Field data-invalid={isInvalid}>
+              <FieldLabel htmlFor="business-name-input">
+                Business Name <span className="text-destructive">*</span>
+              </FieldLabel>
+              <Input
+                required
+                id="business-name-input"
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                aria-invalid={isInvalid}
+                autoComplete="off"
+              />
+              {isInvalid && <FieldError errors={field.state.meta.errors} />}
+            </Field>
+          );
+        }}
+      />
+      <form.Field
+        name="businessType"
+        children={(field) => {
+          const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+          return (
+            <Field data-invalid={isInvalid}>
+              <FieldLabel htmlFor="business-type-input">
+                Business Type <span className="text-destructive">*</span>
+              </FieldLabel>
+              <Input
+                required
+                id="business-type-input"
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                aria-invalid={isInvalid}
+                autoComplete="off"
+              />
+              {isInvalid && <FieldError errors={field.state.meta.errors} />}
+            </Field>
+          );
+        }}
+      />
+      <form.Field
+        name="website"
+        children={(field) => {
+          const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+          return (
+            <Field data-invalid={isInvalid}>
+              <FieldLabel htmlFor="website-input">Website</FieldLabel>
+              <Input
+                id="website-input"
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                aria-invalid={isInvalid}
+                autoComplete="off"
+                placeholder="https://www.examplebusiness.com"
+              />
+              {isInvalid && <FieldError errors={field.state.meta.errors} />}
+            </Field>
+          );
+        }}
+      />
+      <form.Field
+        name="currency"
+        children={(field) => {
+          const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+          return (
+            <Field data-invalid={isInvalid}>
+              <FieldLabel htmlFor="currency-input">
+                Preferred Currency <span className="text-destructive">*</span>
+              </FieldLabel>
+              <Select
+                name={field.name}
+                value={CURRENCIES.find((c) => c.value === field.state.value)?.name}
+                onValueChange={(e) => {
+                  if (e) field.handleChange(e);
+                }}
+              >
+                <SelectTrigger id="select-currency" aria-invalid={isInvalid} className="min-w-30">
+                  <SelectValue placeholder="Select currency" />
+                </SelectTrigger>
+                <SelectContent>
+                  {/*<SelectItem value="auto">Auto</SelectItem>*/}
+                  {CURRENCIES.map((currency) => (
+                    <SelectItem key={currency.value} value={currency.value}>
+                      {currency.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {isInvalid && <FieldError errors={field.state.meta.errors} />}
+            </Field>
+          );
+        }}
+      />
+    </Field>
+  );
+}

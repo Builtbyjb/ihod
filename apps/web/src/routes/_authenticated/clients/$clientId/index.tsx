@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Mail, MapPin, Phone, Plus, UserCircle } from "lucide-react";
 import InvoicesTable from "@/components/InvoicesTable";
 import type { Client, Invoice, InvoiceStatus } from "@/lib/types";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useLayout } from "@/hooks/useLayout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const API_URL = import.meta.env.VITE_API_URL;
 function RouteComponent() {
@@ -60,21 +61,56 @@ function RouteComponent() {
   return (
     <div className="flex flex-col min-h-screen">
       {clientInfo && (
-        <div>
-          <h1>{clientInfo.name}</h1>
-          <p>{clientInfo.email}</p>
-          <p>{clientInfo.phone}</p>
-          <p>{clientInfo.address}</p>
-          <p>{clientInfo.city}</p>
-          <p>{clientInfo.country}</p>
-        </div>
+        <Card className="mb-8">
+          <CardHeader className="flex items-center gap-3">
+            <UserCircle className="h-6 w-6" />
+            <CardTitle>{clientInfo.name}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center shrink-0 mt-0.5">
+                <Mail className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Email</p>
+                <p className="text-sm mt-0.5 whitespace-pre-line">{clientInfo.email}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center shrink-0 mt-0.5">
+                <Phone className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Phone</p>
+                <p className="text-sm mt-0.5 whitespace-pre-line">{clientInfo.phone}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center shrink-0 mt-0.5">
+                <MapPin className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Address</p>
+                <p className="text-sm mt-0.5 whitespace-pre-line">
+                  <span>{clientInfo.address}</span>
+                  <br />
+                  <span>{clientInfo.city}</span>
+                  <br />
+                  <span>{clientInfo.country}</span>
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
       <div>
-        <Button onClick={() => navigate({ to: "/clients/$clientId/invoices/new", params: { clientId } })}>
+        <Button
+          onClick={() => navigate({ to: "/clients/$clientId/invoices/new", params: { clientId } })}
+          className="mb-4"
+        >
           <Plus className="mr-2 h-4 w-4" />
           Create Invoice
         </Button>
-        <br />
         <InvoicesTable
           clientId={clientId}
           invoices={invoices}
