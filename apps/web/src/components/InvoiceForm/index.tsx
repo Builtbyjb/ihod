@@ -36,7 +36,7 @@ const invoiceFormSchema = z.object({
 interface InvoiceFormProps {
   clientInfo: Client | null;
   existingInvoice?: Invoice | null;
-  invoiceId?: string,
+  invoiceId?: string;
 }
 
 type InvoiceForm = z.infer<typeof invoiceFormSchema>;
@@ -45,57 +45,57 @@ const status = [
   { label: "Draft", value: "draft" },
   { label: "Sent", value: "sent" },
   { label: "Paid", value: "paid" },
-  { label: "Overdue", value: "overdue" }
-]
+  { label: "Overdue", value: "overdue" },
+];
 
 export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: InvoiceFormProps) {
   const router = useRouter();
 
   const handleCreate = async (value: InvoiceForm) => {
     try {
-      if (!clientInfo) throw new Error("Client Id not found")
+      if (!clientInfo) throw new Error("Client Id not found");
 
-      const payload = { ...value, clientId: clientInfo.id }
+      const payload = { ...value, clientId: clientInfo.id };
 
       const response = await fetch(`${API_URL}/api/v1/clients/${clientInfo.id}/invoices/create`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      })
+        body: JSON.stringify(payload),
+      });
 
-      if (!response.ok) throw new Error("Failed to create invoice")
+      if (!response.ok) throw new Error("Failed to create invoice");
 
-      toast.success("Invoice created")
-      form.reset()
+      toast.success("Invoice created");
+      form.reset();
     } catch (error) {
-      console.log(error)
+      console.log(error);
       toast.error("Failed to create invoice: " + error.message);
     }
-  }
+  };
 
   const handleUpdate = async (value: InvoiceForm) => {
     try {
-      if (!clientInfo) throw new Error("Client Id not found")
-      if (!invoiceId) throw new Error("Invoice Id not found")
+      if (!clientInfo) throw new Error("Client Id not found");
+      if (!invoiceId) throw new Error("Invoice Id not found");
 
-      const payload = { ...value, clientId: clientInfo.id }
+      const payload = { ...value, clientId: clientInfo.id };
 
       const response = await fetch(`${API_URL}/api/v1/clients/${clientInfo.id}/invoices/${invoiceId}/edit`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      })
+        body: JSON.stringify(payload),
+      });
 
-      if (!response.ok) throw new Error("Failed to create invoice")
+      if (!response.ok) throw new Error("Failed to create invoice");
 
-      toast.success("Invoice Edited")
+      toast.success("Invoice Edited");
     } catch (error) {
-      console.log(error)
+      console.log(error);
       toast.error("Failed to create invoice: " + error.message);
     }
-  }
+  };
 
   const form = useForm({
     defaultValues: {
@@ -116,8 +116,8 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
       onSubmit: invoiceFormSchema,
     },
     onSubmit: async ({ value }) => {
-      if (!existingInvoice) await handleCreate(value)
-      else await handleUpdate(value)
+      if (!existingInvoice) await handleCreate(value);
+      else await handleUpdate(value);
     },
   });
 
@@ -132,7 +132,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
       form.setFieldValue("items", existingInvoice.items);
       form.setFieldValue("notes", existingInvoice.notes);
     }
-  }, [existingInvoice, form])
+  }, [existingInvoice, form]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -169,8 +169,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
               <form.Field
                 name="status"
                 children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor="invoice-status-select">Invoice Status</FieldLabel>
@@ -182,9 +181,9 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                         }}
                         required
                       >
-                        <SelectTrigger id="status-select" aria-invalid={isInvalid} >
+                        <SelectTrigger id="status-select" aria-invalid={isInvalid}>
                           <SelectValue placeholder="Select Status">
-                            {status.find(c => c.value === field.state.value)?.label}
+                            {status.find((c) => c.value === field.state.value)?.label}
                           </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
@@ -197,7 +196,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                           </SelectGroup>
                         </SelectContent>
                       </Select>
-                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
                     </Field>
                   );
                 }}
@@ -211,11 +210,10 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor="issue-date-input">
-                        Issue Date
-                      </FieldLabel>
+                      <FieldLabel htmlFor="issue-date-input">Issue Date</FieldLabel>
                       <Popover>
-                        <PopoverTrigger id="issue-date-input"
+                        <PopoverTrigger
+                          id="issue-date-input"
                           className="flex border border-border items-center p-2 w-44 rounded-lg m-0 justify-between data-[empty=true]:text-muted-foreground"
                         >
                           {format(field.state.value, "PPP")}
@@ -225,10 +223,13 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                           <Calendar
                             mode="single"
                             selected={field.state.value}
-                            onSelect={(e) => { if (e) field.handleChange(e); }} />
+                            onSelect={(e) => {
+                              if (e) field.handleChange(e);
+                            }}
+                          />
                         </PopoverContent>
                       </Popover>
-                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
                     </Field>
                   );
                 }}
@@ -240,11 +241,10 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor="issue-date-input">
-                        Due Date
-                      </FieldLabel>
+                      <FieldLabel htmlFor="issue-date-input">Due Date</FieldLabel>
                       <Popover>
-                        <PopoverTrigger id="issue-date-input"
+                        <PopoverTrigger
+                          id="issue-date-input"
                           className="flex border border-border rounded-lg p-2 w-44 m-0 justify-between data-[empty=true]:text-muted-foreground"
                         >
                           {format(field.state.value, "PPP")}
@@ -254,11 +254,13 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                           <Calendar
                             mode="single"
                             selected={field.state.value}
-                            onSelect={(e) => { if (e) field.handleChange(e); }}
+                            onSelect={(e) => {
+                              if (e) field.handleChange(e);
+                            }}
                           />
                         </PopoverContent>
                       </Popover>
-                      {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
                     </Field>
                   );
                 }}
@@ -275,8 +277,8 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
           <CardContent className="space-y-4">
             <form.Subscribe
               selector={(s) => {
-                const subtotal = s.values.items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0)
-                return subtotal
+                const subtotal = s.values.items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+                return subtotal;
               }}
               children={(subtotal) => {
                 return (
@@ -284,7 +286,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                     <span className="text-muted-foreground">Subtotal</span>
                     <span>{formatCurrency(subtotal)}</span>
                   </div>
-                )
+                );
               }}
             />
             <div className="flex items-center justify-between text-sm">
@@ -306,7 +308,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                           min="0"
                           max="100"
                         />
-                        {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                        {isInvalid && <FieldError errors={field.state.meta.errors} />}
                       </Field>
                     );
                   }}
@@ -324,7 +326,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                           <span>{formatCurrency(taxAmount)}</span>
                         </FieldContent>
                       </Field>
-                    )
+                    );
                   }}
                 />
               </div>
@@ -340,13 +342,11 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                     </div>
                     <div>
                       <FieldContent>
-                        <span className="font-medium">
-                          {formatCurrency(total)}
-                        </span>
+                        <span className="font-medium">{formatCurrency(total)}</span>
                       </FieldContent>
                     </div>
                   </div>
-                )
+                );
               }}
             />
           </CardContent>
@@ -372,16 +372,14 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                     </Button>
                   </div>
                   {field.state.value.map((_, idx) => (
-                    <Field key={idx} orientation="responsive" className="grid md:grid-cols-12 gap-4" >
+                    <Field key={idx} orientation="responsive" className="grid md:grid-cols-12 gap-4">
                       <form.Field
                         name={`items[${idx}].description`}
                         children={(field) => {
                           const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                           return (
                             <Field data-invalid={isInvalid} className="col-span-5">
-                              <FieldLabel htmlFor={`line-item-description-${idx}`}>
-                                Description
-                              </FieldLabel>
+                              <FieldLabel htmlFor={`line-item-description-${idx}`}>Description</FieldLabel>
                               <Input
                                 className="w-auto"
                                 required
@@ -394,7 +392,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                                 placeholder="Item description"
                                 autoComplete="off"
                               />
-                              {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                              {isInvalid && <FieldError errors={field.state.meta.errors} />}
                             </Field>
                           );
                         }}
@@ -405,9 +403,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                           const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                           return (
                             <Field data-invalid={isInvalid} className="col-span-2">
-                              <FieldLabel htmlFor={`line-item-quantity-${idx}`}>
-                                Quantity
-                              </FieldLabel>
+                              <FieldLabel htmlFor={`line-item-quantity-${idx}`}>Quantity</FieldLabel>
                               <Input
                                 className="w-auto"
                                 required
@@ -418,7 +414,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                                 onChange={(e) => field.handleChange(Number(e.target.value))}
                                 aria-invalid={isInvalid}
                               />
-                              {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                              {isInvalid && <FieldError errors={field.state.meta.errors} />}
                             </Field>
                           );
                         }}
@@ -426,13 +422,10 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                       <form.Field
                         name={`items[${idx}].unitPrice`}
                         children={(field) => {
-                          const isInvalid =
-                            field.state.meta.isTouched && !field.state.meta.isValid;
+                          const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                           return (
                             <Field data-invalid={isInvalid} className="col-span-2">
-                              <FieldLabel htmlFor={`line-item-unit-price-${idx}`}>
-                                Unit Price
-                              </FieldLabel>
+                              <FieldLabel htmlFor={`line-item-unit-price-${idx}`}>Unit Price</FieldLabel>
                               <Input
                                 className="w-auto"
                                 required
@@ -443,28 +436,26 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                                 onChange={(e) => field.handleChange(Number(e.target.value))}
                                 aria-invalid={isInvalid}
                               />
-                              {isInvalid && (<FieldError errors={field.state.meta.errors} />)}
+                              {isInvalid && <FieldError errors={field.state.meta.errors} />}
                             </Field>
                           );
                         }}
                       />
                       <form.Subscribe
                         selector={(s) => {
-                          const item = s.values.items[idx]
-                          if (item && item.quantity && item.unitPrice) return item.quantity * item.unitPrice
-                          else return 0
+                          const item = s.values.items[idx];
+                          if (item && item.quantity && item.unitPrice) return item.quantity * item.unitPrice;
+                          else return 0;
                         }}
                         children={(total) => {
                           return (
                             <Field className="col-span-2">
                               <FieldLabel>Total</FieldLabel>
                               <FieldContent>
-                                <span className="font-medium">
-                                  {formatCurrency(total)}
-                                </span>
+                                <span className="font-medium">{formatCurrency(total)}</span>
                               </FieldContent>
                             </Field>
-                          )
+                          );
                         }}
                       />
                       <Field className="col-span-1">
@@ -519,13 +510,13 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
       </Card>
 
       <div className="flex gap-4 justify-end">
-        <Button type="button" variant="outline" onClick={() => router.history.back()} >
-          Cancel
+        <Button type="button" variant="outline" onClick={() => router.history.back()}>
+          Back
         </Button>
         <Button type="submit" form="create-invoice-form">
           {existingInvoice ? "Update Invoice" : "Create Invoice"}
         </Button>
       </div>
-    </form >
+    </form>
   );
 }

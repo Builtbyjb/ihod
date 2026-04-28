@@ -20,7 +20,7 @@ import { Separator } from "../ui/separator";
 import { Badge } from "@/components/ui/badge";
 
 type SidebarProps = {
-  businessName?: string;
+  businessname?: string;
   username?: string;
   email?: string;
 };
@@ -82,7 +82,7 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
                 <AvatarFallback>{props.username?.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
               <div className="flex flex-col">
-                <span className="truncate font-medium text-xl">{props.businessName}</span>
+                <span className="truncate font-medium text-xl">{props.businessname}</span>
                 <span className="truncate text-xs">{props.username}</span>
                 <span className="truncate text-xs">{props.email}</span>
               </div>
@@ -94,27 +94,26 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
       <Separator className="mt-2 mb-2" />
       <SidebarContent>
         <SidebarGroup>
-          <SidebarMenu className="space-y-2">
+          <SidebarMenu>
             {navItems.map((item) => (
               <Collapsible key={item.title} defaultOpen={item.isActive} className="group/collapsible">
                 <SidebarMenuItem>
-                  <CollapsibleTrigger className="w-full">
-                    <SidebarMenuButton
-                      tooltip={item.title}
-                      className="hover:bg-accent flex gap-4 items-center hover:cursor-pointer"
-                      onClick={() => {
-                        if (item.items === undefined) {
-                          navigate({ to: item.url });
-                          setOpenMobile(false);
-                        }
-                      }}
-                    >
-                      <item.icon />
-                      <span>{item.title}</span>
-                      {item.items && (
-                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                      )}
-                    </SidebarMenuButton>
+                  <CollapsibleTrigger
+                    className="hover:bg-accent flex gap-4 items-center hover:cursor-pointer w-full rounded-lg p-2"
+                    onClick={() => {
+                      if (item.items === undefined) {
+                        navigate({ to: item.url });
+                        setOpenMobile(false);
+                      }
+                    }}
+                  >
+                    {/*<SidebarMenuButton>*/}
+                    <item.icon className="h-4 w-4" />
+                    <span>{item.title}</span>
+                    {item.items && (
+                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                    )}
+                    {/*</SidebarMenuButton>*/}
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     {item.items?.length ? (
@@ -130,7 +129,7 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
                                   navigate({ to: subItem.url });
                                 }}
                               >
-                                <subItem.icon />
+                                <subItem.icon className="w-4 h-4" />
                                 <span>{subItem.title}</span>
                               </SidebarMenuButton>
                             </SidebarMenuItem>

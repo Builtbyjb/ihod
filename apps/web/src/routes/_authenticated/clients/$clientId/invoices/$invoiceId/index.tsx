@@ -12,7 +12,7 @@ import { InvoicePDF } from "@/components/InvoiceView/PDF";
 import { InvoicePrint } from "@/components/InvoiceView/Print";
 import { calculateSubTotal, calculateTaxAmount, calculateTotalAmount } from "@/lib/utils";
 import { useReactToPrint } from "react-to-print";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, getStatusVariant } from "@/lib/utils";
 
 const API_URL = import.meta.env.VITE_API_URL;
 function RouteComponent() {
@@ -41,21 +41,6 @@ function RouteComponent() {
       }
     })();
   }, [clientId, invoiceId]);
-
-  const getStatusVariant = (status: Invoice["status"]) => {
-    switch (status) {
-      case "paid":
-        return "default";
-      case "sent":
-        return "secondary";
-      case "draft":
-        return "outline";
-      case "overdue":
-        return "destructive";
-      default:
-        return "secondary";
-    }
-  };
 
   const componentRef = useRef(null);
 
@@ -162,9 +147,7 @@ function RouteComponent() {
                 Issued on {format(new Date(invoice.issueDate), "MMMM d, yyyy")}
               </p>
             </div>
-            <Badge variant={getStatusVariant(invoice.status)} className="capitalize text-sm">
-              {invoice.status}
-            </Badge>
+            <Badge className={`capitalize text-sm ${getStatusVariant(invoice.status)}`}>{invoice.status}</Badge>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid gap-6 sm:grid-cols-2">
