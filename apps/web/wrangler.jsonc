@@ -4,14 +4,11 @@
   "compatibility_date": "2026-04-17",
   "pages_build_output_dir": "dist",
   "env": {
-    "staging": {
-      "name": "ihod-web-staging",
-    },
     "production": {
       "name": "ihod-web-production",
     },
-    "uat": {
-      "name": "ihod-web-uat",
+    "preview": {
+      "name": "ihod-web-preview",
     },
   },
 }

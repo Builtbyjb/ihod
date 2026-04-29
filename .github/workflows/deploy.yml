@@ -49,4 +49,4 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: "apps/web"
           packageManager: npm
-          command: pages deploy apps/web/dist
+          command: pages deploy apps/web/dist --env=production
