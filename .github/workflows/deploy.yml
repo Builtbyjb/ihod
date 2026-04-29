@@ -26,7 +26,7 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: "apps/server"
           packageManager: npm
-          command: npx wrangler deploy
+          command: deploy
 
       - name: Build Frontend
         run: npx turbo run build --filter=@ihod/web
@@ -39,4 +39,4 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: "apps/web"
           packageManager: npm
-          command: npx wrangler pages deploy apps/web/dist --project-name=ihod
+          command: pages deploy apps/web/dist --project-name=ihod
