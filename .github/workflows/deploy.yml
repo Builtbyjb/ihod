@@ -15,6 +15,15 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Apply D1 Migrations
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: "apps/server"
+          packageManager: npm
+          command: d1 migrations apply ihod-dev --remote
+
       - name: Build backend
         run: npx turbo run build --filter=@ihod/server
 
@@ -26,7 +35,7 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: "apps/server"
           packageManager: npm
-          command: deploy
+          command: deploy --env=production
 
       - name: Build Frontend
         run: npx turbo run build --filter=@ihod/web
