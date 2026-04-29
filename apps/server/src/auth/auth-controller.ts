@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { Bindings } from "@/lib/types";
 import { drizzle } from "drizzle-orm/d1";
-import { eq } from "drizzle-orm";
+import { DrizzleQueryError, eq } from "drizzle-orm";
 import { members, organizations, users } from "@/db/schema";
 import { parseToken, signToken, sendOTPEmail } from "@/lib/utils";
 import { setCookie, deleteCookie } from "hono/cookie";
@@ -53,9 +53,17 @@ authRouteV1.post("/signup", zValidator("json", signupSchema), async (c) => {
     const data = c.req.valid("json");
     const db = drizzle(c.env.DB);
 
+    // Check if user exists
+    const prevUser = await db.select().from(users).where(eq(users.email, data.email)).get();
+    if (prevUser) return c.json({ message: "A user will this email address exists" }, 400);
+
+    let organization: { id: number } | undefined;
+    let user: { id: number } | undefined;
+    let member: { id: number } | undefined;
+
     try {
         // Create organization
-        const organization = await db
+        organization = await db
             .insert(organizations)
             .values({
                 name: data.businessName,
@@ -69,7 +77,7 @@ authRouteV1.post("/signup", zValidator("json", signupSchema), async (c) => {
             .get();
 
         // Create user
-        const user = await db
+        user = await db
             .insert(users)
             .values({
                 email: data.email,
@@ -82,11 +90,15 @@ authRouteV1.post("/signup", zValidator("json", signupSchema), async (c) => {
             .get();
 
         // Create member
-        await db.insert(members).values({
-            userId: user.id,
-            organizationId: organization.id,
-            roleId: 1,
-        });
+        member = await db
+            .insert(members)
+            .values({
+                userId: user.id,
+                organizationId: organization.id,
+                roleId: 1,
+            })
+            .returning({ id: members.id })
+            .get();
 
         const otp = await sendOTPEmail(c, data.email);
         if (otp instanceof Error) return c.json({ message: "Internal server error" }, 500);
@@ -112,7 +124,15 @@ authRouteV1.post("/signup", zValidator("json", signupSchema), async (c) => {
         return c.json({ message: "Sign up completed" }, 200);
     } catch (error) {
         console.log(error);
-        return c.json({ message: "An error occurred while signing up user" }, 500);
+
+        // Clean up on failure
+        if (error instanceof DrizzleQueryError) {
+            if (user?.id) await db.delete(users).where(eq(users.id, user.id));
+            if (organization?.id) await db.delete(organizations).where(eq(organizations.id, organization.id));
+            if (member?.id) await db.delete(members).where(eq(members.id, member.id));
+        }
+
+        return c.json({ message: "internal server error" }, 500);
     }
 });
 

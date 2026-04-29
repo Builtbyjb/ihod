@@ -31,6 +31,10 @@ export interface InvoiceItem {
     unitPrice: number;
 }
 
+export type ReturnId = {
+    id: number | undefined;
+};
+
 export class ErrorResult extends Error {
     public code: ContentfulStatusCode;
 
