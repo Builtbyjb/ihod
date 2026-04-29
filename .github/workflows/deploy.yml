@@ -21,6 +21,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          d1Token: ${{ secrets.CLOUDFLARE_D1_TOKEN }}
           workingDirectory: "apps/server"
           packageManager: npm
           command: d1 migrations apply ihod --remote --env=production
@@ -39,6 +40,8 @@ jobs:
           command: deploy --env=production
 
       - name: Build Frontend
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
         run: npx turbo run build --filter=@ihod/web
 
       # Deploy Frontend (Cloudflare Pages)
