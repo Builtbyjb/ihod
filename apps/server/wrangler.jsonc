@@ -28,6 +28,14 @@
     },
     "dev": {
       "name": "ihod-server-dev",
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "ihod-dev",
+          "database_id": "1b57c38f-8062-434e-86cd-cfc073b500e8",
+          "migrations_dir": "drizzle/migrations",
+        },
+      ],
       "send_email": [
         {
           "name": "SEND_EMAIL",
