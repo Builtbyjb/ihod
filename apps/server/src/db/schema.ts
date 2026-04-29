@@ -72,7 +72,7 @@ export const clients = sqliteTable("clients", {
 export const invoices = sqliteTable("invoices", {
     id: text("id").primaryKey(),
     clientId: text("client_id").references(() => clients.id),
-    issueDate: int("issued_date", { mode: "timestamp" }).notNull(),
+    issueDate: int("issue_date", { mode: "timestamp" }).notNull(),
     dueDate: int("due_date", { mode: "timestamp" }).notNull(),
     status: text("status").notNull(),
     taxRate: int("tax_rate", { mode: "number" }),

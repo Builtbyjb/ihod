@@ -21,6 +21,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          d1Token: ${{ secrets.CLOUDFLARE_D1_TOKEN }}
           workingDirectory: "apps/server"
           packageManager: npm
           command: d1 migrations apply ihod --remote --env=production
