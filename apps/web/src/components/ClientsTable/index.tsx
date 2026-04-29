@@ -110,7 +110,7 @@ export default function ClientsTable({ onEdit, clients, deleteClient }: ClientsT
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>
-                      <DropdownMenuTrigger>
+                      <DropdownMenuTrigger className="cursor-pointer">
                         <MoreHorizontal className="h-4 w-4" />
                         <span className="sr-only">Open menu</span>
                       </DropdownMenuTrigger>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { Mail, MapPin, Phone, Plus, UserCircle } from "lucide-react";
+import { Mail, MapPin, Phone, Plus, UserCircle, ArrowLeft } from "lucide-react";
 import InvoicesTable from "@/components/InvoicesTable";
 import type { Client, Invoice } from "@/lib/types";
 import { useNavigate } from "@tanstack/react-router";
@@ -13,6 +13,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 function RouteComponent() {
   const [clientInfo, setClientInfo] = useState<Client>();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const router = useRouter();
 
   const { clientId } = Route.useParams();
 
@@ -52,6 +53,10 @@ function RouteComponent() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <Button variant="ghost" onClick={() => router.history.back()} className="w-fit mb-4">
+        <ArrowLeft className="mr-2 h-8 w-8" />
+        Back
+      </Button>
       {clientInfo && (
         <Card className="mb-8">
           <CardHeader className="flex items-center gap-3">

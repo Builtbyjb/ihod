@@ -85,20 +85,15 @@ export default function Step2({ form }) {
               <FieldLabel htmlFor="currency-input">
                 Preferred Currency <span className="text-destructive">*</span>
               </FieldLabel>
-              <Select
-                name={field.name}
-                value={CURRENCIES.find((c) => c.value === field.state.value)?.name}
-                onValueChange={(e) => {
-                  if (e) field.handleChange(e);
-                }}
-              >
+              <Select name={field.name} value={field.state.value} onValueChange={(e) => field.handleChange(e)}>
                 <SelectTrigger id="select-currency" aria-invalid={isInvalid} className="min-w-30">
-                  <SelectValue placeholder="Select currency" />
+                  <SelectValue>
+                    {CURRENCIES.find((c) => c.symbol === field.state.value)?.name || "Select currency"}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  {/*<SelectItem value="auto">Auto</SelectItem>*/}
                   {CURRENCIES.map((currency) => (
-                    <SelectItem key={currency.value} value={currency.value}>
+                    <SelectItem key={currency.name} value={currency.symbol}>
                       {currency.name}
                     </SelectItem>
                   ))}
