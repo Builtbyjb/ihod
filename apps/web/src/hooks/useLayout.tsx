@@ -1,4 +1,4 @@
-import { useState, useContext, createContext } from "react";
+import React, { useState, useContext, createContext } from "react";
 
 type LayoutContextProps = {
   title: string;
@@ -7,7 +7,11 @@ type LayoutContextProps = {
 
 const LayoutContext = createContext<LayoutContextProps | null>(null);
 
-export function LayoutProvider({ children }) {
+type Props = {
+  children: React.ReactNode;
+};
+
+export function LayoutProvider({ children }: Props) {
   const [title, setTitle] = useState("");
   return <LayoutContext.Provider value={{ title, setTitle }}>{children}</LayoutContext.Provider>;
 }

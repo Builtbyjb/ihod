@@ -41,15 +41,17 @@ export default function ClientsTable({ onEdit, clients, deleteClient }: ClientsT
           credentials: "include",
         });
 
-        if (!response.ok) {
-          throw new Error("Failed to delete client");
-        }
+        if (!response.ok) throw new Error("Failed to delete client");
 
         deleteClient(deleteId);
         toast.success("Client deleted");
-      } catch (error) {
-        console.log(error);
-        toast.error("Failed to delete client");
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          console.log(error);
+          toast.error("Failed to delete client");
+        } else {
+          console.log(String(error));
+        }
       } finally {
         setDeleteId(null);
       }

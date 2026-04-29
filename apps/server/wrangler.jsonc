@@ -5,15 +5,15 @@
   "compatibility_date": "2026-04-17",
   "env": {
     "staging": {
-      "name": "ihod-web-staging",
+      "name": "ihod-server-staging",
     },
     "production": {
-      "name": "ihod-web-production",
+      "name": "ihod-server-production",
       "d1_databases": [
         {
           "binding": "DB",
-          "database_name": "ihod-dev",
-          "database_id": "3e8f2fbc-0e94-48c3-9ccb-ec293c6d721f",
+          "database_name": "ihod",
+          "database_id": "1b57c38f-8062-434e-86cd-cfc073b500ef",
           "migrations_dir": "drizzle/migrations",
         },
       ],
@@ -24,10 +24,10 @@
       ],
     },
     "uat": {
-      "name": "ihod-web-uat",
+      "name": "ihod-server-uat",
     },
     "dev": {
-      "name": "ihod-web-dev",
+      "name": "ihod-server-dev",
       "send_email": [
         {
           "name": "SEND_EMAIL",

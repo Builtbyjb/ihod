@@ -1,18 +1,5 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Legend,
-  Tooltip,
-} from "recharts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 
 interface StatusChartProps {
   data: { status: string; count: number; fill: string }[];
@@ -28,7 +15,7 @@ export default function StatusChart({ data }: StatusChartProps) {
         <CardDescription>Distribution by current status</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px]">
+        <div className="h-75">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -41,31 +28,22 @@ export default function StatusChart({ data }: StatusChartProps) {
                 dataKey="count"
                 nameKey="status"
               >
-                {data.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
+                {data.map((_, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip
+              {/*<Tooltip
                 formatter={(value: number, name: string) => [value, name]}
                 contentStyle={{
                   backgroundColor: "var(--card)",
                   border: "1px solid var(--border)",
                   borderRadius: "8px",
                 }}
-              />
+              />*/}
               <Legend
                 verticalAlign="bottom"
                 height={36}
-                formatter={(value) => (
-                  <span
-                    style={{ color: "var(--foreground)", fontSize: "12px" }}
-                  >
-                    {value}
-                  </span>
-                )}
+                formatter={(value) => <span style={{ color: "var(--foreground)", fontSize: "12px" }}>{value}</span>}
               />
             </PieChart>
           </ResponsiveContainer>

@@ -42,21 +42,16 @@ export default function Footer() {
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
                 <FileText className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold tracking-tight">
-                {APP_NAME}
-              </span>
+              <span className="text-xl font-bold tracking-tight">{APP_NAME}</span>
             </Link>
             <p className="mt-4 text-sm text-muted-foreground max-w-xs">
-              The simplest way to create professional invoices and get paid
-              faster.
+              The simplest way to create professional invoices and get paid faster.
             </p>
           </div>
 
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
-              <h3 className="text-sm font-semibold text-foreground mb-4">
-                {category}
-              </h3>
+              <h3 className="text-sm font-semibold text-foreground mb-4">{category}</h3>
               <ul className="space-y-3">
                 {links.map((link) => (
                   <li key={link.name}>
@@ -74,9 +69,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-16 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground">
-            © 2026 IHOD. All rights reserved.
-          </p>
+          <p className="text-sm text-muted-foreground">© 2026 IHOD. All rights reserved.</p>
           {/*<div className="flex items-center gap-6">
             <Link
               to="#"
