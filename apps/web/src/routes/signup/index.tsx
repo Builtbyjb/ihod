@@ -52,6 +52,7 @@ function RouteComponent() {
       website: "",
     },
     validators: {
+      onChange: schema,
       onSubmit: schema,
     },
     onSubmit: async ({ value }) => {
@@ -76,7 +77,7 @@ function RouteComponent() {
   const next = async () => {
     // Validate only the current step's fields before advancing
     const fields = STEPS[stepIndex].fields;
-    const results = await Promise.all(fields.map((field) => form.validateField(field, "submit")));
+    const results = await Promise.all(fields.map((field) => form.validateField(field, "blur")));
     const hasErrors = results.some((r) => r.length > 0);
     if (!hasErrors) setStepIndex((i) => i + 1);
   };

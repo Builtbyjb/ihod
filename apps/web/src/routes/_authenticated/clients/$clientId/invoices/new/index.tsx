@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import InvoiceForm from "@/components/InvoiceForm";
 import type { Client } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 function RouteComponent() {
   const [clientInfo, setClientInfo] = useState<Client | null>(null);
   const { clientId } = Route.useParams();
+  const router = useRouter();
 
   useEffect(() => {
     (async () => {
@@ -28,6 +31,10 @@ function RouteComponent() {
 
   return (
     <main>
+      <Button variant="ghost" onClick={() => router.history.back()} className="w-fit mb-4">
+        <ArrowLeft className="mr-2 h-8 w-8" />
+        Back
+      </Button>
       <InvoiceForm clientInfo={clientInfo} />
     </main>
   );

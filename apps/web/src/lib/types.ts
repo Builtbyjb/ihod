@@ -10,6 +10,11 @@ export interface Client {
     createdAt: string;
 }
 
+export type Currency = {
+    symbol: string;
+    locale: string;
+};
+
 export interface InvoiceItem {
     description: string;
     quantity: number;
@@ -42,8 +47,8 @@ export interface DashboardStats {
 export interface User {
     username: string;
     email: string;
-    currency: string,
-    organizationName: string
+    currency: string;
+    organizationName: string;
 }
 
 export interface AuthState {
@@ -62,5 +67,5 @@ export interface Context {
 
 export interface AuthResponse {
     accessToken: string;
-    user: User
+    user: User;
 }
