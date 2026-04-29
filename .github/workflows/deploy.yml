@@ -22,7 +22,7 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: "apps/server"
           packageManager: npm
-          command: d1 migrations apply ihod-dev --remote
+          command: d1 migrations apply ihod-dev --remote -env=production
 
       - name: Build backend
         run: npx turbo run build --filter=@ihod/server
