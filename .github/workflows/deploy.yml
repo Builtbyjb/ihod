@@ -1,6 +1,6 @@
 name: Deploy
 on:
-  push:
+  pull_request:
     branches: [main]
 
 jobs:
@@ -23,7 +23,7 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: "apps/server"
           packageManager: npm
-          command: d1 migrations apply ihod-dev --remote --env=production
+          command: d1 migrations apply ihod --remote --env=production
 
       - name: Build backend
         run: npx turbo run build --filter=@ihod/server
@@ -49,4 +49,4 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: "apps/web"
           packageManager: npm
-          command: pages deploy apps/web/dist --project-name=ihod
+          command: pages deploy dist --branch=production

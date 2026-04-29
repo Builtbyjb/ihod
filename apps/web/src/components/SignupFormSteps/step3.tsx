@@ -1,7 +1,13 @@
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import type { SignupFormType } from "@/hooks/useSignupForm";
 
-export default function Step3({ form }) {
+type Props = {
+  form: SignupFormType;
+};
+
+/* Location Information */
+export default function Step3({ form }: Props) {
   return (
     <Field>
       <form.Field

@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-// import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -22,7 +21,7 @@ type ClientFormProps = {
   client?: Client | null;
   addClient: (client: Client) => void;
   editClient: (client: Client) => void;
-}
+};
 
 const clientFormSchema = z.object({
   name: z.string().nonempty(),
@@ -31,7 +30,7 @@ const clientFormSchema = z.object({
   address: z.string(),
   city: z.string(),
   country: z.string(),
-})
+});
 
 // Create client response schema
 const clientResponseSchema = z.object({
@@ -46,65 +45,72 @@ const clientResponseSchema = z.object({
     city: z.string(),
     country: z.string(),
     createdAt: z.string(),
-  })
-})
+  }),
+});
 
 type ClientFormType = z.infer<typeof clientFormSchema>;
 
 const API_URL = import.meta.env.VITE_API_URL;
 export default function ClientForm({ open, onOpenChange, client, addClient, editClient }: ClientFormProps) {
-
   const handleClientCreate = async (value: ClientFormType) => {
     try {
       const response = await fetch(`${API_URL}/api/v1/clients/create`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(value)
-      })
+        body: JSON.stringify(value),
+      });
 
-      if (!response.ok) throw new Error("Failed to add client")
+      if (!response.ok) throw new Error("Failed to add client");
 
-      const result = await response.json()
-      const parsedResult = clientResponseSchema.parse(result)
+      const result = await response.json();
+      const parsedResult = clientResponseSchema.parse(result);
 
-      addClient(parsedResult.client)
-      onOpenChange(false)
-      toast.success("Client data added")
-    } catch (error) {
-      console.log(error)
-      toast.error("Failed to add client")
+      addClient(parsedResult.client);
+      onOpenChange(false);
+      toast.success("Client data added");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log(error);
+        toast.error("Failed to add client: " + error.message);
+      } else {
+        console.log(String(error));
+      }
     }
-  }
+  };
 
   const handleClientUpdate = async (id: string, value: ClientFormType) => {
     try {
-      if (!client) throw new Error("Cannot edit null client object")
+      if (!client) throw new Error("Cannot edit null client object");
 
       const response = await fetch(`${API_URL}/api/v1/clients/edit/${id}`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(value)
-      })
+        body: JSON.stringify(value),
+      });
 
-      if (!response.ok) throw new Error("Failed to edit client")
+      if (!response.ok) throw new Error("Failed to edit client");
 
       const newValue: Client = {
         ...value,
         id: client.id,
         createdAt: client.createdAt,
-        organizationId: client.organizationId
-      }
+        organizationId: client.organizationId,
+      };
 
-      editClient(newValue)
-      onOpenChange(false)
-      toast.success("Client data updated")
-    } catch (error) {
-      console.log(error)
-      toast.error("Failed to edit client")
+      editClient(newValue);
+      onOpenChange(false);
+      toast.success("Client data updated");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log(error);
+        toast.error("Failed to edit client: " + error.message);
+      } else {
+        console.log(String(error));
+      }
     }
-  }
+  };
 
   const form = useForm({
     defaultValues: {
@@ -119,10 +125,10 @@ export default function ClientForm({ open, onOpenChange, client, addClient, edit
       onSubmit: clientFormSchema,
     },
     onSubmit: async ({ value }) => {
-      if (client) await handleClientUpdate(client.id, value)
-      else await handleClientCreate(value)
-    }
-  })
+      if (client) await handleClientUpdate(client.id, value);
+      else await handleClientCreate(value);
+    },
+  });
 
   useEffect(() => {
     /* Set default values for client update  */
@@ -134,23 +140,23 @@ export default function ClientForm({ open, onOpenChange, client, addClient, edit
       form.setFieldValue("city", client.city);
       form.setFieldValue("country", client.country);
     }
-  }, [client, form])
+  }, [client, form]);
 
   return (
-    <Dialog open={open} onOpenChange={(open) => {
-      if (!open) {
-        form.reset()
-      }
-      onOpenChange(open)
-    }
-    }>
+    <Dialog
+      open={open}
+      onOpenChange={(open) => {
+        if (!open) {
+          form.reset();
+        }
+        onOpenChange(open);
+      }}
+    >
       <DialogContent className="sm:max-w-125">
         <DialogHeader>
           <DialogTitle>{client ? "Edit Client" : "Add New Client"}</DialogTitle>
           <DialogDescription>
-            {client
-              ? "Update client information"
-              : "Add a new client to your list"}
+            {client ? "Update client information" : "Add a new client to your list"}
           </DialogDescription>
         </DialogHeader>
         <form
@@ -165,8 +171,7 @@ export default function ClientForm({ open, onOpenChange, client, addClient, edit
           <form.Field
             name="name"
             children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor="client-name-input">
@@ -182,18 +187,15 @@ export default function ClientForm({ open, onOpenChange, client, addClient, edit
                     aria-invalid={isInvalid}
                     placeholder="Client's full name"
                   />
-                  {isInvalid && (
-                    <FieldError errors={field.state.meta.errors} />
-                  )}
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
-              )
+              );
             }}
           />
           <form.Field
             name="email"
             children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor="client-email-input">Email</FieldLabel>
@@ -206,18 +208,15 @@ export default function ClientForm({ open, onOpenChange, client, addClient, edit
                     aria-invalid={isInvalid}
                     placeholder="Client's email"
                   />
-                  {isInvalid && (
-                    <FieldError errors={field.state.meta.errors} />
-                  )}
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
-              )
+              );
             }}
           />
           <form.Field
             name="phone"
             children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor="client-phone-input">Phone</FieldLabel>
@@ -231,19 +230,16 @@ export default function ClientForm({ open, onOpenChange, client, addClient, edit
                     aria-invalid={isInvalid}
                     placeholder="+1 (555) 123-4567"
                   />
-                  {isInvalid && (
-                    <FieldError errors={field.state.meta.errors} />
-                  )}
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
-              )
+              );
             }}
           />
           {/* Address */}
           <form.Field
             name="address"
             children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor="client-address-input">Address</FieldLabel>
@@ -256,20 +252,17 @@ export default function ClientForm({ open, onOpenChange, client, addClient, edit
                     aria-invalid={isInvalid}
                     placeholder="Street address"
                   />
-                  {isInvalid && (
-                    <FieldError errors={field.state.meta.errors} />
-                  )}
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
-              )
+              );
             }}
           />
-          <Field orientation="horizontal" >
+          <Field orientation="horizontal">
             {/* City */}
             <form.Field
               name="city"
               children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
+                const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                 return (
                   <Field data-invalid={isInvalid}>
                     <FieldLabel htmlFor="client-city-input">City</FieldLabel>
@@ -282,18 +275,15 @@ export default function ClientForm({ open, onOpenChange, client, addClient, edit
                       aria-invalid={isInvalid}
                       placeholder="City, State ZIP"
                     />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
                   </Field>
-                )
+                );
               }}
             />
             <form.Field
               name="country"
               children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
+                const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                 return (
                   <Field data-invalid={isInvalid}>
                     <FieldLabel htmlFor="client-country-input">Country</FieldLabel>
@@ -306,23 +296,19 @@ export default function ClientForm({ open, onOpenChange, client, addClient, edit
                       aria-invalid={isInvalid}
                       placeholder="Country"
                     />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
                   </Field>
-                )
+                );
               }}
             />
           </Field>
           <DialogFooter className="bg-background">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => form.reset()}
-            >
+            <Button type="button" variant="outline" onClick={() => form.reset()}>
               Reset
             </Button>
-            <Button type="submit" id="create-client-form">{client ? "Update" : "Add"} Client</Button>
+            <Button type="submit" id="create-client-form">
+              {client ? "Update" : "Add"} Client
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

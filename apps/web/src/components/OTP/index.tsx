@@ -16,9 +16,13 @@ export default function OTP() {
       try {
         const response = await verifyOtp(value);
         if (response) navigate({ to: "/dashboard" });
-      } catch (error) {
-        toast.error("Error verifying OTP: " + error.message);
-        console.error(error);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          console.log(error);
+          toast.error("Error verifying OTP: " + error.message);
+        } else {
+          console.error(String(error));
+        }
       }
     }
   };
@@ -27,9 +31,7 @@ export default function OTP() {
     <Card className="w-full max-w-sm">
       <CardHeader>
         <CardTitle className="text-xl">Enter OTP</CardTitle>
-        <CardDescription>
-          Please enter the OTP code sent to your email.
-        </CardDescription>
+        <CardDescription>Please enter the OTP code sent to your email.</CardDescription>
       </CardHeader>
       <CardContent>
         <InputOTP maxLength={8} value={value} onChange={(e) => handleChange(e)}>

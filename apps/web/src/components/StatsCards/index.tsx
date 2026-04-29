@@ -1,21 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, FileText, Clock, Users } from "lucide-react";
 import type { DashboardStats } from "@/lib/types";
+import { formatCurrency } from "@/lib/utils";
 
 interface StatsCardsProps {
   stats: DashboardStats;
 }
 
 export default function StatsCards({ stats }: StatsCardsProps) {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
-
   const cards = [
     {
       title: "Total Revenue",
@@ -56,18 +48,14 @@ export default function StatsCards({ stats }: StatsCardsProps) {
       {cards.map((card) => (
         <Card key={card.title}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {card.title}
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{card.title}</CardTitle>
             <div className={`p-2 rounded-lg ${card.iconBg}`}>
               <card.icon className={`h-4 w-4 ${card.iconColor}`} />
             </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{card.value}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {card.description}
-            </p>
+            <p className="text-xs text-muted-foreground mt-1">{card.description}</p>
           </CardContent>
         </Card>
       ))}
