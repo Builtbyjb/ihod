@@ -6,18 +6,27 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - uses: actions/checkout@v4
-      - uses: npm/action-setup@v3
-        with:
-          version: 9
-      - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: "npm"
 
       - name: Install dependencies
         run: npm install
+
+      - name: Apply D1 Migrations
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: "apps/server"
+          packageManager: npm
+          command: d1 migrations apply ihod-dev --remote --env=production
+
+      - name: Build backend
+        run: npx turbo run build --filter=@ihod/server
 
       # Deploy Backend (Cloudflare Worker)
       - name: Deploy Backend
@@ -26,9 +35,11 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: "apps/server"
-          command: |
-            npx turbo run build --filter=@ihod/server
-            npx wrangler deploy
+          packageManager: npm
+          command: deploy --env=production
+
+      - name: Build Frontend
+        run: npx turbo run build --filter=@ihod/web
 
       # Deploy Frontend (Cloudflare Pages)
       - name: Deploy Frontend
@@ -36,6 +47,6 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: |
-            npx turbo run build --filter=@ihod/web
-            npx wrangler pages deploy apps/web/dist --project-name=ihod
+          workingDirectory: "apps/web"
+          packageManager: npm
+          command: pages deploy apps/web/dist --project-name=ihod

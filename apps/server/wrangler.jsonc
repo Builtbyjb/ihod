@@ -9,12 +9,6 @@
     },
     "production": {
       "name": "ihod-web-production",
-    },
-    "uat": {
-      "name": "ihod-web-uat",
-    },
-    "dev": {
-      "name": "ihod-web-dev",
       "d1_databases": [
         {
           "binding": "DB",
@@ -23,6 +17,17 @@
           "migrations_dir": "drizzle/migrations",
         },
       ],
+      "send_email": [
+        {
+          "name": "SEND_EMAIL",
+        },
+      ],
+    },
+    "uat": {
+      "name": "ihod-web-uat",
+    },
+    "dev": {
+      "name": "ihod-web-dev",
       "send_email": [
         {
           "name": "SEND_EMAIL",
