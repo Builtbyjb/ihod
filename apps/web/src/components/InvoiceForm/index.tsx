@@ -31,7 +31,7 @@ const invoiceFormSchema = z.object({
       unitPrice: z.number().positive(),
     }),
   ),
-  currency: z.string(),
+  currency: z.string().min(2),
   notes: z.string(),
 });
 
@@ -221,9 +221,10 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor="currency-input">
-                        Preferred Currency <span className="text-destructive">*</span>
+                        Currency <span className="text-destructive">*</span>
                       </FieldLabel>
                       <Select
+                        required
                         name={field.name}
                         value={field.state.value}
                         onValueChange={(e) => {
