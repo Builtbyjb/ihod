@@ -1,6 +1,6 @@
 name: Deploy
 on:
-  push:
+  pull_request:
     branches: [main]
 
 jobs:
@@ -49,4 +49,4 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: "apps/web"
           packageManager: npm
-          command: pages deploy apps/web/dist --branch=production
+          command: pages deploy dist --branch=production
