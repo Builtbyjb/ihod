@@ -1,10 +1,16 @@
-import type { Client, Invoice, DashboardStats } from "./types";
+import type { Client, Invoice, DashboardStats, Currency } from "./types";
 
 export const CURRENCIES = [
-    { name: "Naira (NGN)", value: "NGN", symbol: "₦" },
-    { name: "Canadian Dollar (CAD)", value: "CAD", symbol: "C$" },
-    { name: "US Dollar (USD)", value: "USD", symbol: "$" },
+    { name: "Naira", value: "NGN" },
+    { name: "Canadian Dollar", symbol: "CAD" },
+    { name: "US Dollar", symbol: "USD" },
 ];
+
+export const CURRENCY_MAP: Record<string, Currency> = {
+    NGN: { symbol: "₦", locale: "en-NG" },
+    USD: { symbol: "$", locale: "en-US" },
+    EUR: { symbol: "€", locale: "de-DE" },
+};
 
 export function useDashboardStats(invoices: Invoice[], clients: Client[]): DashboardStats {
     const totalRevenue = invoices.filter((inv) => inv.status === "paid").reduce((sum, inv) => sum + inv.taxRate, 0);

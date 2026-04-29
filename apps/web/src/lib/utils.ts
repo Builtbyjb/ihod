@@ -1,15 +1,17 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { InvoiceItem, Invoice } from "./types";
+import { CURRENCY_MAP } from "./store";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-export function formatCurrency(amount: number): string {
-    return new Intl.NumberFormat("en-US", {
+export function formatCurrency(amount: number, currency: string = "USD"): string {
+    const config = CURRENCY_MAP[currency];
+    return new Intl.NumberFormat(config.locale, {
         style: "currency",
-        currency: "USD",
+        currency: currency,
     }).format(amount);
 }
 

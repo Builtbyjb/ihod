@@ -2,7 +2,6 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import authRouteV1 from "./auth/auth-controller";
 import userRouteV1 from "./user/user-controller";
-// import invoiceRouteV1 from "./invoice/invoice-controller";
 import clientRouteV1 from "./client/client-controller";
 import { Bindings } from "@/lib/types";
 
@@ -21,7 +20,6 @@ app.use(
 
 app.route("/api/v1", authRouteV1);
 app.route("/api/v1", userRouteV1);
-// app.route("/api/v1", invoiceRouteV1);
 app.route("/api/v1", clientRouteV1);
 
 export default app;

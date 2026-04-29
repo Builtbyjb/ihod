@@ -9,29 +9,30 @@ export function generateOTP(): string {
 }
 
 export function generateInvoiceNumber(length: number = 4): string {
-    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
     const array = new Uint8Array(length);
     crypto.getRandomValues(array);
-    return Array.from(array, (byte) => chars[byte % chars.length]).join('');
+    return Array.from(array, (byte) => chars[byte % chars.length]).join("");
 }
 
 export async function parseToken(c: Context, tokenName: string): Promise<TokenPayload | ErrorResult> {
     const token = getCookie(c, tokenName);
     if (!token) {
-        return new ErrorResult(tokenName + " token not found", 404)
+        console.log(tokenName + " token not found");
+        return new ErrorResult(tokenName + " token not found", 404);
     }
 
     const secret = c.env.JWT_SECRET;
     if (!secret) {
         console.error("JWT secret not configured");
-        return new ErrorResult("Internal Server Error", 500)
+        return new ErrorResult("Internal Server Error", 500);
     }
 
     try {
         return (await verify(token, secret, "HS256")) as TokenPayload;
     } catch (error) {
-        console.log(error)
-        return new ErrorResult("Internal Server Error", 500)
+        console.log(error);
+        return new ErrorResult("Internal Server Error", 500);
     }
 }
 
@@ -39,7 +40,7 @@ export async function signToken(c: Context, payload: TokenPayload | OTPPayload):
     const secret = c.env.JWT_SECRET;
     if (!secret) {
         console.error("JWT secret not configured");
-        return new Error("Internal Server Error")
+        return new Error("Internal Server Error");
     }
 
     return await sign(payload, secret);
@@ -51,7 +52,7 @@ export async function sendOTPEmail(c: Context, email: string): Promise<Error | s
     const sender = c.env.EMAIL_DOMAIN;
     if (!sender) {
         console.error("EMAIL_DOMAIN not configured");
-        return new Error("Sender not configured")
+        return new Error("Sender not configured");
     }
 
     // Send OTP to user name
@@ -62,5 +63,5 @@ export async function sendOTPEmail(c: Context, email: string): Promise<Error | s
         text: `Your OTP code is: ${otp}`,
     });
 
-    return otp
+    return otp;
 }
