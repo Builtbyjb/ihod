@@ -14,8 +14,8 @@ npm run dev-server
 npm run dev
 
 # Create database migrations
-npm run c-mig
+cd apps/server && npx drizzle-kit generate
 
 # Apply database migrations
-npm run a-mig 
+cd apps/server && npx npx wrangler d1 migrations apply 'ihod-dev' --env=dev --local
 ```

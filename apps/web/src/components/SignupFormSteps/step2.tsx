@@ -1,7 +1,5 @@
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CURRENCIES } from "@/lib/store";
 
 export default function Step2({ form }) {
   return (
@@ -71,34 +69,6 @@ export default function Step2({ form }) {
                 autoComplete="off"
                 placeholder="https://www.examplebusiness.com"
               />
-              {isInvalid && <FieldError errors={field.state.meta.errors} />}
-            </Field>
-          );
-        }}
-      />
-      <form.Field
-        name="currency"
-        children={(field) => {
-          const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-          return (
-            <Field data-invalid={isInvalid}>
-              <FieldLabel htmlFor="currency-input">
-                Preferred Currency <span className="text-destructive">*</span>
-              </FieldLabel>
-              <Select name={field.name} value={field.state.value} onValueChange={(e) => field.handleChange(e)}>
-                <SelectTrigger id="select-currency" aria-invalid={isInvalid} className="min-w-30">
-                  <SelectValue>
-                    {CURRENCIES.find((c) => c.symbol === field.state.value)?.name || "Select currency"}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {CURRENCIES.map((currency) => (
-                    <SelectItem key={currency.name} value={currency.symbol}>
-                      {currency.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
               {isInvalid && <FieldError errors={field.state.meta.errors} />}
             </Field>
           );

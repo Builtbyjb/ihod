@@ -30,7 +30,7 @@ function RouteComponent() {
   }, [clientId]);
 
   return (
-    <main>
+    <main className="mb-8">
       <Button variant="ghost" onClick={() => router.history.back()} className="w-fit mb-4">
         <ArrowLeft className="mr-2 h-8 w-8" />
         Back

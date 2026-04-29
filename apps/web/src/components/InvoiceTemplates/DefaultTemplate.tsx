@@ -12,7 +12,7 @@ type InvoicePDFProps = {
 
 export const DefaultInvoiceTemplate = forwardRef<HTMLDivElement, InvoicePDFProps>(
   ({ invoice, client, bussinessname }, ref) => (
-    <main ref={ref} className="bg-white w-[210mm] min-h-[295mm] mx-auto p-[15mm] text-gray-800 print:p-[15mm]">
+    <main ref={ref} className="bg-white w-[210mm] min-h-[295mm] mx-auto p-[10mm] text-gray-800 print:p-[10mm]">
       <div className="h-full flex flex-col justify-between">
         {/* Top Content */}
         <div className="space-y-8">
@@ -57,8 +57,10 @@ export const DefaultInvoiceTemplate = forwardRef<HTMLDivElement, InvoicePDFProps
               <div key={index} className="grid grid-cols-4 py-3 border-b text-sm">
                 <p>{item.description}</p>
                 <p className="text-center">{item.quantity}</p>
-                <p className="text-right">{formatCurrency(item.unitPrice)}</p>
-                <p className="text-right font-medium">{formatCurrency(item.quantity * item.unitPrice)}</p>
+                <p className="text-right">{formatCurrency(item.unitPrice, invoice.currency)}</p>
+                <p className="text-right font-medium">
+                  {formatCurrency(item.quantity * item.unitPrice, invoice.currency)}
+                </p>
               </div>
             ))}
           </div>
@@ -68,15 +70,15 @@ export const DefaultInvoiceTemplate = forwardRef<HTMLDivElement, InvoicePDFProps
             <div className="w-75 space-y-2 text-sm">
               <div className="flex justify-between">
                 <p>Subtotal</p>
-                <p>{formatCurrency(calculateSubTotal(invoice.items))}</p>
+                <p>{formatCurrency(calculateSubTotal(invoice.items), invoice.currency)}</p>
               </div>
               <div className="flex justify-between">
                 <p>Tax ({invoice.taxRate}%)</p>
-                <p>{formatCurrency(calculateTaxAmount(invoice.items, invoice.taxRate))}</p>
+                <p>{formatCurrency(calculateTaxAmount(invoice.items, invoice.taxRate), invoice.currency)}</p>
               </div>
               <div className="flex justify-between font-bold text-lg border-t pt-2">
                 <p>Total</p>
-                <p>{formatCurrency(calculateTotalAmount(invoice.items, invoice.taxRate))}</p>
+                <p>{formatCurrency(calculateTotalAmount(invoice.items, invoice.taxRate), invoice.currency)}</p>
               </div>
             </div>
           </div>

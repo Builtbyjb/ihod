@@ -15,7 +15,6 @@ export const signupSchema = z.object({
     username: z.string().min(2),
     businessName: z.string().min(2),
     businessType: z.string().min(2),
-    currency: z.string().min(2),
     businessAddress: z.string().min(2),
     city: z.string().min(2),
     country: z.string().min(2),

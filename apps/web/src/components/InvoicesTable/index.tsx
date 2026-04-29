@@ -23,7 +23,6 @@ import type { Invoice } from "@/lib/types";
 import { format } from "date-fns";
 import { useNavigate } from "@tanstack/react-router";
 import { calculateTotalAmount, formatCurrency, getStatusVariant } from "@/lib/utils";
-import { useAuth } from "@/hooks/auth";
 
 interface InvoicesTableProps {
   clientId: string;
@@ -35,7 +34,6 @@ const API_URL = import.meta.env.VITE_API_URL;
 export default function InvoicesTable({ invoices, onDelete, clientId }: InvoicesTableProps) {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const navigate = useNavigate();
-  const { user } = useAuth();
 
   const handleDelete = async () => {
     if (deleteId) {
@@ -94,7 +92,7 @@ export default function InvoicesTable({ invoices, onDelete, clientId }: Invoices
                         {format(new Date(invoice.dueDate), "MMM d, yyyy")}
                       </TableCell>
                       <TableCell className="font-semibold">
-                        {formatCurrency(calculateTotalAmount(invoice.items, invoice.taxRate), user?.currency)}
+                        {formatCurrency(calculateTotalAmount(invoice.items, invoice.taxRate), invoice.currency)}
                       </TableCell>
                       <TableCell>
                         <Badge className={`capitalize ${getStatusVariant(invoice.status)}`}>{invoice.status}</Badge>
