@@ -21,7 +21,6 @@ const schema = z.object({
   username: z.string().min(2),
   businessName: z.string().min(2),
   businessType: z.string().min(2),
-  currency: z.string().min(2),
   businessAddress: z.string().min(2),
   city: z.string().min(2),
   country: z.string().min(2),
@@ -45,7 +44,6 @@ function RouteComponent() {
       username: "",
       businessName: "",
       businessType: "",
-      currency: "",
       businessAddress: "",
       city: "",
       country: "",
@@ -77,7 +75,7 @@ function RouteComponent() {
   const next = async () => {
     // Validate only the current step's fields before advancing
     const fields = STEPS[stepIndex].fields;
-    const results = await Promise.all(fields.map((field) => form.validateField(field, "blur")));
+    const results = await Promise.all(fields.map((field) => form.validateField(field, "change")));
     const hasErrors = results.some((r) => r.length > 0);
     if (!hasErrors) setStepIndex((i) => i + 1);
   };

@@ -63,7 +63,6 @@ authRouteV1.post("/signup", zValidator("json", signupSchema), async (c) => {
                 address: data.businessAddress,
                 city: data.city,
                 country: data.country,
-                currency: data.currency,
                 website: data.website,
             })
             .returning({ id: organizations.id })
@@ -141,7 +140,6 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
         username: user.username,
         email: user.email,
         currentOrgId: parsed.currentOrgId,
-        currency: organization.currency,
         organizationName: organization.name,
         exp: REFRESH_TOKEN_EXP,
     };
@@ -162,7 +160,6 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
         username: user.username,
         email: user.email,
         currentOrgId: parsed.currentOrgId,
-        currency: organization.currency,
         organizationName: organization.name,
         exp: ACCESS_TOKEN_EXP,
     };
@@ -177,7 +174,6 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
                 username: user.username,
                 organizationName: organization.name,
                 email: user.email,
-                currency: organization.currency,
             },
         },
         200,
@@ -199,7 +195,6 @@ authRouteV1.get("/refresh-token", async (c) => {
         username: parsed.username,
         email: parsed.email,
         currentOrgId: parsed.currentOrgId,
-        currency: organization.currency,
         organizationName: organization.name,
         exp: ACCESS_TOKEN_EXP,
     };
@@ -214,7 +209,6 @@ authRouteV1.get("/refresh-token", async (c) => {
                 username: parsed.username,
                 organizationName: organization.name,
                 email: parsed.email,
-                currency: organization.currency,
             },
         },
         200,

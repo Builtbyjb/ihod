@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup } from "@/components/ui/select";
-import { Plus, Trash2, ChevronDownIcon } from "lucide-react";
+import { Plus, Trash2, ChevronDownIcon, Mail, Phone } from "lucide-react";
 import type { Client, Invoice, InvoiceStatus } from "@/lib/types";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
@@ -15,7 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns";
 import { calculateTotalAmount, calculateTaxAmount, formatCurrency } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
-import { useAuth } from "@/hooks/auth";
+import { CURRENCIES } from "@/lib/store";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -31,6 +31,7 @@ const invoiceFormSchema = z.object({
       unitPrice: z.number().positive(),
     }),
   ),
+  currency: z.string(),
   notes: z.string(),
 });
 
@@ -50,8 +51,6 @@ const status = [
 ];
 
 export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: InvoiceFormProps) {
-  const { user } = useAuth();
-
   const handleCreate = async (value: InvoiceForm) => {
     try {
       if (!clientInfo) throw new Error("Client Id not found");
@@ -111,6 +110,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
           unitPrice: 0,
         },
       ],
+      currency: "",
       notes: "",
     },
     validators: {
@@ -132,6 +132,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
       form.setFieldValue("taxRate", existingInvoice.taxRate);
       form.setFieldValue("items", existingInvoice.items);
       form.setFieldValue("notes", existingInvoice.notes);
+      form.setFieldValue("currency", existingInvoice.currency);
     }
   }, [existingInvoice, form]);
 
@@ -152,14 +153,32 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Select client */}
+            <Field>
+              <FieldContent>
+                <div className="flex gap-4">
+                  <h1 className="text-lg mb-2">{clientInfo?.name}</h1>
+                  <div className="flex flex-col gap-2 mb-2">
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-md bg-muted flex items-center justify-center shrink-0 mt-0.5">
+                        <Mail className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm mt-0.5 whitespace-pre-line">{clientInfo?.email}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-6 h-6 rounded-md bg-muted flex items-center justify-center shrink-0 mt-0.5">
+                        <Phone className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm mt-0.5 whitespace-pre-line">{clientInfo?.phone}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </FieldContent>
+            </Field>
             <div className="flex gap-4">
-              <Field>
-                <FieldContent>
-                  <h1 className="text-lg">{clientInfo?.name}</h1>
-                  <p className="text-muted-foreground">{clientInfo?.email}</p>
-                  <p className="text-muted-foreground">{clientInfo?.phone}</p>
-                </FieldContent>
-              </Field>
               <form.Field
                 name="status"
                 children={(field) => {
@@ -195,6 +214,40 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                   );
                 }}
               />
+              <form.Field
+                name="currency"
+                children={(field) => {
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor="currency-input">
+                        Preferred Currency <span className="text-destructive">*</span>
+                      </FieldLabel>
+                      <Select
+                        name={field.name}
+                        value={field.state.value}
+                        onValueChange={(e) => {
+                          if (e) field.handleChange(e);
+                        }}
+                      >
+                        <SelectTrigger id="select-currency" aria-invalid={isInvalid} className="min-w-30">
+                          <SelectValue>
+                            {CURRENCIES.find((c) => c.value === field.state.value)?.name || "Select currency"}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {CURRENCIES.map((currency) => (
+                            <SelectItem key={currency.name} value={currency.value}>
+                              {currency.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                    </Field>
+                  );
+                }}
+              />
             </div>
             <div className="grid gap-8 sm:grid-cols-2">
               {/* Issue Date */}
@@ -208,7 +261,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                       <Popover>
                         <PopoverTrigger
                           id="issue-date-input"
-                          className="flex border border-border items-center p-2 w-44 rounded-lg m-0 justify-between data-[empty=true]:text-muted-foreground"
+                          className="flex border border-border items-center px-2 py-1 w-44 rounded-lg m-0 justify-between data-[empty=true]:text-muted-foreground"
                         >
                           {format(field.state.value, "PPP")}
                           <ChevronDownIcon />
@@ -239,7 +292,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                       <Popover>
                         <PopoverTrigger
                           id="issue-date-input"
-                          className="flex border border-border rounded-lg p-2 w-44 m-0 justify-between data-[empty=true]:text-muted-foreground"
+                          className="flex border border-border rounded-lg px-2 py-1 w-44 m-0 justify-between data-[empty=true]:text-muted-foreground"
                         >
                           {format(field.state.value, "PPP")}
                           <ChevronDownIcon />
@@ -278,7 +331,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                 return (
                   <div className="flex justify-between pt-4 border-t border-border">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span>{formatCurrency(subtotal, user?.currency)}</span>
+                    <span>{formatCurrency(subtotal)}</span>
                   </div>
                 );
               }}
@@ -317,7 +370,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                     return (
                       <Field>
                         <FieldContent>
-                          <span>{formatCurrency(taxAmount, user?.currency)}</span>
+                          <span>{formatCurrency(taxAmount)}</span>
                         </FieldContent>
                       </Field>
                     );
@@ -336,7 +389,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                     </div>
                     <div>
                       <FieldContent>
-                        <span className="font-medium">{formatCurrency(total, user?.currency)}</span>
+                        <span className="font-medium">{formatCurrency(total)}</span>
                       </FieldContent>
                     </div>
                   </div>
@@ -357,7 +410,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                     <FieldTitle className="text-lg mb-4">Line Items</FieldTitle>
                     {field.state.value.map((_, idx) => (
                       <>
-                        {field.state.value.length > 1 && <Separator className="mt-6 mb-6" />}
+                        {field.state.value.length > 1 && <Separator key={`s-${idx}`} className="mt-6 mb-6" />}
                         <Field key={idx} orientation="responsive" className="grid md:grid-cols-12 gap-4">
                           <form.Field
                             name={`items[${idx}].description`}
@@ -438,7 +491,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                                 <Field className="col-span-2">
                                   <FieldLabel>Total</FieldLabel>
                                   <FieldContent>
-                                    <span className="font-medium">{formatCurrency(total, user?.currency)}</span>
+                                    <span className="font-medium">{formatCurrency(total)}</span>
                                   </FieldContent>
                                 </Field>
                               );

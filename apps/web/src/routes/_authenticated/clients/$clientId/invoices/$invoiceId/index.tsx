@@ -135,8 +135,8 @@ function RouteComponent() {
                     <TableRow key={idx}>
                       <TableCell className="font-medium">{item.description}</TableCell>
                       <TableCell className="text-center">{item.quantity}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(item.unitPrice, user?.currency)}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(item.unitPrice, user?.currency)}</TableCell>
+                      <TableCell className="text-right">{formatCurrency(item.unitPrice, invoice.currency)}</TableCell>
+                      <TableCell className="text-right">{formatCurrency(item.unitPrice, invoice.currency)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -159,16 +159,16 @@ function RouteComponent() {
           <CardContent className="space-y-4">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Subtotal</span>
-              <span>{formatCurrency(calculateSubTotal(invoice.items), user?.currency)}</span>
+              <span>{formatCurrency(calculateSubTotal(invoice.items), invoice.currency)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Tax ({invoice.taxRate}%)</span>
-              <span>{formatCurrency(calculateTaxAmount(invoice.items, invoice.taxRate), user?.currency)}</span>
+              <span>{formatCurrency(calculateTaxAmount(invoice.items, invoice.taxRate), invoice.currency)}</span>
             </div>
             <div className="flex justify-between pt-4 border-t border-border">
               <span className="font-semibold">Total</span>
               <span className="text-xl font-bold">
-                {formatCurrency(calculateTotalAmount(invoice.items, invoice.taxRate), user?.currency)}
+                {formatCurrency(calculateTotalAmount(invoice.items, invoice.taxRate), invoice.currency)}
               </span>
             </div>
           </CardContent>

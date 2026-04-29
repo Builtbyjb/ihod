@@ -6,13 +6,7 @@ export type Bindings = {
     EMAIL_DOMAIN: string;
     JWT_SECRET: string;
     SEND_EMAIL: {
-        send: (email: {
-            to: string;
-            from: string;
-            subject: string;
-            text: string;
-            html?: string;
-        }) => Promise<any>;
+        send: (email: { to: string; from: string; subject: string; text: string; html?: string }) => Promise<any>;
     };
     // Add other variables like KV, R2, or Secret Keys here
 };
@@ -21,21 +15,20 @@ export type TokenPayload = JWTPayload & {
     userId: number;
     email: string;
     username: string;
-    currentOrgId: number
-    currency: string
-    organizationName: string
+    currentOrgId: number;
+    organizationName: string;
 };
 
 export type OTPPayload = JWTPayload & {
     userId: number;
-    currentOrgId: number
-    otp: string
+    currentOrgId: number;
+    otp: string;
 };
 
 export interface InvoiceItem {
-    description: string,
-    quantity: number,
-    unitPrice: number
+    description: string;
+    quantity: number;
+    unitPrice: number;
 }
 
 export class ErrorResult extends Error {

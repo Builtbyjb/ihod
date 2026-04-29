@@ -24,6 +24,7 @@ const invoiceFormSchema = z.object({
             unitPrice: z.number().positive(),
         }),
     ),
+    currency: z.string(),
     notes: z.string(),
 });
 
@@ -115,6 +116,7 @@ invoiceRouteV1.post("/create", zValidator("json", invoiceFormSchema), async (c) 
         taxRate: data.taxRate,
         items: data.items,
         notes: data.notes,
+        currency: data.currency,
     });
 
     return c.json({ message: "Invoice created" }, 200);
@@ -146,6 +148,7 @@ invoiceRouteV1.put("/:invoiceId/edit", zValidator("json", invoiceFormSchema), as
             taxRate: data.taxRate,
             items: data.items,
             notes: data.notes,
+            currency: data.currency,
             updatedAt: sql`(unixepoch())`,
         })
         .where(eq(invoices.id, invoiceId));
