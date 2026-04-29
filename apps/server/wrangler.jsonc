@@ -38,6 +38,10 @@
   "dev": {
     "port": 8585,
   },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1, // optional. default = 1.
+  },
 
   // "compatibility_flags": [
   //   "nodejs_compat"
