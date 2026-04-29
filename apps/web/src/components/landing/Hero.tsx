@@ -42,7 +42,7 @@ export default function Hero() {
           <div className="relative mx-auto max-w-5xl">
             <div className="absolute inset-0 bg-linear-to-t from-background via-transparent to-transparent z-10 pointer-events-none" />
             <div className="rounded-lg border border-border bg-card p-2 shadow-2xl shadow-primary/5">
-              <div className="bg-muted/50 p-6 lg:p-8">
+              <div className="bg-muted/40 sm:p-6 lg:p-8">
                 <InvoicePreview />
               </div>
             </div>
@@ -55,7 +55,7 @@ export default function Hero() {
 
 function InvoicePreview() {
   return (
-    <div className="bg-white/70 shadow-lg p-8 max-w-2xl mx-auto">
+    <div className="bg-white/70 text-xs shadow-lg p-4 sm:p-8 max-w-2xl mx-auto">
       <div className="flex justify-between items-start mb-8">
         <div>
           <h3 className="text-2xl font-bold text-foreground">INVOICE</h3>
@@ -82,23 +82,23 @@ function InvoicePreview() {
       </div>
 
       <div className="border-t border-border">
-        <div className="grid grid-cols-12 gap-4 py-3 text-xs uppercase tracking-wide text-muted-foreground">
-          <div className="col-span-6">Description</div>
+        <div className="grid grid-cols-12 gap-3 py-3 text-xs uppercase tracking-wide text-muted-foreground">
+          <div className="col-span-5">Description</div>
           <div className="col-span-2 text-right">Qty</div>
           <div className="col-span-2 text-right">Rate</div>
           <div className="col-span-2 text-right">Amount</div>
         </div>
-        <div className="grid grid-cols-12 gap-4 py-3 border-t border-border">
-          <div className="col-span-6 text-foreground">Website Design</div>
+        <div className="grid grid-cols-12 gap-3 py-3 border-t border-border">
+          <div className="col-span-5 text-foreground">Website Design</div>
           <div className="col-span-2 text-right text-muted-foreground">1</div>
           <div className="col-span-2 text-right text-muted-foreground">$2,500</div>
-          <div className="col-span-2 text-right font-medium text-foreground">$2,500</div>
+          <div className="col-span-2 text-right font-medium text-foreground ml-2">$2,500</div>
         </div>
-        <div className="grid grid-cols-12 gap-4 py-3 border-t border-border">
-          <div className="col-span-6 text-foreground">Development (40 hours)</div>
+        <div className="grid grid-cols-12 gap-3 py-3 border-t border-border">
+          <div className="col-span-5 text-foreground">Development</div>
           <div className="col-span-2 text-right text-muted-foreground">40</div>
           <div className="col-span-2 text-right text-muted-foreground">$150</div>
-          <div className="col-span-2 text-right font-medium text-foreground">$6,000</div>
+          <div className="col-span-2 text-right font-medium text-foreground ml-2">$6,000</div>
         </div>
       </div>
 
