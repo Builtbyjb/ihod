@@ -15,6 +15,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Build backend
+        run: npx turbo run build --filter=@ihod/server
+
       # Deploy Backend (Cloudflare Worker)
       - name: Deploy Backend
         uses: cloudflare/wrangler-action@v3
@@ -23,9 +26,10 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: "apps/server"
           packageManager: npm
-          command: |
-            npx turbo run build --filter=@ihod/server
-            npx wrangler deploy
+          command: npx wrangler deploy
+
+      - name: Build Frontend
+        run: npx turbo run build --filter=@ihod/web
 
       # Deploy Frontend (Cloudflare Pages)
       - name: Deploy Frontend
@@ -35,6 +39,4 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: "apps/web"
           packageManager: npm
-          command: |
-            npx turbo run build --filter=@ihod/web
-            npx wrangler pages deploy apps/web/dist --project-name=ihod
+          command: npx wrangler pages deploy apps/web/dist --project-name=ihod
