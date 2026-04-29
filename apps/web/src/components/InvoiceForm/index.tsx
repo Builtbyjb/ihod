@@ -68,9 +68,13 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
 
       toast.success("Invoice created");
       form.reset();
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to create invoice: " + error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log(error);
+        toast.error("Failed to create invoice: " + error.message);
+      } else {
+        console.log(String(error));
+      }
     }
   };
 
@@ -91,9 +95,13 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
       if (!response.ok) throw new Error("Failed to create invoice");
 
       toast.success("Invoice Edited");
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to create invoice: " + error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log(error);
+        toast.error("Failed to create invoice: " + error.message);
+      } else {
+        console.log(String(error));
+      }
     }
   };
 

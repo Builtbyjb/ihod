@@ -23,6 +23,7 @@ import type { Invoice } from "@/lib/types";
 import { format } from "date-fns";
 import { useNavigate } from "@tanstack/react-router";
 import { calculateTotalAmount, formatCurrency, getStatusVariant } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface InvoicesTableProps {
   clientId: string;
@@ -46,8 +47,13 @@ export default function InvoicesTable({ invoices, onDelete, clientId }: Invoices
         if (!response.ok) throw new Error("An error occurred while deleting the invoice");
 
         onDelete(deleteId);
-      } catch (error) {
-        console.log(error);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          console.log(error);
+          toast.error("Failed to delete invoice: " + error.message);
+        } else {
+          console.log(String(error));
+        }
       } finally {
         setDeleteId(null);
       }

@@ -1,9 +1,7 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
-import * as z from "zod";
 import { Field, FieldGroup } from "@/components/ui/field";
 import { useState } from "react";
 import OTP from "@/components/OTP";
@@ -13,19 +11,7 @@ import Step2 from "@/components/SignupFormSteps/step2";
 import Step3 from "@/components/SignupFormSteps/step3";
 import { STEPS } from "@/components/SignupFormSteps/form-steps";
 import { Progress } from "@/components/ui/progress";
-
-const schema = z.object({
-  firstname: z.string().min(2),
-  lastname: z.string().min(2),
-  email: z.string().email(),
-  username: z.string().min(2),
-  businessName: z.string().min(2),
-  businessType: z.string().min(2),
-  businessAddress: z.string().min(2),
-  city: z.string().min(2),
-  country: z.string().min(2),
-  website: z.string(),
-});
+import { useSignupForm } from "@/hooks/useSignupForm";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -36,40 +22,26 @@ function RouteComponent() {
 
   const navigate = useNavigate();
 
-  const form = useForm({
-    defaultValues: {
-      firstname: "",
-      lastname: "",
-      email: "",
-      username: "",
-      businessName: "",
-      businessType: "",
-      businessAddress: "",
-      city: "",
-      country: "",
-      website: "",
-    },
-    validators: {
-      onChange: schema,
-      onSubmit: schema,
-    },
-    onSubmit: async ({ value }) => {
-      try {
-        const response = await fetch(`${API_URL}/api/v1/auth/signup`, {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(value),
-        });
+  const form = useSignupForm(async (value) => {
+    try {
+      const response = await fetch(`${API_URL}/api/v1/auth/signup`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(value),
+      });
 
-        if (!response.ok) throw new Error("Error setting profile");
+      if (!response.ok) throw new Error("Error setting profile");
 
-        setIsVerified(true);
-      } catch (error) {
+      setIsVerified(true);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
         console.error(error);
         toast.error(error.message);
+      } else {
+        console.log(String(error));
       }
-    },
+    }
   });
 
   const next = async () => {

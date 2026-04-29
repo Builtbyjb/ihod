@@ -32,9 +32,13 @@ function RouteComponent() {
         const success = await login(value.email);
         toast.success("Verification email sent");
         if (success) setIsVerified(true);
-      } catch (error) {
-        toast.error("Login failed: " + error.message);
-        console.error(error);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          toast.error("Login failed: " + error.message);
+          console.error(error);
+        } else {
+          console.log(String(error));
+        }
       }
     },
   });
