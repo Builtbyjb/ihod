@@ -10,8 +10,7 @@ const responseSchema = z.object({
     username: z.string(),
     organizationName: z.string(),
     email: z.string().email(),
-    currency: z.string()
-  })
+  }),
 });
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -20,9 +19,9 @@ const AuthContext = createContext<AuthState | undefined>(undefined);
 type AuthProviderProps = {
   children: React.ReactNode;
   router: AnyRouter;
-}
+};
 
-export function AuthProvider({ children, router, }: AuthProviderProps) {
+export function AuthProvider({ children, router }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
@@ -63,13 +62,12 @@ export function AuthProvider({ children, router, }: AuthProviderProps) {
 
     const data: AuthResponse = await response.json();
     const parsed = responseSchema.parse(data);
-    setAccessToken(parsed.accessToken)
-    setUser(parsed.user)
+    setAccessToken(parsed.accessToken);
+    setUser(parsed.user);
     return parsed;
   };
 
   const authenticate = async (): Promise<boolean> => {
-
     try {
       if (!accessToken || isTokenExpired(accessToken)) {
         // Refresh token is no access token or access token as expired
@@ -80,7 +78,7 @@ export function AuthProvider({ children, router, }: AuthProviderProps) {
       console.error(error);
       return false;
     }
-  }
+  };
 
   const login = async (email: string): Promise<boolean> => {
     const response = await fetch(`${API_URL}/api/v1/auth/login`, {
@@ -108,7 +106,7 @@ export function AuthProvider({ children, router, }: AuthProviderProps) {
     const parsed = responseSchema.parse(data);
 
     setAccessToken(parsed.accessToken);
-    setUser(parsed.user)
+    setUser(parsed.user);
 
     return response.ok;
   };

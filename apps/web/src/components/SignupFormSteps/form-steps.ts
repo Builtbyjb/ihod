@@ -5,7 +5,7 @@ export const STEPS = [
     },
     {
         id: "business",
-        fields: ["businessName", "businessType", "website", "currency"],
+        fields: ["businessName", "businessType", "website"],
     },
     {
         id: "other",

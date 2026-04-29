@@ -2,14 +2,14 @@ import type { Client, Invoice, DashboardStats, Currency } from "./types";
 
 export const CURRENCIES = [
     { name: "Naira", value: "NGN" },
-    { name: "Canadian Dollar", symbol: "CAD" },
-    { name: "US Dollar", symbol: "USD" },
+    { name: "Canadian Dollar", value: "CAD" },
+    { name: "US Dollar", value: "USD" },
 ];
 
 export const CURRENCY_MAP: Record<string, Currency> = {
     NGN: { symbol: "₦", locale: "en-NG" },
     USD: { symbol: "$", locale: "en-US" },
-    EUR: { symbol: "€", locale: "de-DE" },
+    CAD: { symbol: "€", locale: "en-CA" },
 };
 
 export function useDashboardStats(invoices: Invoice[], clients: Client[]): DashboardStats {

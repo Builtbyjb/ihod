@@ -7,12 +7,18 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-export function formatCurrency(amount: number, currency: string = "USD"): string {
-    const config = CURRENCY_MAP[currency];
-    return new Intl.NumberFormat(config.locale, {
-        style: "currency",
-        currency: currency,
-    }).format(amount);
+export function formatCurrency(amount: number, currency?: string): string {
+    if (currency) {
+        const config = CURRENCY_MAP[currency];
+        return new Intl.NumberFormat(config.locale, {
+            style: "currency",
+            currency: currency,
+        }).format(amount);
+    } else {
+        return new Intl.NumberFormat("en-US", {
+            style: "decimal",
+        }).format(amount);
+    }
 }
 
 export function calculateTotalAmount(items: InvoiceItem[], taxRate: number): number {

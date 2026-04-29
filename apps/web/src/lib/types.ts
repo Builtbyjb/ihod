@@ -33,6 +33,7 @@ export interface Invoice {
     status: InvoiceStatus;
     issueDate: string;
     dueDate: string;
+    currency: string;
     notes: string;
     createdAt: string;
 }
@@ -47,7 +48,6 @@ export interface DashboardStats {
 export interface User {
     username: string;
     email: string;
-    currency: string;
     organizationName: string;
 }
 
