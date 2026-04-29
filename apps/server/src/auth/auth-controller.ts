@@ -8,7 +8,7 @@ import { parseToken, signToken, sendOTPEmail } from "@/lib/utils";
 import { setCookie, deleteCookie } from "hono/cookie";
 import type { OTPPayload, TokenPayload } from "@/lib/types";
 import { ErrorResult } from "@/lib/types";
-import { ACCESS_TOKEN_EXP, ACCESS_TOKEN_MAX_AGE, REFRESH_TOKEN_EXP, REFRESH_TOKEN_MAX_AGE } from "@/lib/constants";
+import { getAccessTokenExp, ACCESS_TOKEN_MAX_AGE, getRefreshTokenExp, REFRESH_TOKEN_MAX_AGE } from "@/lib/constants";
 import { loginSchema, otpSchema, signupSchema } from "./auth-zod-schema";
 
 const authRouteV1 = new Hono<{ Bindings: Bindings }>().basePath("/auth");
@@ -32,7 +32,7 @@ authRouteV1.post("/login", zValidator("json", loginSchema), async (c) => {
         userId: user.id,
         currentOrgId: user.currentOrgId,
         otp: otp,
-        exp: ACCESS_TOKEN_EXP,
+        exp: getAccessTokenExp(),
     };
 
     const signResult = await signToken(c, payload);
@@ -107,7 +107,7 @@ authRouteV1.post("/signup", zValidator("json", signupSchema), async (c) => {
             userId: user.id,
             currentOrgId: organization.id,
             otp: otp,
-            exp: ACCESS_TOKEN_EXP,
+            exp: getAccessTokenExp(),
         };
 
         const signResult = await signToken(c, payload);
@@ -161,7 +161,7 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
         email: user.email,
         currentOrgId: parsed.currentOrgId,
         organizationName: organization.name,
-        exp: REFRESH_TOKEN_EXP,
+        exp: getRefreshTokenExp(),
     };
 
     const refreshToken = await signToken(c, refreshPayload);
@@ -181,7 +181,7 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
         email: user.email,
         currentOrgId: parsed.currentOrgId,
         organizationName: organization.name,
-        exp: ACCESS_TOKEN_EXP,
+        exp: getAccessTokenExp(),
     };
 
     const accessToken = await signToken(c, accessPayload);
@@ -216,7 +216,7 @@ authRouteV1.get("/refresh-token", async (c) => {
         email: parsed.email,
         currentOrgId: parsed.currentOrgId,
         organizationName: organization.name,
-        exp: ACCESS_TOKEN_EXP,
+        exp: getAccessTokenExp(),
     };
 
     const accessToken = await signToken(c, accessPayload);
