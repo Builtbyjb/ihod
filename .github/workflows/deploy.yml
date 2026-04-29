@@ -39,6 +39,8 @@ jobs:
           command: deploy --env=production
 
       - name: Build Frontend
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
         run: npx turbo run build --filter=@ihod/web
 
       # Deploy Frontend (Cloudflare Pages)
