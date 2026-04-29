@@ -41,7 +41,7 @@ authRouteV1.post("/login", zValidator("json", loginSchema), async (c) => {
     setCookie(c, "otp_token", signResult, {
         httpOnly: true,
         secure: true,
-        sameSite: "lax",
+        sameSite: "none",
         path: "/",
         maxAge: ACCESS_TOKEN_MAX_AGE,
     });
@@ -116,7 +116,7 @@ authRouteV1.post("/signup", zValidator("json", signupSchema), async (c) => {
         setCookie(c, "otp_token", signResult, {
             httpOnly: true,
             secure: true,
-            sameSite: "lax",
+            sameSite: "none",
             path: "/",
             maxAge: ACCESS_TOKEN_MAX_AGE,
         });
