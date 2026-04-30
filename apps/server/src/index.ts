@@ -10,7 +10,7 @@ const app = new Hono<{ Bindings: Bindings }>();
 app.use(
     "/api/*",
     cors({
-        origin: ["http://localhost:5173", "http://10.0.0.253:5173", "https://production.ihod-web.pages.dev"],
+        origin: ["http://localhost:5173", "http://10.0.0.253:5173", "https://ihod.ajibolaawotide.com/"],
         allowHeaders: ["X-Custom-Header", "Upgrade-Insecure-Requests", "Content-Type", "Authorization", "Set-Cookie"],
         allowMethods: ["POST", "GET", "OPTIONS", "DELETE", "PATCH", "PUT"],
         exposeHeaders: ["Content-Length", "X-Kuma-Revision"],
