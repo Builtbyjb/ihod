@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/auth";
+import { Button } from "@/components/ui/button";
 
 export default function OTP() {
   const [value, setValue] = useState("");
@@ -47,6 +48,9 @@ export default function OTP() {
           </InputOTPGroup>
         </InputOTP>
       </CardContent>
+      <CardFooter>
+        <Button onClick={() => handleChange(value)}>Submit</Button>
+      </CardFooter>
     </Card>
   );
 }
