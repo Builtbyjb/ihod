@@ -49,7 +49,7 @@ export const members = sqliteTable("members", {
 
 export const roles = sqliteTable("roles", {
     id: int("id").primaryKey({ autoIncrement: true }),
-    name: text("name").notNull(),
+    name: text("name").notNull().unique(),
     permissions: text("permissions").notNull(),
     createdAt: int("created_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
     updatedAt: int("updated_at", { mode: "timestamp" }).default(sql`(unixepoch())`),

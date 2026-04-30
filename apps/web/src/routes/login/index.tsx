@@ -113,6 +113,7 @@ function RouteComponent() {
       </div>
       <br />
       <br />
+      {isVerified && <p>If you don’t see it in your inbox, please check your spam folder.</p>}
       {/* Display OTP input */}
       {isVerified && <OTP />}
     </main>
