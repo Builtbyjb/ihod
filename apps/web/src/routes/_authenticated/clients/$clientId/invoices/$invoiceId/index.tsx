@@ -174,7 +174,7 @@ function RouteComponent() {
           </CardContent>
         </Card>
       </div>
-      <div style={{ position: "fixed", top: "-9999px", left: "-9999px", width: "794px" }}>
+      <div className="print-section">
         <DefaultInvoiceTemplate ref={ref} invoice={invoice} client={client} bussinessname={user?.organizationName} />
       </div>
     </main>

@@ -48,7 +48,7 @@ export default function OTP() {
           </InputOTPGroup>
         </InputOTP>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="bg-background">
         <Button onClick={() => handleChange(value)}>Submit</Button>
       </CardFooter>
     </Card>
