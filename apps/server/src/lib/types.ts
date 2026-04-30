@@ -8,6 +8,7 @@ export type Bindings = {
     SEND_EMAIL: {
         send: (email: { to: string; from: string; subject: string; text: string; html?: string }) => Promise<any>;
     };
+    ENV: string;
     // Add other variables like KV, R2, or Secret Keys here
 };
 
