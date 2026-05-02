@@ -34,6 +34,7 @@ function RouteComponent() {
       if (!response.ok) throw new Error("Error setting profile");
 
       setIsVerified(true);
+      toast.success("Verification Email Sent");
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error(error);
@@ -105,8 +106,11 @@ function RouteComponent() {
         </Link>
         .
       </div>
-      <br />
-      <br />
+      {isVerified && (
+        <p className="text-sm mt-4  mb-4 text-gray-700">
+          If you don’t see it in your inbox, please check your spam folder.
+        </p>
+      )}
       {isVerified && <OTP />}
     </main>
   );
