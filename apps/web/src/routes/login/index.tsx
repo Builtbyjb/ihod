@@ -111,10 +111,10 @@ function RouteComponent() {
         </Link>
         .
       </div>
-      <br />
-      <br />
       {isVerified && (
-        <p className="text-sm mb-4 text-gray-700">If you don’t see it in your inbox, please check your spam folder.</p>
+        <p className="text-sm mt-4  mb-4 text-gray-700">
+          If you don’t see it in your inbox, please check your spam folder.
+        </p>
       )}
       {/* Display OTP input */}
       {isVerified && <OTP />}
