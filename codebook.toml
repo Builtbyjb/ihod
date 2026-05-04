@@ -3,5 +3,5 @@ flag_words = ["todo", "fixme", "note"]
 min_word_length = 3
 words = [
     "cloudflare","vitejs", "tanstack", "lucide", "cta", "npx", "ihod", "uat", "hono", "zod", "sonner", "autofill", "hsl", "otp",
-    "dotenv", "kuma", "firstname", "lastname", "unixepoch", "NGN"
+    "dotenv", "kuma", "firstname", "lastname", "unixepoch", "NGN", "recharts"
 ]
