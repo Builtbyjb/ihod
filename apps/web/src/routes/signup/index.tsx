@@ -12,6 +12,7 @@ import Step3 from "@/components/SignupFormSteps/step3";
 import { STEPS } from "@/components/SignupFormSteps/form-steps";
 import { Progress } from "@/components/ui/progress";
 import { useSignupForm } from "@/hooks/useSignupForm";
+import type { SignupFormField } from "@/lib/types";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -48,7 +49,7 @@ function RouteComponent() {
   const next = async () => {
     // Validate only the current step's fields before advancing
     const fields = STEPS[stepIndex].fields;
-    const results = await Promise.all(fields.map((field) => form.validateField(field, "change")));
+    const results = await Promise.all(fields.map((field: SignupFormField) => form.validateField(field, "change")));
     const hasErrors = results.some((r) => r.length > 0);
     if (!hasErrors) setStepIndex((i) => i + 1);
   };
