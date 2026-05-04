@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { ErrorResult, OTPPayload, TokenPayload } from "./types";
+import { ErrorResult, OTPPayload, TokenPayload, Invoice, InvoiceItem } from "./types";
 import { getCookie } from "hono/cookie";
 import { verify, sign } from "hono/jwt";
 
@@ -64,4 +64,31 @@ export async function sendOTPEmail(c: Context, email: string): Promise<Error | s
     });
 
     return otp;
+}
+
+function calculateTotalAmount(items: InvoiceItem[], taxRate: number): number {
+    const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+    const taxAmount = subtotal * (taxRate / 100);
+    return subtotal + taxAmount;
+}
+
+export function calculateRevenue(invoices: Invoice[]): number {
+    let totalRevenue = 0;
+
+    for (const invoice of invoices) {
+        const totalAmount = calculateTotalAmount(invoice.items, invoice.taxRate);
+        totalRevenue += totalAmount;
+    }
+
+    return totalRevenue;
+}
+
+export function countPaidInvoices(invoices: Invoice[]): number {
+    const paidInvoices: Invoice[] = invoices.filter((i) => i.status === "paid");
+    return paidInvoices.length;
+}
+
+export function countPendingAmount(invoices: Invoice[]): number {
+    const pendingInvoices: Invoice[] = invoices.filter((i) => i.status === "sent" || i.status === "overdue");
+    return pendingInvoices.length;
 }

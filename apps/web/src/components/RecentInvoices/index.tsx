@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Invoice } from "@/lib/types";
 import { format } from "date-fns";
-import { formatCurrency, getStatusVariant } from "@/lib/utils";
+import { formatCurrency, getStatusVariant, calculateTotalAmount } from "@/lib/utils";
 import { SkeletonBarChart } from "@/components/Skeleton";
 
 interface RecentInvoicesProps {
@@ -43,8 +43,9 @@ export default function RecentInvoices({ invoices, isLoading }: RecentInvoicesPr
                   <span className="text-sm text-muted-foreground">{invoice.client.name}</span>
                 </div>
                 <div className="flex flex-col items-end gap-1">
-                  {/* Total*/}
-                  <span className="font-semibold">{formatCurrency(invoice.taxRate, invoice.currency)}</span>
+                  <span className="font-semibold">
+                    {formatCurrency(calculateTotalAmount(invoice.items, invoice.taxRate))}
+                  </span>
                   <span className="text-xs text-muted-foreground">
                     {format(new Date(invoice.issueDate), "MMM d, yyyy")}
                   </span>
