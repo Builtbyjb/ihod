@@ -1,6 +1,6 @@
 import { Context } from "hono";
 import { ErrorResult, OTPPayload, TokenPayload } from "./types";
-import { getCookie, setCookie } from "hono/cookie";
+import { getCookie } from "hono/cookie";
 import { verify, sign } from "hono/jwt";
 
 export function generateOTP(): string {

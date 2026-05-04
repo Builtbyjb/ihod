@@ -7,8 +7,7 @@ CREATE TABLE IF NOT EXISTS `roles` (
 );
 
 INSERT INTO `roles` (`name`, `permissions`) VALUES
-    ('superadmin', 'all'),
+    ('super_admin', 'all'),
     ('admin', 'all'),
-    ('user', 'read'),
-    ('guest', 'none')
+    ('member', 'read'),
 ON CONFLICT(`name`) DO NOTHING;

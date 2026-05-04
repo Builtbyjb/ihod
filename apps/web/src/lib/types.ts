@@ -69,3 +69,15 @@ export interface AuthResponse {
     accessToken: string;
     user: User;
 }
+
+export type SignupFormField =
+    | "firstname"
+    | "lastname"
+    | "email"
+    | "username"
+    | "businessName"
+    | "businessType"
+    | "website"
+    | "businessAddress"
+    | "city"
+    | "country";

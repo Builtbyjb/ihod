@@ -93,14 +93,33 @@
     @apply font-sans;
   }
 
-  div {
-    font-size: 0.875rem;
+  @media screen {
+    .print-section {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1; /* Behind other elements */
+      opacity: 0.01; /* Nearly invisible but still "rendered" */
+      width: 794px; /* Fixed width (A4 equivalent) */
+      pointer-events: none;
+    }
   }
 
   @media print {
     body {
       margin: 0;
       padding: 0;
+    }
+
+    .print-section,
+    .print-section * {
+      visibility: visible;
+    }
+    .print-section {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
     }
 
     @page {
