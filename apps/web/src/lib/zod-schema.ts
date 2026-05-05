@@ -34,3 +34,10 @@ export const InvoiceSchema = z.object({
     notes: z.string(),
     createdAt: z.string(),
 });
+
+export const TopStatsSchema = z.object({
+    totalRevenue: z.number(),
+    paidInvoices: z.number(),
+    pendingAmount: z.number(),
+    totalClients: z.number(),
+});

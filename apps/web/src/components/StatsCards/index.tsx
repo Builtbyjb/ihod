@@ -1,11 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, FileText, Clock, Users } from "lucide-react";
-import type { DashboardStats } from "@/lib/types";
+import type { TopStats } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
 import { SkeletonCard } from "@/components/Skeleton";
 
 interface StatsCardsProps {
-  stats: DashboardStats | null;
+  stats: TopStats;
   isLoading: boolean;
 }
 

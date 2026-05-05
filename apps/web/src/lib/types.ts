@@ -43,11 +43,23 @@ export type Invoice = {
     createdAt: string;
 };
 
-export type DashboardStats = {
+export type MonthRevenue = {
+    month: string;
+    revenue: number;
+};
+
+export type TopStats = {
     totalRevenue: number;
     paidInvoices: number;
     pendingAmount: number;
     totalClients: number;
+};
+
+export type DashboardStats = {
+    topStats: TopStats;
+    invoiceData: InvoiceStatusData[];
+    monthlyRevenues: MonthRevenue[];
+    recentInvoices: Invoice[];
 };
 
 export type User = {
@@ -86,8 +98,3 @@ export type SignupFormField =
     | "businessAddress"
     | "city"
     | "country";
-
-export type MonthRevenue = {
-    month: string;
-    revenue: number;
-};

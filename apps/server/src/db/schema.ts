@@ -65,8 +65,12 @@ export const clients = sqliteTable("clients", {
     city: text("city"),
     country: text("country"),
     deleted: int("deleted", { mode: "boolean" }).notNull().default(false),
-    createdAt: int("created_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
-    updatedAt: int("updated_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
+    createdAt: int("created_at", { mode: "timestamp" })
+        .notNull()
+        .default(sql`(unixepoch())`),
+    updatedAt: int("updated_at", { mode: "timestamp" })
+        .notNull()
+        .default(sql`(unixepoch())`),
 });
 
 export const invoices = sqliteTable("invoices", {
@@ -85,6 +89,10 @@ export const invoices = sqliteTable("invoices", {
     notes: text("notes"),
     currency: text("currency").notNull(),
     deleted: int("deleted", { mode: "boolean" }).notNull().default(false),
-    createdAt: int("created_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
-    updatedAt: int("updated_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
+    createdAt: int("created_at", { mode: "timestamp" })
+        .notNull()
+        .default(sql`(unixepoch())`),
+    updatedAt: int("updated_at", { mode: "timestamp" })
+        .notNull()
+        .default(sql`(unixepoch())`),
 });
