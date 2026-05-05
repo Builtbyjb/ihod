@@ -100,7 +100,7 @@ function RouteComponent() {
         <Card className="lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle className="text-2xl">{invoice.invoiceNumber}</CardTitle>
+              <CardTitle className="text-2xl">{invoice.id}</CardTitle>
               <p className="text-sm text-muted-foreground mt-1">
                 Issued on {format(new Date(invoice.issueDate), "MMMM d, yyyy")}
               </p>
