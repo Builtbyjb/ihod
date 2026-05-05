@@ -3,8 +3,8 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
+  // BreadcrumbPage,
+  // BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
 interface HeaderProps {
@@ -16,12 +16,14 @@ export default function Header({ title }: HeaderProps) {
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem className="hidden md:block">
-          <BreadcrumbLink href="#">{title}</BreadcrumbLink>
+          <BreadcrumbLink href="#" className="text-lg text-gray-900 font-medium">
+            {title}
+          </BreadcrumbLink>
         </BreadcrumbItem>
-        <BreadcrumbSeparator className="hidden md:block" />
+        {/*<BreadcrumbSeparator className="hidden md:block" />
         <BreadcrumbItem>
           <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-        </BreadcrumbItem>
+        </BreadcrumbItem>*/}
       </BreadcrumbList>
     </Breadcrumb>
   );

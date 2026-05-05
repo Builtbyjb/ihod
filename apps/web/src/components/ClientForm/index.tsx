@@ -302,7 +302,7 @@ export default function ClientForm({ open, onOpenChange, client, addClient, edit
               }}
             />
           </Field>
-          <DialogFooter className="bg-background">
+          <DialogFooter className="bg-background border-t-0">
             <Button type="button" variant="outline" onClick={() => form.reset()}>
               Reset
             </Button>

@@ -1,6 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useLayout } from "@/hooks/useLayout";
 
 function RouteComponent() {
+  const { setTitle } = useLayout();
+  setTitle("Billing");
+
   return <div>Hello "/_authenticated/settings/billings"!</div>;
 }
 

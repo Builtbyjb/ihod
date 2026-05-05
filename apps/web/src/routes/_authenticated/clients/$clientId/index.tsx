@@ -22,7 +22,7 @@ function RouteComponent() {
 
   const navigate = useNavigate();
 
-  const handleInvoiceDelete = (invoiceId: number) => {
+  const handleInvoiceDelete = (invoiceId: string) => {
     setInvoices((prev) => prev.filter((i) => i.id !== invoiceId));
   };
 
