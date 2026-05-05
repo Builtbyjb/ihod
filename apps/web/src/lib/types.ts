@@ -29,10 +29,8 @@ export type InvoiceStatusData = {
 };
 
 export type Invoice = {
-    id: number;
-    invoiceNumber: string;
+    id: string;
     clientId: string;
-    client: Client;
     items: InvoiceItem[];
     taxRate: number;
     status: InvoiceStatus;

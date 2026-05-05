@@ -8,6 +8,7 @@ import { useLayout } from "@/hooks/useLayout";
 import type { DashboardStats } from "@/lib/types";
 import { InvoiceSchema, InvoiceStatusSchema, TopStatsSchema } from "@/lib/zod-schema";
 import * as z from "zod";
+import { toast } from "sonner";
 
 const schema = z.object({
   topStats: TopStatsSchema,
@@ -76,6 +77,7 @@ function RouteComponent() {
         setDashboardStats(parsedResult);
       } catch (error) {
         console.error(error);
+        toast.error("Error fetching dashboard statistics");
       } finally {
         setIsLoading(false);
       }

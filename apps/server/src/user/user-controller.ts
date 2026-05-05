@@ -3,7 +3,15 @@ import { Bindings, ErrorResult, Client, Invoice } from "@/lib/types";
 import { drizzle } from "drizzle-orm/d1";
 import { eq, and, sql } from "drizzle-orm";
 import { users, organizations, members, clients, invoices } from "@/db/schema";
-import { parseToken, countPaidInvoices, calculateRevenue, countPendingAmount } from "@/lib/utils";
+import { parseToken } from "@/lib/utils";
+import {
+    countPaidInvoices,
+    calculateRevenue,
+    countPendingAmount,
+    getInvoiceData,
+    getMonthlyRevenues,
+    getRecentInvoices,
+} from "./user-service";
 
 const userRouteV1 = new Hono<{ Bindings: Bindings }>().basePath("/user");
 
@@ -38,8 +46,16 @@ userRouteV1.get("/dashboard-stats", async (c) => {
     const totalRevenue = calculateRevenue(allInvoices);
     const paidInvoices = countPaidInvoices(allInvoices);
     const pendingAmount = countPendingAmount(allInvoices);
+    const invoiceData = getInvoiceData(allInvoices);
+    const monthlyRevenues = getMonthlyRevenues(allInvoices);
+    const recentInvoices = getRecentInvoices(allInvoices);
 
-    const dashboardStats = { totalRevenue, paidInvoices, pendingAmount, totalClients, monthlyRevenues };
+    const dashboardStats = {
+        topStats: { totalRevenue, paidInvoices, pendingAmount, totalClients },
+        invoiceData,
+        monthlyRevenues,
+        recentInvoices,
+    };
     return c.json(dashboardStats, 200);
 });
 
