@@ -5,36 +5,33 @@ import { Check } from "lucide-react";
 const plans = [
   {
     name: "Free",
-    price: "$0",
+    price: "₦0",
     description: "Perfect for getting started",
-    features: [
-      "Up to 3 invoices per month",
-      "Basic templates",
-      "Email support",
-      "PDF downloads",
-    ],
+    features: ["Up to 3 invoices per month", "Basic templates", "Email support", "PDF downloads"],
     cta: "Get started",
     featured: false,
+    disabled: false,
   },
   {
     name: "Pro",
-    price: "$12",
+    price: "₦9,870",
     period: "/month",
     description: "For growing businesses",
     features: [
       "Unlimited invoices",
       "All premium templates",
       "Automatic reminders",
-      "Accept online payments",
-      "Multi-currency support",
+      // "Accept online payments",
+      // "Multi-currency support",
       "Priority support",
     ],
     cta: "Start free trial",
     featured: true,
+    disabled: false,
   },
   {
     name: "Team",
-    price: "$29",
+    price: "₦39,940",
     period: "/month",
     description: "For teams and agencies",
     features: [
@@ -42,11 +39,12 @@ const plans = [
       "Up to 5 team members",
       "Team collaboration",
       "Custom branding",
-      "API access",
+      // "API access",
       "Dedicated support",
     ],
     cta: "Contact sales",
     featured: false,
+    disabled: true,
   },
 ];
 
@@ -55,9 +53,7 @@ function RouteComponent() {
     <section id="pricing" className="py-24 lg:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center mb-16">
-          <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-            Pricing
-          </p>
+          <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">Pricing</p>
           <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl text-balance">
             Simple, transparent pricing
           </h2>
@@ -71,9 +67,7 @@ function RouteComponent() {
             <div
               key={plan.name}
               className={`relative rounded-2xl border p-8 ${
-                plan.featured
-                  ? "border-primary bg-card shadow-xl scale-105"
-                  : "border-border bg-card"
+                plan.featured ? "border-primary bg-card shadow-xl scale-105" : "border-border bg-card"
               }`}
             >
               {plan.featured && (
@@ -84,20 +78,12 @@ function RouteComponent() {
                 </div>
               )}
               <div className="mb-6">
-                <h3 className="text-xl font-semibold text-foreground">
-                  {plan.name}
-                </h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {plan.description}
-                </p>
+                <h3 className="text-xl font-semibold text-foreground">{plan.name}</h3>
+                <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
               </div>
               <div className="mb-6">
-                <span className="text-4xl font-bold text-foreground">
-                  {plan.price}
-                </span>
-                {plan.period && (
-                  <span className="text-muted-foreground">{plan.period}</span>
-                )}
+                <span className="text-4xl font-bold text-foreground">{plan.price}</span>
+                {plan.period && <span className="text-muted-foreground">{plan.period}</span>}
               </div>
               <ul className="space-y-3 mb-8">
                 {plan.features.map((feature) => (
@@ -107,10 +93,7 @@ function RouteComponent() {
                   </li>
                 ))}
               </ul>
-              <Button
-                className="w-full"
-                variant={plan.featured ? "default" : "outline"}
-              >
+              <Button className="w-full" disabled={plan.disabled} variant={plan.featured ? "default" : "outline"}>
                 {plan.cta}
               </Button>
             </div>

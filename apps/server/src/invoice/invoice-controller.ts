@@ -7,7 +7,7 @@ import { getCookie } from "hono/cookie";
 import { drizzle } from "drizzle-orm/d1";
 import { eq, and, sql, desc } from "drizzle-orm";
 import { clients, invoices } from "@/db/schema";
-import { generateInvoiceNumber } from "@/lib/utils";
+import { generateInvoiceNumber, getCurrentYear } from "@/lib/utils";
 
 const invoiceRouteV1 = new Hono<{ Bindings: Bindings }>();
 
@@ -108,7 +108,7 @@ invoiceRouteV1.post("/create", zValidator("json", invoiceFormSchema), async (c) 
 
     // TODO: Better error handling
     await db.insert(invoices).values({
-        id: "inv-" + generateInvoiceNumber(),
+        id: "inv-" + getCurrentYear() + "-" + generateInvoiceNumber(),
         clientId: data.clientId,
         issueDate: data.issueDate,
         dueDate: data.dueDate,

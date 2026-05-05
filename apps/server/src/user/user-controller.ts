@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { Bindings, ErrorResult, Client, Invoice } from "@/lib/types";
 import { drizzle } from "drizzle-orm/d1";
 import { eq, and, sql } from "drizzle-orm";
-import { users, organizations, members, clients, invoices } from "@/db/schema";
+import { clients, invoices } from "@/db/schema";
 import { parseToken } from "@/lib/utils";
 import {
     countPaidInvoices,
@@ -21,11 +21,17 @@ userRouteV1.get("/dashboard-stats", async (c) => {
     const parsedToken = await parseToken(c, "refresh_token");
     if (parsedToken instanceof ErrorResult) return c.json({ message: parsedToken.message }, parsedToken.code);
 
-    // TODO: Better error handling
-    const allClients: Client[] = await db
-        .select()
-        .from(clients)
-        .where(and(eq(clients.organizationId, parsedToken.currentOrgId), eq(clients.deleted, false)));
+    let allClients: Client[] = [];
+
+    try {
+        allClients = await db
+            .select()
+            .from(clients)
+            .where(and(eq(clients.organizationId, parsedToken.currentOrgId), eq(clients.deleted, false)));
+    } catch (error) {
+        console.log(error);
+        return c.json({ message: "An error occurred while fetching all clients" }, 500);
+    }
 
     if (allClients.length === 0) return c.json({ message: "No clients found" }, 200);
 
