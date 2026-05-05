@@ -1,15 +1,20 @@
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import type { Invoice } from "@/lib/types";
 import { format } from "date-fns";
-import { formatCurrency, getStatusVariant } from "@/lib/utils";
+import { formatCurrency, getStatusVariant, calculateTotalAmount } from "@/lib/utils";
+import { SkeletonBarChart } from "@/components/Skeleton";
 
 interface RecentInvoicesProps {
   invoices: Invoice[];
+  isLoading: boolean;
 }
 
-export default function RecentInvoices({ invoices }: RecentInvoicesProps) {
+export default function RecentInvoices({ invoices, isLoading }: RecentInvoicesProps) {
+  const navigate = useNavigate();
+
   const recentInvoices = [...invoices]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5);
@@ -21,30 +26,36 @@ export default function RecentInvoices({ invoices }: RecentInvoicesProps) {
           <CardTitle>Recent Invoices</CardTitle>
           <CardDescription>Latest invoice activity</CardDescription>
         </div>
-        <Link to="/clients" className="text-sm font-medium text-primary hover:underline">
+        <Button variant="outline" onClick={() => navigate({ to: "/clients" })}>
           View all
-        </Link>
+        </Button>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {recentInvoices.map((invoice) => (
-            <div key={invoice.id} className="flex items-center justify-between p-3 rounded-lg border border-border">
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">{invoice.invoiceNumber}</span>
-                  <Badge className={`${getStatusVariant(invoice.status)} capitalize`}>{invoice.status}</Badge>
+        {!isLoading ? (
+          <div className="space-y-4">
+            {recentInvoices.map((invoice) => (
+              <div key={invoice.id} className="flex items-center justify-between p-3 rounded-lg border border-border">
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">{invoice.id}</span>
+                    <Badge className={`${getStatusVariant(invoice.status)} capitalize`}>{invoice.status}</Badge>
+                  </div>
+                  {/*<span className="text-sm text-muted-foreground">{invoice.client.name}</span>*/}
                 </div>
-                <span className="text-sm text-muted-foreground">{invoice.client.name}</span>
+                <div className="flex flex-col items-end gap-1">
+                  <span className="font-semibold">
+                    {formatCurrency(calculateTotalAmount(invoice.items, invoice.taxRate))}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {format(new Date(invoice.issueDate), "MMM d, yyyy")}
+                  </span>
+                </div>
               </div>
-              <div className="flex flex-col items-end gap-1">
-                <span className="font-semibold">{formatCurrency(invoice.taxRate, invoice.currency)}</span>
-                <span className="text-xs text-muted-foreground">
-                  {format(new Date(invoice.issueDate), "MMM d, yyyy")}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <SkeletonBarChart />
+        )}
       </CardContent>
     </Card>
   );

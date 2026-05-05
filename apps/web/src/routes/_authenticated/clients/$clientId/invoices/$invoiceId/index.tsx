@@ -37,6 +37,7 @@ function RouteComponent() {
         // TODO: Zod validate
         const result = await response.json();
         setInvoice(result.invoice);
+        console.log(result.invoice);
         setClient(result.client);
       } catch (error) {
         console.log(error);

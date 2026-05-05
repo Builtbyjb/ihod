@@ -1,5 +1,6 @@
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import type { JWTPayload } from "hono/utils/jwt/types";
+import { users, organizations, members, clients, invoices } from "@/db/schema";
 
 export type Bindings = {
     DB: D1Database;
@@ -26,11 +27,11 @@ export type OTPPayload = JWTPayload & {
     otp: string;
 };
 
-export interface InvoiceItem {
+export type InvoiceItem = {
     description: string;
     quantity: number;
     unitPrice: number;
-}
+};
 
 export type ReturnId = {
     id: number | undefined;
@@ -48,3 +49,6 @@ export class ErrorResult extends Error {
         Object.setPrototypeOf(this, ErrorResult.prototype);
     }
 }
+
+export type Client = typeof clients.$inferSelect;
+export type Invoice = typeof invoices.$inferSelect;

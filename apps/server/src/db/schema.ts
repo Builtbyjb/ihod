@@ -65,21 +65,34 @@ export const clients = sqliteTable("clients", {
     city: text("city"),
     country: text("country"),
     deleted: int("deleted", { mode: "boolean" }).notNull().default(false),
-    createdAt: int("created_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
-    updatedAt: int("updated_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
+    createdAt: int("created_at", { mode: "timestamp" })
+        .notNull()
+        .default(sql`(unixepoch())`),
+    updatedAt: int("updated_at", { mode: "timestamp" })
+        .notNull()
+        .default(sql`(unixepoch())`),
 });
 
 export const invoices = sqliteTable("invoices", {
     id: text("id").primaryKey(),
-    clientId: text("client_id").references(() => clients.id),
+    clientId: text("client_id")
+        .references(() => clients.id)
+        .notNull(),
     issueDate: int("issue_date", { mode: "timestamp" }).notNull(),
     dueDate: int("due_date", { mode: "timestamp" }).notNull(),
     status: text("status").notNull(),
-    taxRate: int("tax_rate", { mode: "number" }),
-    items: text("items", { mode: "json" }).$type<InvoiceItem[]>().default([]),
+    taxRate: int("tax_rate", { mode: "number" }).notNull().default(0),
+    items: text("items", { mode: "json" })
+        .$type<InvoiceItem[]>()
+        .notNull()
+        .default(sql`'[]'`),
     notes: text("notes"),
     currency: text("currency").notNull(),
     deleted: int("deleted", { mode: "boolean" }).notNull().default(false),
-    createdAt: int("created_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
-    updatedAt: int("updated_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
+    createdAt: int("created_at", { mode: "timestamp" })
+        .notNull()
+        .default(sql`(unixepoch())`),
+    updatedAt: int("updated_at", { mode: "timestamp" })
+        .notNull()
+        .default(sql`(unixepoch())`),
 });

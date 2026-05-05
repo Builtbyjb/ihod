@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { ErrorResult, OTPPayload, TokenPayload } from "./types";
+import { ErrorResult, OTPPayload, TokenPayload, Invoice, InvoiceItem } from "./types";
 import { getCookie } from "hono/cookie";
 import { verify, sign } from "hono/jwt";
 
@@ -64,4 +64,8 @@ export async function sendOTPEmail(c: Context, email: string): Promise<Error | s
     });
 
     return otp;
+}
+
+export function getCurrentYear(): number {
+    return new Date().getFullYear();
 }

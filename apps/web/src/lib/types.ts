@@ -1,4 +1,4 @@
-export interface Client {
+export type Client = {
     id: string;
     organizationId: number;
     name: string;
@@ -8,26 +8,29 @@ export interface Client {
     city: string;
     country: string;
     createdAt: string;
-}
+};
 
 export type Currency = {
     symbol: string;
     locale: string;
 };
 
-export interface InvoiceItem {
+export type InvoiceItem = {
     description: string;
     quantity: number;
     unitPrice: number;
-}
+};
 
 export type InvoiceStatus = "draft" | "sent" | "paid" | "overdue";
 
-export interface Invoice {
-    id: number;
-    invoiceNumber: string;
+export type InvoiceStatusData = {
+    status: InvoiceStatus;
+    count: number;
+};
+
+export type Invoice = {
+    id: string;
     clientId: string;
-    client: Client;
     items: InvoiceItem[];
     taxRate: number;
     status: InvoiceStatus;
@@ -36,20 +39,32 @@ export interface Invoice {
     currency: string;
     notes: string;
     createdAt: string;
-}
+};
 
-export interface DashboardStats {
+export type MonthRevenue = {
+    month: string;
+    revenue: number;
+};
+
+export type TopStats = {
     totalRevenue: number;
     paidInvoices: number;
     pendingAmount: number;
     totalClients: number;
-}
+};
 
-export interface User {
+export type DashboardStats = {
+    topStats: TopStats;
+    invoiceData: InvoiceStatusData[];
+    monthlyRevenues: MonthRevenue[];
+    recentInvoices: Invoice[];
+};
+
+export type User = {
     username: string;
     email: string;
     organizationName: string;
-}
+};
 
 export interface AuthState {
     accessToken: string | null;
