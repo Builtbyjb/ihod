@@ -100,7 +100,7 @@ function RouteComponent() {
             <CardContent>
               <div className="flex items-center gap-2">
                 <Input type="text" value={referralLink} readOnly className="w-90" />
-                <Copy className="ml-2 text-gray-600" />
+                <Copy className="ml-2 text-gray-600 hover:cursor-pointer hover:text-gray-800" />
               </div>
             </CardContent>
           </Card>
