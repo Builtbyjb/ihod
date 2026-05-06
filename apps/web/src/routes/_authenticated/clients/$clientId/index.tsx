@@ -8,14 +8,15 @@ import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useLayout } from "@/hooks/useLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useFetch } from "@/hooks/useFetch";
 
-const API_URL = import.meta.env.VITE_API_URL;
 function RouteComponent() {
   const [clientInfo, setClientInfo] = useState<Client>();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const router = useRouter();
 
   const { clientId } = Route.useParams();
+  const { doGET } = useFetch();
 
   const { setTitle } = useLayout();
   if (clientInfo?.name) setTitle(clientInfo.name);
@@ -27,13 +28,10 @@ function RouteComponent() {
   };
 
   useEffect(() => {
-    const handleInvoiceFetch = async () => {
+    (async () => {
       try {
-        const response = await fetch(`${API_URL}/api/v1/clients/${clientId}`, {
-          method: "GET",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-        });
+        const response = await doGET(`/api/v1/clients/${clientId}`);
+        if (response instanceof Error) throw response;
 
         if (!response.ok) throw new Error("Failed to fetch client");
 
@@ -46,10 +44,8 @@ function RouteComponent() {
         console.log(error);
         toast.error("Failed to fetch invoices");
       }
-    };
-
-    handleInvoiceFetch();
-  }, [clientId]);
+    })();
+  }, [doGET, clientId]);
 
   return (
     <div className="flex flex-col min-h-screen">

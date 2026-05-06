@@ -26,6 +26,13 @@ export default defineConfig([
       ],
       "react-hooks/set-state-in-effect": "warn",
       "@typescript-eslint/no-explicit-any": "off",
+      "no-warning-comments": [
+        "warn",
+        {
+          terms: ["todo", "fixme"],
+          location: "start",
+        },
+      ],
     },
   },
 ]);

@@ -1,5 +1,4 @@
 dictionaries = ["en_us", "en_gb"]
-flag_words = ["todo", "fixme", "note"]
 min_word_length = 3
 words = [
     "cloudflare","vitejs", "tanstack", "lucide", "cta", "npx", "ihod", "uat", "hono", "zod", "sonner", "autofill", "hsl", "otp",
