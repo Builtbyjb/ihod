@@ -3,6 +3,7 @@ import type { AnyRouter } from "@tanstack/react-router";
 import type { User, AuthState, AuthResponse } from "@/lib/types";
 import { jwtDecode } from "jwt-decode";
 import { z } from "zod";
+import { useFetch } from "@/hooks/useFetch";
 
 const responseSchema = z.object({
   accessToken: z.string(),
@@ -13,7 +14,6 @@ const responseSchema = z.object({
   }),
 });
 
-const API_URL = import.meta.env.VITE_API_URL;
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
 type AuthProviderProps = {
@@ -24,12 +24,12 @@ type AuthProviderProps = {
 export function AuthProvider({ children, router }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const { doGET, doPOST } = useFetch();
 
   const logout = async () => {
     try {
-      await fetch(`${API_URL}/api/v1/auth/logout`, {
-        credentials: "include",
-      });
+      const response = await doGET("/api/v1/auth/logout");
+      if (response instanceof Error) throw response;
     } catch (error) {
       console.error(error);
     } finally {
@@ -54,9 +54,8 @@ export function AuthProvider({ children, router }: AuthProviderProps) {
   };
 
   const refreshToken = async (): Promise<AuthResponse> => {
-    const response = await fetch(`${API_URL}/api/v1/auth/refresh-token`, {
-      credentials: "include",
-    });
+    const response = await doGET("/api/v1/auth/refresh-token");
+    if (response instanceof Error) throw response;
 
     if (!response.ok) throw new Error("Failed to refresh token");
 
@@ -81,24 +80,16 @@ export function AuthProvider({ children, router }: AuthProviderProps) {
   };
 
   const login = async (email: string): Promise<boolean> => {
-    const response = await fetch(`${API_URL}/api/v1/auth/login`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
+    const response = await doPOST("/api/v1/auth/login", { email });
+    if (response instanceof Error) throw response;
 
     if (response.ok) return response.ok;
     else throw new Error("Authentication failed");
   };
 
   const verifyOtp = async (otp: string): Promise<boolean> => {
-    const response = await fetch(`${API_URL}/api/v1/auth/verify-otp`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ otp }),
-    });
+    const response = await doPOST("/api/v1/auth/verify-otp", { otp });
+    if (response instanceof Error) throw response;
 
     if (!response.ok) throw new Error("Failed to verify OTP");
 

@@ -96,3 +96,10 @@ export type SignupFormField =
     | "businessAddress"
     | "city"
     | "country";
+
+export type FetchInstance = {
+    doGET: (url: string) => Promise<Response | Error>;
+    doPOST: (url: string, data: any, contentType?: string) => Promise<Response | Error>;
+    doDELETE: () => void;
+    doPUT: () => void;
+};

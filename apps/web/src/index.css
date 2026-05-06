@@ -71,7 +71,7 @@
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
   --radius: 0.5rem;
-  --sidebar: oklch(0.95 0.0029 84.56);
+  --sidebar: oklch(0.93 0.003 84.56);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.9793 0.0029 84.56);
   --sidebar-primary-foreground: oklch(0.985 0 0);
@@ -85,6 +85,9 @@
   * {
     @apply border-border outline-ring/50;
     /*overscroll-behavior: none;*/
+    font-size: 0.9rem /* 15px */;
+    font-weight: 400;
+    line-height: 1.8rem;
   }
   body {
     @apply bg-background text-foreground;

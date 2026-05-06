@@ -13,6 +13,7 @@ import { useReactToPrint } from "react-to-print";
 import { formatCurrency, getStatusVariant } from "@/lib/utils";
 import { useAuth } from "@/hooks/auth";
 import { useDownloadPDF } from "@/hooks/useDownloadPDF";
+import { useLayout } from "@/hooks/useLayout";
 
 const API_URL = import.meta.env.VITE_API_URL;
 function RouteComponent() {
@@ -23,6 +24,9 @@ function RouteComponent() {
   const [client, setClient] = useState<Client | null>(null);
   const { user } = useAuth();
   const { ref, download } = useDownloadPDF();
+
+  const { setTitle } = useLayout();
+  if (invoice?.id) setTitle(invoice.id);
 
   useEffect(() => {
     (async () => {
@@ -96,7 +100,7 @@ function RouteComponent() {
         <Card className="lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle className="text-2xl">{invoice.invoiceNumber}</CardTitle>
+              <CardTitle className="text-2xl">{invoice.id}</CardTitle>
               <p className="text-sm text-muted-foreground mt-1">
                 Issued on {format(new Date(invoice.issueDate), "MMMM d, yyyy")}
               </p>

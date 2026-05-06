@@ -38,17 +38,32 @@ export function calculateSubTotal(items: InvoiceItem[]): number {
     return subtotal;
 }
 
-export const getStatusVariant = (status: Invoice["status"]) => {
+export function getStatusVariant(status: Invoice["status"]): string {
     switch (status) {
         case "paid":
-            return "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300";
+            return "bg-green-50 text-green-700";
         case "sent":
-            return "bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300";
+            return "bg-sky-50 text-sky-700";
         case "draft":
-            return "bg-gray-50 text-gray-700 dark:bg-gray-950 dark:text-gray-300";
+            return "bg-gray-50 text-gray-700";
         case "overdue":
-            return "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300";
+            return "bg-red-50 text-red-700";
         default:
-            return "bg-secondary text-secondary dark:bg-secondary dark:text-secondary";
+            return "bg-secondary text-secondary";
     }
-};
+}
+
+export function getBadgeVariant(badge: string): string {
+    switch (badge) {
+        case "green":
+            return "bg-green-50 text-green-700";
+        case "blue":
+            return "bg-sky-50 text-sky-700";
+        case "gray":
+            return "bg-gray-50 text-gray-700";
+        case "red":
+            return "bg-red-50 text-red-700";
+        default:
+            return "bg-secondary text-secondary";
+    }
+}

@@ -15,7 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns";
 import { calculateTotalAmount, calculateTaxAmount, formatCurrency } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
-import { CURRENCIES } from "@/lib/store";
+import { CURRENCIES } from "@/lib/constant";
 
 const API_URL = import.meta.env.VITE_API_URL;
 

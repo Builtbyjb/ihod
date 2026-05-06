@@ -51,6 +51,6 @@ function RouteComponent() {
   );
 }
 
-export const Route = createFileRoute("/_authenticated/settings")({
+export const Route = createFileRoute("/_authenticated/settings/")({
   component: RouteComponent,
 });

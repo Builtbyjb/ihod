@@ -92,7 +92,7 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
       </SidebarHeader>
       <Badge className="bg-blue-100 text-blue-700/80">Beta</Badge>
       <Separator className="mt-2 mb-2" />
-      <SidebarContent>
+      <SidebarContent className="">
         <SidebarGroup>
           <SidebarMenu>
             {navItems.map((item) => (

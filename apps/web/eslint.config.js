@@ -25,6 +25,14 @@ export default defineConfig([
         { allowExportNames: ["Route"] }, // tells eslint Route export is expected
       ],
       "react-hooks/set-state-in-effect": "warn",
+      "@typescript-eslint/no-explicit-any": "off",
+      "no-warning-comments": [
+        "warn",
+        {
+          terms: ["todo", "fixme"],
+          location: "start",
+        },
+      ],
     },
   },
 ]);

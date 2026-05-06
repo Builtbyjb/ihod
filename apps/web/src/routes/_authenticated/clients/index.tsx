@@ -7,6 +7,7 @@ import { Plus } from "lucide-react";
 import type { Client } from "@/lib/types";
 import * as z from "zod";
 import { useLayout } from "@/hooks/useLayout";
+import { useFetch } from "@/hooks/useFetch";
 
 const clientsResponseSchema = z.array(
   z.object({
@@ -22,11 +23,11 @@ const clientsResponseSchema = z.array(
   }),
 );
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 function RouteComponent() {
   const { setTitle } = useLayout();
   setTitle("Clients");
+
+  const { doGET } = useFetch();
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
@@ -57,13 +58,8 @@ function RouteComponent() {
   useEffect(() => {
     (async () => {
       try {
-        const response = await fetch(`${API_URL}/api/v1/clients`, {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await doGET("/api/v1/clients");
+        if (response instanceof Error) throw response;
 
         if (!response.ok) throw new Error("Failed to fetch clients");
 
@@ -75,7 +71,7 @@ function RouteComponent() {
         console.log(error);
       }
     })();
-  }, []);
+  }, [doGET]);
 
   return (
     <main className="space-y-4">

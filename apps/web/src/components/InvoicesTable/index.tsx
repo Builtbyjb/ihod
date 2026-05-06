@@ -28,12 +28,12 @@ import { toast } from "sonner";
 interface InvoicesTableProps {
   clientId: string;
   invoices: Invoice[];
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void;
 }
 
 const API_URL = import.meta.env.VITE_API_URL;
 export default function InvoicesTable({ invoices, onDelete, clientId }: InvoicesTableProps) {
-  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleDelete = async () => {

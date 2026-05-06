@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import type { MonthRevenue } from "@/lib/types";
 import { SkeletonBarChart } from "@/components/Skeleton";
 
@@ -33,8 +33,8 @@ export default function RevenueChart({ data, isLoading }: RevenueChartProps) {
                   tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
                   // tickFormatter={formatCurrency}
                 />
-                {/*<Tooltip
-                  formatter={(value: number = 0) => [
+                <Tooltip
+                  formatter={(value) => [
                     new Intl.NumberFormat("en-US", {
                       style: "currency",
                       currency: "USD",
@@ -46,7 +46,7 @@ export default function RevenueChart({ data, isLoading }: RevenueChartProps) {
                     border: "1px solid var(--border)",
                     borderRadius: "8px",
                   }}
-                />*/}
+                />
                 <Bar dataKey="revenue" fill="var(--primary)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
