@@ -2,6 +2,7 @@ import type { FetchInstance } from "@/lib/types";
 import { toast } from "sonner";
 
 const API_URL = import.meta.env.VITE_API_URL;
+const RETRY_INTERVAL = 2000; // 2s
 export function useFetch(): FetchInstance {
     const doGET = async (url: string): Promise<Response | Error> => {
         let maxRetries = 3;
@@ -18,7 +19,8 @@ export function useFetch(): FetchInstance {
                 maxRetries -= 1;
 
                 if (maxRetries > 0) {
-                    toast.error("Network Error: Retrying");
+                    toast.error("Network Error: Retrying...");
+                    await new Promise((resolve) => setTimeout(resolve, RETRY_INTERVAL));
                     continue;
                 }
             }
@@ -43,7 +45,8 @@ export function useFetch(): FetchInstance {
                 maxRetries -= 1;
 
                 if (maxRetries > 0) {
-                    toast.error("Network Error: Retrying");
+                    toast.error("Network Error: Retrying...");
+                    await new Promise((resolve) => setTimeout(resolve, RETRY_INTERVAL));
                     continue;
                 }
             }

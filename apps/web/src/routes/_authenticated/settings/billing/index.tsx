@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useLayout } from "@/hooks/useLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,8 @@ function RouteComponent() {
   const { setTitle } = useLayout();
   setTitle("Billing");
 
+  const navigate = useNavigate();
+
   return (
     <div className="space-y-8">
       <Card>
@@ -18,7 +20,7 @@ function RouteComponent() {
           <CardDescription>Get access to premium features and priority support</CardDescription>
         </CardHeader>
         <CardContent>
-          <Button>Subscribe Now</Button>
+          <Button onClick={() => navigate({ to: "/settings/billing/subscribe" })}>Subscribe Now</Button>
         </CardContent>
       </Card>
       <Card>
@@ -43,6 +45,6 @@ function RouteComponent() {
   );
 }
 
-export const Route = createFileRoute("/_authenticated/settings/billing")({
+export const Route = createFileRoute("/_authenticated/settings/billing/")({
   component: RouteComponent,
 });
