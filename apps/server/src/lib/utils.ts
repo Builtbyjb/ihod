@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { ErrorResult, OTPPayload, TokenPayload, Invoice, InvoiceItem } from "./types";
+import { ErrorResult, OTPPayload, TokenPayload } from "./types";
 import { getCookie } from "hono/cookie";
 import { verify, sign } from "hono/jwt";
 
@@ -32,7 +32,7 @@ export async function parseToken(c: Context, tokenName: string): Promise<TokenPa
         return (await verify(token, secret, "HS256")) as TokenPayload;
     } catch (error) {
         console.log(error);
-        return new ErrorResult("Internal Server Error", 500);
+        return new ErrorResult("Error verifying token", 403);
     }
 }
 

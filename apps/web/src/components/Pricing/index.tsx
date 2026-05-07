@@ -1,50 +1,57 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
+import { useFetch } from "@/hooks/useFetch";
+import * as z from "zod";
 
-const plans = [
-  {
-    name: "Free",
-    price: "₦0",
-    description: "Perfect for getting started",
-    features: ["Up to 3 invoices per month", "Basic templates", "Email support", "PDF downloads"],
-    cta: "Get started for free",
-    featured: false,
-    disabled: false,
-  },
-  {
-    name: "Pro",
-    price: "₦9,870",
-    period: "/month",
-    description: "For growing businesses",
-    features: ["Unlimited invoices", "All premium templates", "Automatic reminders", "Priority support"],
-    cta: "Get Pro Plan",
-    featured: true,
-    disabled: false,
-  },
-  {
-    name: "Team",
-    price: "₦39,940",
-    period: "/month",
-    description: "For teams and agencies",
-    features: [
-      "Everything in Pro",
-      "Up to 5 team members",
-      "Team collaboration",
-      "Custom branding",
-      "Dedicated support",
-    ],
-    cta: "Contact sales",
-    featured: false,
-    disabled: true,
-  },
-];
+const planSchema = z.object({
+  id: z.number(),
+  planCode: z.string(),
+  name: z.string(),
+  description: z.string(),
+  amount: z.number(),
+  currency: z.string(),
+  interval: z.string(),
+  features: z.array(z.string()),
+  disabled: z.boolean(),
+  featured: z.boolean(),
+  cta: z.string(),
+});
+
+const plansSchema = z.array(planSchema);
+
+type Plan = z.infer<typeof planSchema>;
 
 export default function Pricing() {
+  const [plans, setPlans] = useState<Plan[]>([]);
+
+  const { doGET } = useFetch();
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await doGET("/api/v1/payments/plans");
+        if (response instanceof Error) throw new Error(response.message);
+
+        const result = await response.json();
+        const parsedResult = plansSchema.parse(result.plans);
+        setPlans(parsedResult);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  }, [doGET]);
+
+  const handleSubscribe = (plan: Plan) => {
+    console.log(plan);
+  };
+
   return (
     <div className="grid gap-8 lg:grid-cols-3">
       {plans.map((plan) => (
         <div
-          key={plan.name}
+          key={plan.id}
           className={`relative rounded-2xl border p-8 ${
             plan.featured ? "border-primary bg-card shadow-xl scale-105" : "border-border bg-card"
           }`}
@@ -61,8 +68,8 @@ export default function Pricing() {
             <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
           </div>
           <div className="mb-6">
-            <span className="text-4xl font-bold text-foreground">{plan.price}</span>
-            {plan.period && <span className="text-muted-foreground">{plan.period}</span>}
+            <span className="text-3xl font-medium text-foreground">{formatCurrency(plan.amount, plan.currency)}</span>
+            {plan.interval && <span className="text-muted-foreground">{plan.interval}</span>}
           </div>
           <ul className="space-y-3 mb-8">
             {plan.features.map((feature) => (
@@ -72,7 +79,12 @@ export default function Pricing() {
               </li>
             ))}
           </ul>
-          <Button className="w-full" disabled={plan.disabled} variant={plan.featured ? "default" : "outline"}>
+          <Button
+            className="w-full"
+            disabled={plan.disabled}
+            variant={plan.featured ? "default" : "outline"}
+            onClick={() => handleSubscribe(plan)}
+          >
             {plan.cta}
           </Button>
         </div>

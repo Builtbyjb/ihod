@@ -2,5 +2,5 @@ dictionaries = ["en_us", "en_gb"]
 min_word_length = 3
 words = [
     "cloudflare","vitejs", "tanstack", "lucide", "cta", "npx", "ihod", "uat", "hono", "zod", "sonner", "autofill", "hsl", "otp",
-    "dotenv", "kuma", "firstname", "lastname", "unixepoch", "NGN", "recharts"
+    "dotenv", "kuma", "firstname", "lastname", "unixepoch", "NGN", "recharts", "paystack"
 ]

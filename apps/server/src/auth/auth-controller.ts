@@ -9,7 +9,7 @@ import { setCookie, deleteCookie } from "hono/cookie";
 import type { OTPPayload, TokenPayload } from "@/lib/types";
 import { ErrorResult } from "@/lib/types";
 import { getAccessTokenExp, ACCESS_TOKEN_MAX_AGE, getRefreshTokenExp, REFRESH_TOKEN_MAX_AGE } from "@/lib/constants";
-import { loginSchema, otpSchema, signupSchema } from "./auth-zod-schema";
+import { loginSchema, otpSchema, signupSchema, PaystackCustomerResponseSchema } from "./auth-zod-schema";
 
 const authRouteV1 = new Hono<{ Bindings: Bindings }>().basePath("/auth");
 
@@ -19,7 +19,7 @@ authRouteV1.post("/login", zValidator("json", loginSchema), async (c) => {
     const { email } = c.req.valid("json");
     const db = drizzle(c.env.DB);
 
-    let user = await db.select().from(users).where(eq(users.email, email)).get();
+    const user = await db.select().from(users).where(eq(users.email, email)).get();
     if (!user) {
         console.log("Error finding user");
         return c.json({ message: "User not found" }, 404);
@@ -62,6 +62,23 @@ authRouteV1.post("/signup", zValidator("json", signupSchema), async (c) => {
     let member: { id: number } | undefined;
 
     try {
+        // Create Paystack customer
+        const response = await fetch("https://api.paystack.co/customer", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${c.env.PAYSTACK_SECRET}`,
+            },
+            body: JSON.stringify({
+                email: data.email,
+                first_name: data.firstname,
+                last_name: data.lastname,
+            }),
+        });
+
+        const paystackResult = await response.json();
+        const parsePaystackResult = PaystackCustomerResponseSchema.parse(paystackResult);
+
         // Create organization
         organization = await db
             .insert(organizations)
@@ -72,6 +89,8 @@ authRouteV1.post("/signup", zValidator("json", signupSchema), async (c) => {
                 city: data.city,
                 country: data.country,
                 website: data.website,
+                paystackCustomerCode: parsePaystackResult.data.customer_code,
+                paystackCustomerId: parsePaystackResult.data.id,
             })
             .returning({ id: organizations.id })
             .get();
@@ -161,6 +180,7 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
         email: user.email,
         currentOrgId: parsed.currentOrgId,
         organizationName: organization.name,
+        paystackCustomerCode: organization.paystackCustomerCode,
         exp: getRefreshTokenExp(),
     };
 

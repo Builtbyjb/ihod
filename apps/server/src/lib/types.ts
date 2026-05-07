@@ -1,6 +1,6 @@
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import type { JWTPayload } from "hono/utils/jwt/types";
-import { users, organizations, members, clients, invoices } from "@/db/schema";
+import { clients, invoices } from "@/db/schema";
 
 export type Bindings = {
     DB: D1Database;
@@ -10,6 +10,7 @@ export type Bindings = {
         send: (email: { to: string; from: string; subject: string; text: string; html?: string }) => Promise<any>;
     };
     ENV: string;
+    PAYSTACK_SECRET: string;
     // Add other variables like KV, R2, or Secret Keys here
 };
 
