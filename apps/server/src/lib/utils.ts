@@ -69,3 +69,23 @@ export async function sendOTPEmail(c: Context, email: string): Promise<Error | s
 export function getCurrentYear(): number {
     return new Date().getFullYear();
 }
+
+// Helper to verify Paystack HMAC-SHA512 signature
+export async function verifyPaystackSignature(secret: string, body: string, signature: string): Promise<boolean> {
+    const encoder = new TextEncoder();
+
+    // Import the secret key
+    const key = await crypto.subtle.importKey("raw", encoder.encode(secret), { name: "HMAC", hash: "SHA-512" }, false, [
+        "sign",
+    ]);
+
+    // Sign the body
+    const signatureBuffer = await crypto.subtle.sign("HMAC", key, encoder.encode(body));
+
+    // Convert to hex string
+    const hash = Array.from(new Uint8Array(signatureBuffer))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+
+    return hash === signature;
+}

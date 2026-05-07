@@ -28,8 +28,6 @@ export const organizations = sqliteTable("organizations", {
     paystackCustomerId: int("paystack_customer_id").notNull().unique(),
     paystackPlanId: int("paystack_plan_id").unique(),
     paystackPlanCode: text("paystack_plan_code").unique(),
-    paystackSubscriptionCode: text("paystack_subscription_code").unique(),
-    paystackEmailToken: text("paystack_email_token").unique(),
     deleted: int("deleted", { mode: "boolean" }).notNull().default(false),
     createdAt: int("created_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
     updatedAt: int("updated_at", { mode: "timestamp" }).default(sql`(unixepoch())`),

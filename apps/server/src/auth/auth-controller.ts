@@ -55,7 +55,7 @@ authRouteV1.post("/signup", zValidator("json", signupSchema), async (c) => {
 
     // Check if user exists
     const prevUser = await db.select().from(users).where(eq(users.email, data.email)).get();
-    if (prevUser) return c.json({ message: "A user will this email address exists" }, 400);
+    if (prevUser) return c.json({ message: "A user with this email address exists" }, 400);
 
     let organization: { id: number } | undefined;
     let user: { id: number } | undefined;
@@ -180,7 +180,6 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
         email: user.email,
         currentOrgId: parsed.currentOrgId,
         organizationName: organization.name,
-        paystackCustomerCode: organization.paystackCustomerCode,
         exp: getRefreshTokenExp(),
     };
 

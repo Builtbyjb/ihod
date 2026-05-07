@@ -4,6 +4,7 @@ import { Check } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { useFetch } from "@/hooks/useFetch";
 import * as z from "zod";
+import { useNavigate } from "@tanstack/react-router";
 
 const planSchema = z.object({
   id: z.number(),
@@ -26,13 +27,14 @@ type Plan = z.infer<typeof planSchema>;
 export default function Pricing() {
   const [plans, setPlans] = useState<Plan[]>([]);
 
-  const { doGET } = useFetch();
+  const { doGET, doPOST } = useFetch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
       try {
         const response = await doGET("/api/v1/payments/plans");
-        if (response instanceof Error) throw new Error(response.message);
+        if (response instanceof Error) throw response;
 
         const result = await response.json();
         const parsedResult = plansSchema.parse(result.plans);
@@ -43,8 +45,19 @@ export default function Pricing() {
     })();
   }, [doGET]);
 
-  const handleSubscribe = (plan: Plan) => {
-    console.log(plan);
+  const handleSubscribe = async (plan: Plan) => {
+    try {
+      const response = await doPOST("/api/v1/payments/subscribe", { planCode: plan.planCode });
+      if (response instanceof Error) throw response;
+
+      const result = await response.json();
+      console.log(result.data);
+      navigate({
+        href: result.data.data.authorization_url,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

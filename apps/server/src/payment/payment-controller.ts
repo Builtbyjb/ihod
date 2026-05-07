@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { Bindings, ErrorResult } from "@/lib/types";
-import { parseToken } from "@/lib/utils";
+import { parseToken, verifyPaystackSignature } from "@/lib/utils";
 import { plans, freePlan } from "@/lib/store";
 import { PaystackPlanResponseSchema } from "./payment-zod-schema";
 
@@ -16,7 +16,6 @@ paymentRouteV1.get("/plans", async (c) => {
         });
 
         const result: any = await response.json();
-        console.log(result.data);
         const parsedResult = PaystackPlanResponseSchema.parse(result.data);
 
         const subPlans = parsedResult.map((r) => {
@@ -76,6 +75,63 @@ paymentRouteV1.post("/subscribe", async (c) => {
     }
 });
 
-paymentRouteV1.get("/callback", async (c) => {});
+paymentRouteV1.get("/callback", async (c) => {
+    // Get the reference from the URL
+    const reference = c.req.query("reference");
+
+    if (!reference) {
+        return c.json({ error: "No reference found" }, 400);
+    }
+
+    try {
+        // Verify transaction
+        const response = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${c.env.PAYSTACK_SECRET}`,
+            },
+        });
+
+        const data: any = await response.json();
+        // console.log(data);
+
+        if (data.status && data.data.status === "success") {
+            // Success: Update your DB (e.g., set user as "active")
+            // Then redirect the user to your frontend success page
+            return c.redirect("http://localhost:5173/settings/billing");
+        } else {
+            // Payment failed or is still pending
+            return c.redirect("http://localhost:5173/settings/billing");
+        }
+    } catch (error) {
+        console.log(error);
+        return c.json({ error: "Verification failed" }, 500);
+    }
+});
+
+paymentRouteV1.post("/webhook", async (c) => {
+    const signature = c.req.header("x-paystack-signature") ?? "";
+
+    // Get the raw body as a string for verification
+    const body = await c.req.text();
+
+    // Verify the signature
+    const isValidSignature = verifyPaystackSignature(c.env.PAYSTACK_SECRET, body, signature);
+
+    if (!isValidSignature) {
+        return c.json({ message: "Invalid signature" }, 401);
+    }
+
+    // Parse the body and handle events
+    const event = JSON.parse(body);
+
+    if (event.event === "charge.success") {
+        // Update your database here
+        // console.log(event);
+    }
+
+    // Always return a 200 OK to acknowledge receipt
+    return c.json({ status: "success" }, 200);
+});
 
 export default paymentRouteV1;
