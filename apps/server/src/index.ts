@@ -1,9 +1,12 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { Bindings } from "@/lib/types";
+
+/* Routes  */
 import authRouteV1 from "./auth/auth-controller";
 import userRouteV1 from "./user/user-controller";
 import clientRouteV1 from "./client/client-controller";
-import { Bindings } from "@/lib/types";
+import paymentRouteV1 from "./payment/payment-controller";
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -18,8 +21,10 @@ app.use(
     }),
 );
 
+/* Register routes */
 app.route("/api/v1", authRouteV1);
 app.route("/api/v1", userRouteV1);
 app.route("/api/v1", clientRouteV1);
+app.route("/api/v1", paymentRouteV1);
 
 export default app;

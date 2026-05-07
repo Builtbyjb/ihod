@@ -84,13 +84,13 @@ clientRouteV1.post("/create", zValidator("json", clientFormSchema), async (c) =>
         return c.json({ message: "Internal Server Error" }, 500);
     }
 
-    //  TODO: Better error handling
+    // TODO: Better error handling
     const decoded = (await verify(refreshToken, secret, "HS256")) as TokenPayload;
 
     const member = await db.select().from(members).where(eq(members.userId, decoded.userId));
     if (member.length == 0) return c.json("User is not part of an organization", 400);
 
-    //  TODO: Better error handling
+    // TODO: Better error handling
     const client = await db
         .insert(clients)
         .values({
@@ -203,5 +203,6 @@ clientRouteV1.post("/search", async (c) => {
     return c.json({ data: result }, 200);
 });
 
-clientRouteV1.route("/:clientId/invoices", invoiceRouteV1);
+/* Links the invoice routes to the clients route */
+clientRouteV1.route("/:clientId", invoiceRouteV1);
 export default clientRouteV1;

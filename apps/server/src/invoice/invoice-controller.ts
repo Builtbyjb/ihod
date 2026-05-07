@@ -9,7 +9,7 @@ import { eq, and, sql, desc } from "drizzle-orm";
 import { clients, invoices } from "@/db/schema";
 import { generateInvoiceNumber, getCurrentYear } from "@/lib/utils";
 
-const invoiceRouteV1 = new Hono<{ Bindings: Bindings }>();
+const invoiceRouteV1 = new Hono<{ Bindings: Bindings }>().basePath("/invoices");
 
 const invoiceFormSchema = z.object({
     clientId: z.string(),
@@ -28,6 +28,7 @@ const invoiceFormSchema = z.object({
     notes: z.string(),
 });
 
+/* Returns all the invoices created for a client */
 invoiceRouteV1.get("/", async (c) => {
     const clientId = c.req.param("clientId");
     if (!clientId) return c.json({ message: "No client Id" }, 400);
@@ -56,6 +57,7 @@ invoiceRouteV1.get("/", async (c) => {
     return c.json({ message: "All Invoices", data: result }, 200);
 });
 
+/* Gets a single invoices for a client using the invoice id */
 invoiceRouteV1.get("/:invoiceId", async (c) => {
     const clientId = c.req.param("clientId");
     if (!clientId) return c.json({ message: "No client Id" }, 400);

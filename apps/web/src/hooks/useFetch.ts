@@ -3,6 +3,7 @@ import { toast } from "sonner";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const RETRY_INTERVAL = 2000; // 2s
+
 export function useFetch(): FetchInstance {
     const doGET = async (url: string): Promise<Response | Error> => {
         let maxRetries = 3;
