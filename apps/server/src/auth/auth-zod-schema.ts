@@ -20,3 +20,16 @@ export const signupSchema = z.object({
     country: z.string().min(2),
     website: z.string(),
 });
+
+export const PaystackCustomerResponseSchema = z.object({
+    status: z.boolean(),
+    message: z.string(),
+    data: z.object({
+        email: z.string().email(),
+        integration: z.number(),
+        domain: z.string(),
+        customer_code: z.string(),
+        id: z.number(),
+        identified: z.boolean(),
+    }),
+});

@@ -1,9 +1,8 @@
 import { Hono } from "hono";
-import { Bindings, ErrorResult, Client, Invoice } from "@/lib/types";
+import { Bindings, Client, Invoice, TokenPayload } from "@/lib/types";
 import { drizzle } from "drizzle-orm/d1";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { clients, invoices } from "@/db/schema";
-import { parseToken } from "@/lib/utils";
 import {
     countPaidInvoices,
     calculateRevenue,
@@ -12,14 +11,14 @@ import {
     getMonthlyRevenues,
     getRecentInvoices,
 } from "./user-service";
+import { authMiddleware } from "@/middleware/auth-middleware";
 
 const userRouteV1 = new Hono<{ Bindings: Bindings }>().basePath("/user");
+userRouteV1.use("*", authMiddleware());
 
-userRouteV1.get("/dashboard-stats", async (c) => {
+userRouteV1.get("/dashboard", async (c) => {
     const db = drizzle(c.env.DB);
-
-    const parsedToken = await parseToken(c, "refresh_token");
-    if (parsedToken instanceof ErrorResult) return c.json({ message: parsedToken.message }, parsedToken.code);
+    const jwtPayload = c.get("jwtPayload") as TokenPayload;
 
     let allClients: Client[] = [];
 
@@ -27,7 +26,7 @@ userRouteV1.get("/dashboard-stats", async (c) => {
         allClients = await db
             .select()
             .from(clients)
-            .where(and(eq(clients.organizationId, parsedToken.currentOrgId), eq(clients.deleted, false)));
+            .where(and(eq(clients.organizationId, jwtPayload.currentOrgId), eq(clients.deleted, false)));
     } catch (error) {
         console.log(error);
         return c.json({ message: "An error occurred while fetching all clients" }, 500);
@@ -37,7 +36,7 @@ userRouteV1.get("/dashboard-stats", async (c) => {
 
     const totalClients = allClients.length;
 
-    let allInvoices: Invoice[] = [];
+    const allInvoices: Invoice[] = [];
 
     // Get all invoices for all clients
     for (const client of allClients) {

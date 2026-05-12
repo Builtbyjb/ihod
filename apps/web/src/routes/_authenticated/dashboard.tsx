@@ -64,7 +64,7 @@ function RouteComponent() {
     (async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`${API_URL}/api/v1/user/dashboard-stats`, {
+        const response = await fetch(`${API_URL}/api/v1/user/dashboard`, {
           method: "GET",
           credentials: "include",
         });

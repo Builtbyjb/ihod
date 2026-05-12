@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { ErrorResult, OTPPayload, TokenPayload, Invoice, InvoiceItem } from "./types";
+import { ErrorResult, TokenPayload } from "./types";
 import { getCookie } from "hono/cookie";
 import { verify, sign } from "hono/jwt";
 
@@ -32,11 +32,11 @@ export async function parseToken(c: Context, tokenName: string): Promise<TokenPa
         return (await verify(token, secret, "HS256")) as TokenPayload;
     } catch (error) {
         console.log(error);
-        return new ErrorResult("Internal Server Error", 500);
+        return new ErrorResult("Error verifying token", 403);
     }
 }
 
-export async function signToken(c: Context, payload: TokenPayload | OTPPayload): Promise<Error | string> {
+export async function signToken(c: Context, payload: TokenPayload): Promise<Error | string> {
     const secret = c.env.JWT_SECRET;
     if (!secret) {
         console.error("JWT secret not configured");
@@ -68,4 +68,24 @@ export async function sendOTPEmail(c: Context, email: string): Promise<Error | s
 
 export function getCurrentYear(): number {
     return new Date().getFullYear();
+}
+
+// Helper to verify Paystack HMAC-SHA512 signature
+export async function verifyPaystackSignature(secret: string, body: string, signature: string): Promise<boolean> {
+    const encoder = new TextEncoder();
+
+    // Import the secret key
+    const key = await crypto.subtle.importKey("raw", encoder.encode(secret), { name: "HMAC", hash: "SHA-512" }, false, [
+        "sign",
+    ]);
+
+    // Sign the body
+    const signatureBuffer = await crypto.subtle.sign("HMAC", key, encoder.encode(body));
+
+    // Convert to hex string
+    const hash = Array.from(new Uint8Array(signatureBuffer))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+
+    return hash === signature;
 }

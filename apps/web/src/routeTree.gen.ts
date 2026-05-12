@@ -22,8 +22,9 @@ import { Route as GuestPricingIndexRouteImport } from './routes/_guest/pricing/i
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated/clients/index'
 import { Route as AuthenticatedSettingsReferralRouteImport } from './routes/_authenticated/settings/referral'
-import { Route as AuthenticatedSettingsBillingRouteImport } from './routes/_authenticated/settings/billing'
+import { Route as AuthenticatedSettingsBillingIndexRouteImport } from './routes/_authenticated/settings/billing/index'
 import { Route as AuthenticatedClientsClientIdIndexRouteImport } from './routes/_authenticated/clients/$clientId/index'
+import { Route as AuthenticatedSettingsBillingSubscribeRouteImport } from './routes/_authenticated/settings/billing/subscribe'
 import { Route as AuthenticatedClientsClientIdInvoicesIndexRouteImport } from './routes/_authenticated/clients/$clientId/invoices/index'
 import { Route as AuthenticatedClientsClientIdInvoicesNewIndexRouteImport } from './routes/_authenticated/clients/$clientId/invoices/new/index'
 import { Route as AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRouteImport } from './routes/_authenticated/clients/$clientId/invoices/$invoiceId/index'
@@ -96,16 +97,22 @@ const AuthenticatedSettingsReferralRoute =
     path: '/settings/referral',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedSettingsBillingRoute =
-  AuthenticatedSettingsBillingRouteImport.update({
-    id: '/settings/billing',
-    path: '/settings/billing',
+const AuthenticatedSettingsBillingIndexRoute =
+  AuthenticatedSettingsBillingIndexRouteImport.update({
+    id: '/settings/billing/',
+    path: '/settings/billing/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedClientsClientIdIndexRoute =
   AuthenticatedClientsClientIdIndexRouteImport.update({
     id: '/clients/$clientId/',
     path: '/clients/$clientId/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedSettingsBillingSubscribeRoute =
+  AuthenticatedSettingsBillingSubscribeRouteImport.update({
+    id: '/settings/billing/subscribe',
+    path: '/settings/billing/subscribe',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedClientsClientIdInvoicesIndexRoute =
@@ -139,14 +146,15 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/login/': typeof LoginIndexRoute
   '/signup/': typeof SignupIndexRoute
-  '/settings/billing': typeof AuthenticatedSettingsBillingRoute
   '/settings/referral': typeof AuthenticatedSettingsReferralRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/pricing/': typeof GuestPricingIndexRoute
   '/privacy-policy/': typeof GuestPrivacyPolicyIndexRoute
   '/terms-of-service/': typeof GuestTermsOfServiceIndexRoute
+  '/settings/billing/subscribe': typeof AuthenticatedSettingsBillingSubscribeRoute
   '/clients/$clientId/': typeof AuthenticatedClientsClientIdIndexRoute
+  '/settings/billing/': typeof AuthenticatedSettingsBillingIndexRoute
   '/clients/$clientId/invoices/': typeof AuthenticatedClientsClientIdInvoicesIndexRoute
   '/clients/$clientId/invoices/$invoiceId/': typeof AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRoute
   '/clients/$clientId/invoices/new/': typeof AuthenticatedClientsClientIdInvoicesNewIndexRoute
@@ -158,14 +166,15 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/login': typeof LoginIndexRoute
   '/signup': typeof SignupIndexRoute
-  '/settings/billing': typeof AuthenticatedSettingsBillingRoute
   '/settings/referral': typeof AuthenticatedSettingsReferralRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/pricing': typeof GuestPricingIndexRoute
   '/privacy-policy': typeof GuestPrivacyPolicyIndexRoute
   '/terms-of-service': typeof GuestTermsOfServiceIndexRoute
+  '/settings/billing/subscribe': typeof AuthenticatedSettingsBillingSubscribeRoute
   '/clients/$clientId': typeof AuthenticatedClientsClientIdIndexRoute
+  '/settings/billing': typeof AuthenticatedSettingsBillingIndexRoute
   '/clients/$clientId/invoices': typeof AuthenticatedClientsClientIdInvoicesIndexRoute
   '/clients/$clientId/invoices/$invoiceId': typeof AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRoute
   '/clients/$clientId/invoices/new': typeof AuthenticatedClientsClientIdInvoicesNewIndexRoute
@@ -180,14 +189,15 @@ export interface FileRoutesById {
   '/_guest/': typeof GuestIndexRoute
   '/login/': typeof LoginIndexRoute
   '/signup/': typeof SignupIndexRoute
-  '/_authenticated/settings/billing': typeof AuthenticatedSettingsBillingRoute
   '/_authenticated/settings/referral': typeof AuthenticatedSettingsReferralRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_guest/pricing/': typeof GuestPricingIndexRoute
   '/_guest/privacy-policy/': typeof GuestPrivacyPolicyIndexRoute
   '/_guest/terms-of-service/': typeof GuestTermsOfServiceIndexRoute
+  '/_authenticated/settings/billing/subscribe': typeof AuthenticatedSettingsBillingSubscribeRoute
   '/_authenticated/clients/$clientId/': typeof AuthenticatedClientsClientIdIndexRoute
+  '/_authenticated/settings/billing/': typeof AuthenticatedSettingsBillingIndexRoute
   '/_authenticated/clients/$clientId/invoices/': typeof AuthenticatedClientsClientIdInvoicesIndexRoute
   '/_authenticated/clients/$clientId/invoices/$invoiceId/': typeof AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRoute
   '/_authenticated/clients/$clientId/invoices/new/': typeof AuthenticatedClientsClientIdInvoicesNewIndexRoute
@@ -201,14 +211,15 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login/'
     | '/signup/'
-    | '/settings/billing'
     | '/settings/referral'
     | '/clients/'
     | '/settings/'
     | '/pricing/'
     | '/privacy-policy/'
     | '/terms-of-service/'
+    | '/settings/billing/subscribe'
     | '/clients/$clientId/'
+    | '/settings/billing/'
     | '/clients/$clientId/invoices/'
     | '/clients/$clientId/invoices/$invoiceId/'
     | '/clients/$clientId/invoices/new/'
@@ -220,14 +231,15 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/signup'
-    | '/settings/billing'
     | '/settings/referral'
     | '/clients'
     | '/settings'
     | '/pricing'
     | '/privacy-policy'
     | '/terms-of-service'
+    | '/settings/billing/subscribe'
     | '/clients/$clientId'
+    | '/settings/billing'
     | '/clients/$clientId/invoices'
     | '/clients/$clientId/invoices/$invoiceId'
     | '/clients/$clientId/invoices/new'
@@ -241,14 +253,15 @@ export interface FileRouteTypes {
     | '/_guest/'
     | '/login/'
     | '/signup/'
-    | '/_authenticated/settings/billing'
     | '/_authenticated/settings/referral'
     | '/_authenticated/clients/'
     | '/_authenticated/settings/'
     | '/_guest/pricing/'
     | '/_guest/privacy-policy/'
     | '/_guest/terms-of-service/'
+    | '/_authenticated/settings/billing/subscribe'
     | '/_authenticated/clients/$clientId/'
+    | '/_authenticated/settings/billing/'
     | '/_authenticated/clients/$clientId/invoices/'
     | '/_authenticated/clients/$clientId/invoices/$invoiceId/'
     | '/_authenticated/clients/$clientId/invoices/new/'
@@ -356,11 +369,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsReferralRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/settings/billing': {
-      id: '/_authenticated/settings/billing'
+    '/_authenticated/settings/billing/': {
+      id: '/_authenticated/settings/billing/'
       path: '/settings/billing'
-      fullPath: '/settings/billing'
-      preLoaderRoute: typeof AuthenticatedSettingsBillingRouteImport
+      fullPath: '/settings/billing/'
+      preLoaderRoute: typeof AuthenticatedSettingsBillingIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/clients/$clientId/': {
@@ -368,6 +381,13 @@ declare module '@tanstack/react-router' {
       path: '/clients/$clientId'
       fullPath: '/clients/$clientId/'
       preLoaderRoute: typeof AuthenticatedClientsClientIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings/billing/subscribe': {
+      id: '/_authenticated/settings/billing/subscribe'
+      path: '/settings/billing/subscribe'
+      fullPath: '/settings/billing/subscribe'
+      preLoaderRoute: typeof AuthenticatedSettingsBillingSubscribeRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/clients/$clientId/invoices/': {
@@ -403,11 +423,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedSettingsBillingRoute: typeof AuthenticatedSettingsBillingRoute
   AuthenticatedSettingsReferralRoute: typeof AuthenticatedSettingsReferralRoute
   AuthenticatedClientsIndexRoute: typeof AuthenticatedClientsIndexRoute
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
+  AuthenticatedSettingsBillingSubscribeRoute: typeof AuthenticatedSettingsBillingSubscribeRoute
   AuthenticatedClientsClientIdIndexRoute: typeof AuthenticatedClientsClientIdIndexRoute
+  AuthenticatedSettingsBillingIndexRoute: typeof AuthenticatedSettingsBillingIndexRoute
   AuthenticatedClientsClientIdInvoicesIndexRoute: typeof AuthenticatedClientsClientIdInvoicesIndexRoute
   AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRoute: typeof AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRoute
   AuthenticatedClientsClientIdInvoicesNewIndexRoute: typeof AuthenticatedClientsClientIdInvoicesNewIndexRoute
@@ -416,12 +437,15 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedSettingsBillingRoute: AuthenticatedSettingsBillingRoute,
   AuthenticatedSettingsReferralRoute: AuthenticatedSettingsReferralRoute,
   AuthenticatedClientsIndexRoute: AuthenticatedClientsIndexRoute,
   AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
+  AuthenticatedSettingsBillingSubscribeRoute:
+    AuthenticatedSettingsBillingSubscribeRoute,
   AuthenticatedClientsClientIdIndexRoute:
     AuthenticatedClientsClientIdIndexRoute,
+  AuthenticatedSettingsBillingIndexRoute:
+    AuthenticatedSettingsBillingIndexRoute,
   AuthenticatedClientsClientIdInvoicesIndexRoute:
     AuthenticatedClientsClientIdInvoicesIndexRoute,
   AuthenticatedClientsClientIdInvoicesInvoiceIdIndexRoute:
