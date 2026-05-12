@@ -5,12 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowLeft, Download, Pencil, Printer } from "lucide-react";
-import { format } from "date-fns";
 import type { Client, Invoice } from "@/lib/types";
 import { DefaultInvoiceTemplate } from "@/components/InvoiceTemplates/DefaultTemplate";
 import { calculateSubTotal, calculateTaxAmount, calculateTotalAmount } from "@/lib/utils";
 import { useReactToPrint } from "react-to-print";
-import { formatCurrency, getStatusVariant } from "@/lib/utils";
+import { formatCurrency, getStatusVariant, formatDate } from "@/lib/utils";
 import { useAuth } from "@/hooks/auth";
 import { useDownloadPDF } from "@/hooks/useDownloadPDF";
 import { useLayout } from "@/hooks/useLayout";
@@ -101,9 +100,7 @@ function RouteComponent() {
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle className="text-2xl">{invoice.id}</CardTitle>
-              <p className="text-sm text-muted-foreground mt-1">
-                Issued on {format(new Date(invoice.issueDate), "MMMM d, yyyy")}
-              </p>
+              <p className="text-sm text-muted-foreground mt-1">Issued on {formatDate(invoice.issueDate)}</p>
             </div>
             <Badge className={`capitalize text-sm ${getStatusVariant(invoice.status)}`}>{invoice.status}</Badge>
           </CardHeader>
@@ -121,7 +118,7 @@ function RouteComponent() {
               </div>
               <div className="sm:text-right">
                 <h3 className="text-sm font-medium text-muted-foreground mb-2">Due Date</h3>
-                <p className="font-semibold">{format(new Date(invoice.dueDate), "MMMM d, yyyy")}</p>
+                <p className="font-semibold">{formatDate(invoice.dueDate)}</p>
               </div>
             </div>
 

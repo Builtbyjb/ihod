@@ -89,13 +89,32 @@ paymentRouteV1.get("/paystack/subscriptions", async (c) => {
 
         const result: any = await response.json();
 
-        return c.json({ data: result.data }, 200);
+        // TODO: Better type handling
+        const subs = result.data.map((r: any) => {
+            return {
+                id: r.id,
+                planName: r.plan.name,
+                status: r.status,
+                amount: {
+                    currency: r.plan.currency,
+                    value: r.amount / 100,
+                },
+                subscriptionCode: r.subscription_code,
+                emailToken: r.email_token,
+                nextBillingCycle: r.next_payment_date,
+            };
+        });
+
+        return c.json({ data: subs }, 200);
     } catch (error) {
         console.log(error);
     }
-
-    return c.json({ subscriptions: {} }, 200);
 });
+
+// TODO: zod validate
+paymentRouteV1.post("/paystack/subcriptions/enable", async (c) => {});
+
+paymentRouteV1.post("/paystack/subcriptions/disable", async (c) => {});
 
 paymentRouteV1.get("/paystack/callback", async (c) => {
     // Get the reference from the URL

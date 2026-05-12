@@ -37,7 +37,7 @@ userRouteV1.get("/dashboard-stats", async (c) => {
 
     const totalClients = allClients.length;
 
-    let allInvoices: Invoice[] = [];
+    const allInvoices: Invoice[] = [];
 
     // Get all invoices for all clients
     for (const client of allClients) {

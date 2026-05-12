@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { InvoiceItem, Invoice } from "./types";
 import { CURRENCY_MAP } from "./constant";
+import { format } from "date-fns";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -19,6 +20,10 @@ export function formatCurrency(amount: number, currency?: string): string {
             style: "decimal",
         }).format(amount);
     }
+}
+
+export function formatDate(date: string): string {
+    return format(new Date(date), "MMMM d, yyyy");
 }
 
 export function calculateTotalAmount(items: InvoiceItem[], taxRate: number): number {
@@ -55,13 +60,13 @@ export function getStatusVariant(status: Invoice["status"]): string {
 
 export function getBadgeVariant(badge: string): string {
     switch (badge) {
-        case "green":
+        case "active":
             return "bg-green-50 text-green-700";
         case "blue":
             return "bg-sky-50 text-sky-700";
-        case "gray":
-            return "bg-gray-50 text-gray-700";
-        case "red":
+        case "non-renewing":
+            return "bg-gray-200 text-gray-700";
+        case "disabled":
             return "bg-red-50 text-red-700";
         default:
             return "bg-secondary text-secondary";
