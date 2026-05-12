@@ -6,8 +6,7 @@ CREATE TABLE IF NOT EXISTS `roles` (
 	`updated_at` integer DEFAULT (unixepoch())
 );
 
-INSERT INTO `roles` (`name`, `permissions`) VALUES
+INSERT OR IGNORE INTO `roles` (`name`, `permissions`) VALUES
     ('super_admin', 'all'),
     ('admin', 'all'),
-    ('member', 'read'),
-ON CONFLICT(`name`) DO NOTHING;
+    ('member', 'read');
