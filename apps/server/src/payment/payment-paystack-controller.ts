@@ -6,7 +6,7 @@ import { PaystackPlanResponseSchema } from "./payment-zod-schema";
 
 const paymentRouteV1 = new Hono<{ Bindings: Bindings }>().basePath("/payments");
 
-paymentRouteV1.get("/plans", async (c) => {
+paymentRouteV1.get("/paystack/plans", async (c) => {
     try {
         const response = await fetch("https://api.paystack.co/plan", {
             method: "GET",
@@ -44,7 +44,7 @@ paymentRouteV1.get("/plans", async (c) => {
     }
 });
 
-paymentRouteV1.post("/subscribe", async (c) => {
+paymentRouteV1.post("/paystack/subscribe", async (c) => {
     // TODO: Validate data
     const data = await c.req.json();
 
@@ -75,13 +75,33 @@ paymentRouteV1.post("/subscribe", async (c) => {
     }
 });
 
-paymentRouteV1.get("/callback", async (c) => {
+paymentRouteV1.get("/paystack/subscriptions", async (c) => {
+    const parsed = await parseToken(c, "refresh_token");
+    if (parsed instanceof ErrorResult) return c.json({ message: parsed.message }, parsed.code);
+
+    try {
+        const response = await fetch(`https://api.paystack.co/subscription?customer=${parsed.paystackCustomerId}`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${c.env.PAYSTACK_SECRET}`,
+            },
+        });
+
+        const result: any = await response.json();
+
+        return c.json({ data: result.data }, 200);
+    } catch (error) {
+        console.log(error);
+    }
+
+    return c.json({ subscriptions: {} }, 200);
+});
+
+paymentRouteV1.get("/paystack/callback", async (c) => {
     // Get the reference from the URL
     const reference = c.req.query("reference");
 
-    if (!reference) {
-        return c.json({ error: "No reference found" }, 400);
-    }
+    if (!reference) return c.json({ error: "No reference found" }, 400);
 
     try {
         // Verify transaction
@@ -93,11 +113,13 @@ paymentRouteV1.get("/callback", async (c) => {
         });
 
         const data: any = await response.json();
-        // console.log(data);
+        console.log("Callback: ", data);
 
         if (data.status && data.data.status === "success") {
             // Success: Update your DB (e.g., set user as "active")
             // Then redirect the user to your frontend success page
+            // TODO: Use env variables instead
+            // TODO: Figure out a way to denote success and failure
             return c.redirect("http://localhost:5173/settings/billing");
         } else {
             // Payment failed or is still pending
@@ -109,7 +131,7 @@ paymentRouteV1.get("/callback", async (c) => {
     }
 });
 
-paymentRouteV1.post("/webhook", async (c) => {
+paymentRouteV1.post("/paystack/webhook", async (c) => {
     const signature = c.req.header("x-paystack-signature") ?? "";
 
     // Get the raw body as a string for verification
@@ -117,20 +139,17 @@ paymentRouteV1.post("/webhook", async (c) => {
 
     // Verify the signature
     const isValidSignature = verifyPaystackSignature(c.env.PAYSTACK_SECRET, body, signature);
-
-    if (!isValidSignature) {
-        return c.json({ message: "Invalid signature" }, 401);
-    }
+    if (!isValidSignature) return c.json({ message: "Invalid signature" }, 401);
 
     // Parse the body and handle events
     const event = JSON.parse(body);
+    console.log("Webhook: ", event);
 
     if (event.event === "charge.success") {
         // Update your database here
-        // console.log(event);
     }
 
-    // Always return a 200 OK to acknowledge receipt
+    // Return a 200 OK to acknowledge receipt
     return c.json({ status: "success" }, 200);
 });
 

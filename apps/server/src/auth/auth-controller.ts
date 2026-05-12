@@ -6,7 +6,7 @@ import { DrizzleQueryError, eq } from "drizzle-orm";
 import { members, organizations, users } from "@/db/schema";
 import { parseToken, signToken, sendOTPEmail } from "@/lib/utils";
 import { setCookie, deleteCookie } from "hono/cookie";
-import type { OTPPayload, TokenPayload } from "@/lib/types";
+import type { TokenPayload } from "@/lib/types";
 import { ErrorResult } from "@/lib/types";
 import { getAccessTokenExp, ACCESS_TOKEN_MAX_AGE, getRefreshTokenExp, REFRESH_TOKEN_MAX_AGE } from "@/lib/constants";
 import { loginSchema, otpSchema, signupSchema, PaystackCustomerResponseSchema } from "./auth-zod-schema";
@@ -28,8 +28,10 @@ authRouteV1.post("/login", zValidator("json", loginSchema), async (c) => {
     const otp = await sendOTPEmail(c, email);
     if (otp instanceof Error) return c.json({ message: "Internal server error" }, 500);
 
-    const payload: OTPPayload = {
+    const payload: TokenPayload = {
         userId: user.id,
+        email: user.email,
+        username: user.username,
         currentOrgId: user.currentOrgId,
         otp: otp,
         exp: getAccessTokenExp(),
@@ -58,7 +60,7 @@ authRouteV1.post("/signup", zValidator("json", signupSchema), async (c) => {
     if (prevUser) return c.json({ message: "A user with this email address exists" }, 400);
 
     let organization: { id: number } | undefined;
-    let user: { id: number } | undefined;
+    let user: { id: number; email: string; username: string } | undefined;
     let member: { id: number } | undefined;
 
     try {
@@ -105,7 +107,7 @@ authRouteV1.post("/signup", zValidator("json", signupSchema), async (c) => {
                 username: data.username,
                 currentOrgId: organization.id,
             })
-            .returning({ id: users.id })
+            .returning()
             .get();
 
         // Create member
@@ -122,10 +124,14 @@ authRouteV1.post("/signup", zValidator("json", signupSchema), async (c) => {
         const otp = await sendOTPEmail(c, data.email);
         if (otp instanceof Error) return c.json({ message: "Internal server error" }, 500);
 
-        const payload: OTPPayload = {
+        const payload: TokenPayload = {
             userId: user.id,
+            email: user.email,
+            username: user.username,
             currentOrgId: organization.id,
             otp: otp,
+            paystackCustomerCode: parsePaystackResult.data.customer_code,
+            paystackCustomerId: parsePaystackResult.data.id,
             exp: getAccessTokenExp(),
         };
 
@@ -174,16 +180,18 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
     const organization = await db.select().from(organizations).where(eq(organizations.id, parsed.currentOrgId)).get();
     if (!organization) return c.json({ message: "User organization not found" }, 404);
 
-    const refreshPayload: TokenPayload = {
+    const payload: TokenPayload = {
         userId: parsed.userId,
         username: user.username,
         email: user.email,
         currentOrgId: parsed.currentOrgId,
         organizationName: organization.name,
+        paystackCustomerCode: parsed.paystackCustomerCode,
+        paystackCustomerId: parsed.paystackCustomerId,
         exp: getRefreshTokenExp(),
     };
 
-    const refreshToken = await signToken(c, refreshPayload);
+    const refreshToken = await signToken(c, payload);
     if (refreshToken instanceof Error) return c.json({ message: refreshToken.message }, 500);
 
     setCookie(c, "refresh_token", refreshToken, {
@@ -200,6 +208,8 @@ authRouteV1.post("/verify-otp", zValidator("json", otpSchema), async (c) => {
         email: user.email,
         currentOrgId: parsed.currentOrgId,
         organizationName: organization.name,
+        paystackCustomerCode: parsed.paystackCustomerCode,
+        paystackCustomerId: parsed.paystackCustomerId,
         exp: getAccessTokenExp(),
     };
 
@@ -235,6 +245,8 @@ authRouteV1.get("/refresh-token", async (c) => {
         email: parsed.email,
         currentOrgId: parsed.currentOrgId,
         organizationName: organization.name,
+        paystackCustomerCode: parsed.paystackCustomerCode,
+        paystackCustomerId: parsed.paystackCustomerId,
         exp: getAccessTokenExp(),
     };
 

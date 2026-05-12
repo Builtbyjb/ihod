@@ -19,13 +19,10 @@ export type TokenPayload = JWTPayload & {
     email: string;
     username: string;
     currentOrgId: number;
-    organizationName: string;
-};
-
-export type OTPPayload = JWTPayload & {
-    userId: number;
-    currentOrgId: number;
-    otp: string;
+    organizationName?: string;
+    otp?: string;
+    paystackCustomerCode?: string;
+    paystackCustomerId?: number;
 };
 
 export type InvoiceItem = {

@@ -33,7 +33,7 @@ export default function Pricing() {
   useEffect(() => {
     (async () => {
       try {
-        const response = await doGET("/api/v1/payments/plans");
+        const response = await doGET("/api/v1/payments/paystack/plans");
         if (response instanceof Error) throw response;
 
         const result = await response.json();
@@ -47,7 +47,7 @@ export default function Pricing() {
 
   const handleSubscribe = async (plan: Plan) => {
     try {
-      const response = await doPOST("/api/v1/payments/subscribe", { planCode: plan.planCode });
+      const response = await doPOST("/api/v1/payments/paystack/subscribe", { planCode: plan.planCode });
       if (response instanceof Error) throw response;
 
       const result = await response.json();

@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { ErrorResult, OTPPayload, TokenPayload } from "./types";
+import { ErrorResult, TokenPayload } from "./types";
 import { getCookie } from "hono/cookie";
 import { verify, sign } from "hono/jwt";
 
@@ -36,7 +36,7 @@ export async function parseToken(c: Context, tokenName: string): Promise<TokenPa
     }
 }
 
-export async function signToken(c: Context, payload: TokenPayload | OTPPayload): Promise<Error | string> {
+export async function signToken(c: Context, payload: TokenPayload): Promise<Error | string> {
     const secret = c.env.JWT_SECRET;
     if (!secret) {
         console.error("JWT secret not configured");

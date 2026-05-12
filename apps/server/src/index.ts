@@ -6,7 +6,7 @@ import { Bindings } from "@/lib/types";
 import authRouteV1 from "./auth/auth-controller";
 import userRouteV1 from "./user/user-controller";
 import clientRouteV1 from "./client/client-controller";
-import paymentRouteV1 from "./payment/payment-controller";
+import paymentRouteV1 from "./payment/payment-paystack-controller";
 
 const app = new Hono<{ Bindings: Bindings }>();
 
