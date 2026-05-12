@@ -93,6 +93,26 @@ function RouteComponent() {
     }
   };
 
+  const handleUpdate = async (subscription: Subscription) => {
+    try {
+      const response = await doPOST("/api/v1/payments/paystack/subscriptions/update", {
+        subscriptionCode: subscription.subscriptionCode,
+        emailToken: subscription.emailToken,
+      });
+
+      if (response instanceof Error) throw response;
+
+      if (!response.ok) throw new Error("An error occurred while fetching subscription update link");
+
+      const result = await response.json();
+      navigate({
+        href: result.updateLink,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="space-y-8">
       <Card>
@@ -115,7 +135,7 @@ function RouteComponent() {
                     <CardTitle>{s.planName}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between mb-4">
                       <div>
                         <Badge className={`${getBadgeVariant(s.status)}`}> {s.status}</Badge>
                         <p className="text-muted-foreground">
@@ -137,6 +157,9 @@ function RouteComponent() {
                         </Button>
                       )}
                     </div>
+                    <Button variant="outline" onClick={() => handleUpdate(s)}>
+                      Enable
+                    </Button>
                   </CardContent>
                 </Card>
               ))}

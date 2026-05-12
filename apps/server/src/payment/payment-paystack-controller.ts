@@ -90,7 +90,6 @@ paymentRouteV1.get("/paystack/subscriptions", async (c) => {
 
         const result: any = await response.json();
 
-        // TODO: Better type handling
         const subs = result.data.map((r: any) => {
             return {
                 id: r.id,
@@ -161,6 +160,26 @@ paymentRouteV1.post("/paystack/subcriptions/disable", zValidator("json", Paystac
         const result: any = await response.json();
 
         return c.json({ message: result.message }, 200);
+    } catch (error) {
+        console.log(error);
+        return c.json({ error: "Internal Server Error" }, 500);
+    }
+});
+
+paymentRouteV1.post("/paystack/subscriptions/update", zValidator("json", PaystackSubscriptionSchema), async (c) => {
+    const data = c.req.valid("json");
+
+    try {
+        const response = await fetch(`https://api.paystack.co/subscription/${data.subscriptionCode}/manage/link`, {
+            headers: {
+                Authorization: `Bearer ${c.env.PAYSTACK_SECRET}`,
+            },
+        });
+
+        if (!response.ok) throw new Error("An error occurred while fetching subscription update link");
+
+        const result: any = await response.json();
+        return c.json({ updateLink: result.data.link }, 200);
     } catch (error) {
         console.log(error);
         return c.json({ error: "Internal Server Error" }, 500);

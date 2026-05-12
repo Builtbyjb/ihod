@@ -51,7 +51,7 @@ export default function Pricing() {
       if (response instanceof Error) throw response;
 
       const result = await response.json();
-      console.log(result.data);
+      // console.log(result.data);
       navigate({
         href: result.data.data.authorization_url,
       });
