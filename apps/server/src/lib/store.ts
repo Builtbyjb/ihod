@@ -36,7 +36,7 @@ export const freePlan = {
     currency: "NGN",
     interval: "monthly",
     description: "Perfect for getting started",
-    features: ["Up to 3 invoices per month", "Basic templates", "Email support", "PDF downloads"],
+    features: ["Up to 5 invoices per month", "Basic templates", "Email support", "PDF downloads"],
     cta: "Get started for free",
     featured: false,
     disabled: false,

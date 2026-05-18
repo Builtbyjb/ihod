@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OTP Verification Email</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background-color: #0e0f13;
+        font-family: "DM Sans", sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 16px;
+      }
+
+      .email-wrapper {
+        width: 100%;
+        max-width: 560px;
+      }
+
+      /* Header strip */
+      .email-header {
+        background: #c9a84c;
+        border-radius: 12px 12px 0 0;
+        padding: 20px 40px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .logo-mark {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: #0e0f13;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .logo-mark svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .brand-name {
+        font-family: "DM Sans", sans-serif;
+        font-weight: 500;
+        font-size: 15px;
+        color: #0e0f13;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      /* Main card */
+      .email-body {
+        background: #16171d;
+        border: 1px solid #2a2b34;
+        border-top: none;
+        padding: 52px 48px 44px;
+      }
+
+      .eyebrow {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #c9a84c;
+        margin-bottom: 20px;
+      }
+
+      .heading {
+        font-family: "Cormorant Garamond", serif;
+        font-weight: 300;
+        font-size: 38px;
+        line-height: 1.15;
+        color: #ecedf2;
+        margin-bottom: 20px;
+      }
+
+      .heading em {
+        font-style: italic;
+        font-weight: 400;
+        color: #c9a84c;
+      }
+
+      .subtext {
+        font-size: 14px;
+        line-height: 1.75;
+        color: #7e808f;
+        margin-bottom: 44px;
+        max-width: 420px;
+      }
+
+      /* OTP section */
+      .otp-label {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #4a4c5c;
+        margin-bottom: 14px;
+      }
+
+      .otp-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+
+      .otp-digit {
+        width: 62px;
+        height: 72px;
+        border-radius: 10px;
+        background: #1d1e27;
+        border: 1px solid #2e3040;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "DM Mono", monospace;
+        font-weight: 500;
+        font-size: 28px;
+        color: #ecedf2;
+        letter-spacing: -0.02em;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .otp-digit::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #c9a84c;
+        border-radius: 10px 10px 0 0;
+      }
+
+      .otp-separator {
+        width: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #2e3040;
+        font-size: 22px;
+        font-weight: 300;
+      }
+
+      .otp-expiry {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12px;
+        color: #5a5c6e;
+        margin-bottom: 44px;
+      }
+
+      .otp-expiry svg {
+        flex-shrink: 0;
+        color: #c9a84c;
+      }
+
+      /* Divider */
+      .divider {
+        height: 1px;
+        background: linear-gradient(
+          to right,
+          transparent,
+          #2a2b34 30%,
+          #2a2b34 70%,
+          transparent
+        );
+        margin-bottom: 32px;
+      }
+
+      /* Security notice */
+      .security-box {
+        background: #12131a;
+        border: 1px solid #22232e;
+        border-left: 2px solid #c9a84c;
+        border-radius: 0 8px 8px 0;
+        padding: 16px 18px;
+        margin-bottom: 40px;
+      }
+
+      .security-box p {
+        font-size: 12.5px;
+        line-height: 1.7;
+        color: #5e6070;
+      }
+
+      .security-box strong {
+        color: #9d9fae;
+        font-weight: 500;
+      }
+
+      /* CTA button */
+      .btn-row {
+        margin-bottom: 44px;
+      }
+
+      .btn-primary {
+        display: inline-block;
+        padding: 13px 28px;
+        background: #c9a84c;
+        color: #0e0f13;
+        font-family: "DM Sans", sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        text-decoration: none;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      /* Footer */
+      .email-footer {
+        background: #11121a;
+        border: 1px solid #2a2b34;
+        border-top: none;
+        border-radius: 0 0 12px 12px;
+        padding: 28px 48px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .footer-left p {
+        font-size: 11.5px;
+        color: #3e4050;
+        line-height: 1.7;
+      }
+
+      .footer-links {
+        display: flex;
+        gap: 18px;
+      }
+
+      .footer-links a {
+        font-size: 11.5px;
+        color: #4a4c5e;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+
+      @media (max-width: 540px) {
+        .email-body {
+          padding: 36px 24px 32px;
+        }
+        .heading {
+          font-size: 30px;
+        }
+        .otp-digit {
+          width: 48px;
+          height: 60px;
+          font-size: 24px;
+        }
+        .email-footer {
+          flex-direction: column;
+          align-items: flex-start;
+          padding: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-wrapper">
+      <!-- Header -->
+      <div class="email-header">
+        <div class="logo-mark">
+          <svg
+            viewBox="0 0 18 18"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M9 2L15.5 5.75V12.25L9 16L2.5 12.25V5.75L9 2Z"
+              stroke="#c9a84c"
+              stroke-width="1.5"
+            />
+            <circle cx="9" cy="9" r="2.5" fill="#c9a84c" />
+          </svg>
+        </div>
+        <span class="brand-name">Acme&nbsp;Corp</span>
+      </div>
+
+      <!-- Body -->
+      <div class="email-body">
+        <p class="eyebrow">Security Verification</p>
+
+        <h1 class="heading">Your <em>one-time</em><br />passcode</h1>
+
+        <p class="subtext">
+          We received a sign-in request for your account. Enter the code below
+          to complete verification. This code is valid for 10 minutes.
+        </p>
+
+        <p class="otp-label">Verification code</p>
+
+        <div class="otp-row">
+          <div class="otp-digit">4</div>
+          <div class="otp-digit">8</div>
+          <div class="otp-digit">2</div>
+          <div class="otp-separator">·</div>
+          <div class="otp-digit">9</div>
+          <div class="otp-digit">1</div>
+          <div class="otp-digit">7</div>
+        </div>
+
+        <p class="otp-expiry">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          Expires in 10 minutes &nbsp;·&nbsp; Tue, 12 May 2026 at 09:32 AM UTC
+        </p>
+
+        <div class="divider"></div>
+
+        <div class="security-box">
+          <p>
+            <strong>Didn't request this?</strong> If you didn't attempt to sign
+            in, please ignore this email. Your account is safe — no action is
+            required. Never share this code with anyone, including Acme Corp
+            support.
+          </p>
+        </div>
+
+        <div class="btn-row">
+          <a class="btn-primary" href="#">Open Acme Dashboard →</a>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="email-footer">
+        <div class="footer-left">
+          <p>Acme Corp · 340 Pine Street, San Francisco, CA 94111</p>
+          <p>
+            You're receiving this because you enabled two-factor authentication.
+          </p>
+        </div>
+        <div class="footer-links">
+          <a href="#">Unsubscribe</a>
+          <a href="#">Privacy</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

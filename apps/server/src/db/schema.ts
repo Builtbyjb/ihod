@@ -26,7 +26,11 @@ export const organizations = sqliteTable("organizations", {
     website: text("website"),
     paystackCustomerCode: text("paystack_customer_code").notNull().unique(),
     paystackCustomerId: int("paystack_customer_id").notNull().unique(),
-    paystackSubscriptionStatus: int("paystack_subscription_status", { mode: "boolean" }).notNull().default(false),
+    paystackPlanCode: text("paystack_plan_code"),
+    paystackPlanId: int("paystack_plan_id"),
+    paystackSubscriptionStatus: text("paystack_subscription_status", { enum: ["active", "disable", "none"] })
+        .notNull()
+        .default("none"),
     deleted: int("deleted", { mode: "boolean" }).notNull().default(false),
     createdAt: int("created_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
     updatedAt: int("updated_at", { mode: "timestamp" }).default(sql`(unixepoch())`),

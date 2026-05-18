@@ -127,6 +127,7 @@ function RouteComponent() {
       <div>
         <h1 className="text-xl font-medium mb-4">Your Subscriptions</h1>
         <div className="space-y-6">
+          {/*TODO: Add loading skeleton */}
           {subscriptions.length > 0 ? (
             <>
               {subscriptions.map((s) => (

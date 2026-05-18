@@ -72,3 +72,7 @@ export function getBadgeVariant(badge: string): string {
             return "bg-secondary text-secondary";
     }
 }
+
+export function getCurrentYear(): number {
+    return new Date().getFullYear();
+}

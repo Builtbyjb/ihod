@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { FileText } from "lucide-react";
 import { APP_NAME } from "@/lib/constant";
+import { getCurrentYear } from "@/lib/utils";
 
 const footerLinks = {
   Product: [
@@ -27,8 +28,8 @@ const footerLinks = {
   Legal: [
     { name: "Privacy", href: "/privacy-policy" },
     { name: "Terms", href: "/terms-of-service" },
-    { name: "Security", href: "/security" },
-    { name: "Cookies", href: "/cookies" },
+    // { name: "Security", href: "/security" },
+    // { name: "Cookies", href: "/cookies" },
   ],
 };
 
@@ -69,7 +70,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-16 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground">© 2026 IHOD. All rights reserved.</p>
+          <p className="text-sm text-muted-foreground">{`© ${getCurrentYear()} ACORP. All rights reserved.`}</p>
           {/*<div className="flex items-center gap-6">
             <Link
               to="#"
