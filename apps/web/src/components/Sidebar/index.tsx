@@ -9,6 +9,7 @@ import {
   User,
   UserPlus,
   Users,
+  MessageCircle,
 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import {
@@ -72,6 +73,11 @@ const navItems = [
         title: "Referral",
         url: "/settings/referral",
         icon: UserPlus,
+      },
+      {
+        title: "Feedback",
+        url: "/settings/feedback",
+        icon: MessageCircle,
       },
     ],
   },

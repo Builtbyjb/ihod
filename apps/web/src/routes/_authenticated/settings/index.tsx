@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,7 +17,7 @@ function RouteComponent() {
   }, [setTitle]);
 
   return (
-    <main className="space-y-6">
+    <div className="space-y-6">
       <Banner backgroundColor={"bg-sky-100"} icon={<BadgeInfo />} text="Coming soon!" />
       <Card>
         <CardHeader>
@@ -50,12 +50,11 @@ function RouteComponent() {
             <Textarea id="address" placeholder="123 Business Street, City, State ZIP, Country" rows={2} />
           </div>
         </CardContent>
+        <CardFooter className="bg-background">
+          <Button>Save Settings</Button>
+        </CardFooter>
       </Card>
-
-      <div className="flex justify-end">
-        <Button>Save Settings</Button>
-      </div>
-    </main>
+    </div>
   );
 }
 

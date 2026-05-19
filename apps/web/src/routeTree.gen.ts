@@ -23,6 +23,7 @@ import { Route as GuestPricingIndexRouteImport } from './routes/_guest/pricing/i
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated/clients/index'
 import { Route as AuthenticatedSettingsReferralRouteImport } from './routes/_authenticated/settings/referral'
+import { Route as AuthenticatedSettingsFeedbackRouteImport } from './routes/_authenticated/settings/feedback'
 import { Route as AuthenticatedSettingsBillingIndexRouteImport } from './routes/_authenticated/settings/billing/index'
 import { Route as AuthenticatedClientsClientIdIndexRouteImport } from './routes/_authenticated/clients/$clientId/index'
 import { Route as AuthenticatedSettingsBillingSubscribeRouteImport } from './routes/_authenticated/settings/billing/subscribe'
@@ -103,6 +104,12 @@ const AuthenticatedSettingsReferralRoute =
     path: '/settings/referral',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedSettingsFeedbackRoute =
+  AuthenticatedSettingsFeedbackRouteImport.update({
+    id: '/settings/feedback',
+    path: '/settings/feedback',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedSettingsBillingIndexRoute =
   AuthenticatedSettingsBillingIndexRouteImport.update({
     id: '/settings/billing/',
@@ -153,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/templates': typeof AuthenticatedTemplatesRoute
   '/login/': typeof LoginIndexRoute
   '/signup/': typeof SignupIndexRoute
+  '/settings/feedback': typeof AuthenticatedSettingsFeedbackRoute
   '/settings/referral': typeof AuthenticatedSettingsReferralRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
@@ -174,6 +182,7 @@ export interface FileRoutesByTo {
   '/templates': typeof AuthenticatedTemplatesRoute
   '/login': typeof LoginIndexRoute
   '/signup': typeof SignupIndexRoute
+  '/settings/feedback': typeof AuthenticatedSettingsFeedbackRoute
   '/settings/referral': typeof AuthenticatedSettingsReferralRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
@@ -198,6 +207,7 @@ export interface FileRoutesById {
   '/_guest/': typeof GuestIndexRoute
   '/login/': typeof LoginIndexRoute
   '/signup/': typeof SignupIndexRoute
+  '/_authenticated/settings/feedback': typeof AuthenticatedSettingsFeedbackRoute
   '/_authenticated/settings/referral': typeof AuthenticatedSettingsReferralRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/login/'
     | '/signup/'
+    | '/settings/feedback'
     | '/settings/referral'
     | '/clients/'
     | '/settings/'
@@ -242,6 +253,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/login'
     | '/signup'
+    | '/settings/feedback'
     | '/settings/referral'
     | '/clients'
     | '/settings'
@@ -265,6 +277,7 @@ export interface FileRouteTypes {
     | '/_guest/'
     | '/login/'
     | '/signup/'
+    | '/_authenticated/settings/feedback'
     | '/_authenticated/settings/referral'
     | '/_authenticated/clients/'
     | '/_authenticated/settings/'
@@ -388,6 +401,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsReferralRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/settings/feedback': {
+      id: '/_authenticated/settings/feedback'
+      path: '/settings/feedback'
+      fullPath: '/settings/feedback'
+      preLoaderRoute: typeof AuthenticatedSettingsFeedbackRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/settings/billing/': {
       id: '/_authenticated/settings/billing/'
       path: '/settings/billing'
@@ -443,6 +463,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedTemplatesRoute: typeof AuthenticatedTemplatesRoute
+  AuthenticatedSettingsFeedbackRoute: typeof AuthenticatedSettingsFeedbackRoute
   AuthenticatedSettingsReferralRoute: typeof AuthenticatedSettingsReferralRoute
   AuthenticatedClientsIndexRoute: typeof AuthenticatedClientsIndexRoute
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
@@ -458,6 +479,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedTemplatesRoute: AuthenticatedTemplatesRoute,
+  AuthenticatedSettingsFeedbackRoute: AuthenticatedSettingsFeedbackRoute,
   AuthenticatedSettingsReferralRoute: AuthenticatedSettingsReferralRoute,
   AuthenticatedClientsIndexRoute: AuthenticatedClientsIndexRoute,
   AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
