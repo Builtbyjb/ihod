@@ -1,5 +1,15 @@
 import * as React from "react";
-import { ChevronRight, CreditCard, LayoutDashboard, LogOut, Settings, User, UserPlus, Users } from "lucide-react";
+import {
+  ChevronRight,
+  CreditCard,
+  LayoutDashboard,
+  LayoutTemplate,
+  LogOut,
+  Settings,
+  User,
+  UserPlus,
+  Users,
+} from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import {
   Sidebar,
@@ -18,6 +28,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "../ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { getBadgeVariant } from "@/lib/utils";
 
 type SidebarProps = {
   businessname?: string;
@@ -34,8 +45,13 @@ const navItems = [
   },
   {
     title: "Clients",
-    url: "/Clients",
+    url: "/clients",
     icon: Users,
+  },
+  {
+    title: "Templates",
+    url: "/templates",
+    icon: LayoutTemplate,
   },
   {
     title: "Settings",
@@ -83,14 +99,14 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
               </Avatar>
               <div className="flex flex-col">
                 <span className="truncate font-medium text-xl">{props.businessname}</span>
-                <span className="truncate text-xs">{props.username}</span>
-                <span className="truncate text-xs">{props.email}</span>
+                <span className="truncate text-sm">{props.username}</span>
+                <span className="truncate text-sm">{props.email}</span>
               </div>
             </div>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <Badge className="bg-blue-100 text-blue-700/80">Beta</Badge>
+      <Badge className={getBadgeVariant("blue")}>Beta</Badge>
       <Separator className="mt-2 mb-2" />
       <SidebarContent className="">
         <SidebarGroup>
@@ -109,7 +125,7 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
                   >
                     {/*<SidebarMenuButton>*/}
                     <item.icon className="h-4 w-4" />
-                    <span>{item.title}</span>
+                    <p>{item.title}</p>
                     {item.items && (
                       <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                     )}
@@ -130,7 +146,7 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
                                 }}
                               >
                                 <subItem.icon className="w-4 h-4" />
-                                <span>{subItem.title}</span>
+                                <p>{subItem.title}</p>
                               </SidebarMenuButton>
                             </SidebarMenuItem>
                           ))}

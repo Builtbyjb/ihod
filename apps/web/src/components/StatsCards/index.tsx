@@ -50,9 +50,9 @@ export default function StatsCards({ stats, isLoading }: StatsCardsProps) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {cards.map((card) => (
-        <>
+        <div key={card.title}>
           {!isLoading ? (
-            <Card key={card.title}>
+            <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">{card.title}</CardTitle>
                 <div className={`p-2 rounded-lg ${card.iconBg}`}>
@@ -67,7 +67,7 @@ export default function StatsCards({ stats, isLoading }: StatsCardsProps) {
           ) : (
             <SkeletonCard />
           )}
-        </>
+        </div>
       ))}
     </div>
   );

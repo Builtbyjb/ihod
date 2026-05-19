@@ -5,9 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getBadgeVariant, formatDate, formatCurrency } from "@/lib/utils";
-import { Calendar } from "lucide-react";
+import { BadgeInfo, Calendar } from "lucide-react";
 import * as z from "zod";
 import { useFetch } from "@/hooks/useFetch";
+import Banner from "@/components/Banner";
 
 const SubscriptionSchema = z.object({
   id: z.number(),
@@ -28,7 +29,10 @@ const SubscriptionsSchema = z.array(SubscriptionSchema);
 
 function RouteComponent() {
   const { setTitle } = useLayout();
-  setTitle("Billing");
+
+  useEffect(() => {
+    setTitle("Billing");
+  }, [setTitle]);
 
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
 
@@ -115,6 +119,7 @@ function RouteComponent() {
 
   return (
     <div className="space-y-8">
+      <Banner backgroundColor={"bg-sky-100"} icon={<BadgeInfo />} text={"Coming soon!"} />
       <Card>
         <CardHeader>
           <CardTitle>Upgrade Your Plan</CardTitle>

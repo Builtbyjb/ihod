@@ -8,20 +8,14 @@ type Plans = {
 export const plans: Record<string, Plans> = {
     PLN_2zz8jgorepk0t2n: {
         // Pro plan
-        features: ["Unlimited invoices", "All premium templates", "Automatic reminders", "Priority support"],
+        features: ["Unlimited invoices", "Premium templates", "Automatic reminders", "Priority support"],
         cta: "Get Pro Plan",
         featured: true,
         disabled: false,
     },
     PLN_naa6o3ymymu5un8: {
         // Team plan
-        features: [
-            "Everything in Pro",
-            "Up to 5 team members",
-            "Team collaboration",
-            "Custom branding",
-            "Dedicated support",
-        ],
+        features: ["Everything in Pro", "Up to 5 team members", "Team collaboration", "Dedicated support"],
         cta: "Contact sales",
         featured: false,
         disabled: true,

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useLayout } from "@/hooks/useLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,29 +8,27 @@ import { Copy, Users, BadgeInfo } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { getBadgeVariant, formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Item, ItemContent, ItemMedia, ItemTitle } from "@/components/ui/item";
+import { APP_NAME } from "@/lib/constant";
+import Banner from "@/components/Banner";
 
 function RouteComponent() {
   const { setTitle } = useLayout();
-  setTitle("Referrals");
+
+  useEffect(() => {
+    setTitle("Referrals");
+  }, [setTitle]);
+
   const referralLink = "https://invoice.acorp.app/ref/USER12345";
 
   const [referralEnabled, setReferralEnabled] = useState(true);
 
   return (
     <div className="space-y-8 mb-8">
-      <Item className="outline bg-sky-100">
-        <ItemMedia>
-          <BadgeInfo />
-        </ItemMedia>
-        <ItemContent>
-          <ItemTitle>Coming soon !!!</ItemTitle>
-        </ItemContent>
-      </Item>
+      <Banner backgroundColor="bg-sky-100" icon={<BadgeInfo />} text="Coming soon!" />
       <Card>
         <CardHeader>
           <CardTitle>Join Our Referral Program</CardTitle>
-          <CardDescription>Earn rewards by referring your friends to join Ihod</CardDescription>
+          <CardDescription>Earn rewards by referring your friends to join {APP_NAME} </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-2">

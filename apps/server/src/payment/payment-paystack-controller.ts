@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { Bindings, TokenPayload } from "@/lib/types";
 import { verifyPaystackSignature } from "@/lib/utils";
-import { plans, freePlan } from "@/lib/store";
+import { plans, freePlan } from "@/lib/plan";
 import {
     PaystackPlanResponseSchema,
     PaystackSubscriptionSchema,

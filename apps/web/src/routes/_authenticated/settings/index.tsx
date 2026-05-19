@@ -5,12 +5,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useLayout } from "@/hooks/useLayout";
+import { useEffect } from "react";
+import Banner from "@/components/Banner";
+import { BadgeInfo } from "lucide-react";
 
 function RouteComponent() {
   const { setTitle } = useLayout();
-  setTitle("Settings");
+
+  useEffect(() => {
+    setTitle("Settings");
+  }, [setTitle]);
+
   return (
     <main className="space-y-6">
+      <Banner backgroundColor={"bg-sky-100"} icon={<BadgeInfo />} text="Coming soon!" />
       <Card>
         <CardHeader>
           <CardTitle>Business Information</CardTitle>

@@ -15,6 +15,7 @@ import { Route as SplatRouteImport } from './routes/$'
 import { Route as SignupIndexRouteImport } from './routes/signup/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as GuestIndexRouteImport } from './routes/_guest/index'
+import { Route as AuthenticatedTemplatesRouteImport } from './routes/_authenticated/templates'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as GuestTermsOfServiceIndexRouteImport } from './routes/_guest/terms-of-service/index'
 import { Route as GuestPrivacyPolicyIndexRouteImport } from './routes/_guest/privacy-policy/index'
@@ -57,6 +58,11 @@ const GuestIndexRoute = GuestIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => GuestRoute,
+} as any)
+const AuthenticatedTemplatesRoute = AuthenticatedTemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
@@ -144,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/$': typeof SplatRoute
   '/': typeof GuestIndexRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/templates': typeof AuthenticatedTemplatesRoute
   '/login/': typeof LoginIndexRoute
   '/signup/': typeof SignupIndexRoute
   '/settings/referral': typeof AuthenticatedSettingsReferralRoute
@@ -164,6 +171,7 @@ export interface FileRoutesByTo {
   '/$': typeof SplatRoute
   '/': typeof GuestIndexRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/templates': typeof AuthenticatedTemplatesRoute
   '/login': typeof LoginIndexRoute
   '/signup': typeof SignupIndexRoute
   '/settings/referral': typeof AuthenticatedSettingsReferralRoute
@@ -186,6 +194,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/_guest': typeof GuestRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/templates': typeof AuthenticatedTemplatesRoute
   '/_guest/': typeof GuestIndexRoute
   '/login/': typeof LoginIndexRoute
   '/signup/': typeof SignupIndexRoute
@@ -209,6 +218,7 @@ export interface FileRouteTypes {
     | '/$'
     | '/'
     | '/dashboard'
+    | '/templates'
     | '/login/'
     | '/signup/'
     | '/settings/referral'
@@ -229,6 +239,7 @@ export interface FileRouteTypes {
     | '/$'
     | '/'
     | '/dashboard'
+    | '/templates'
     | '/login'
     | '/signup'
     | '/settings/referral'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/_guest'
     | '/_authenticated/dashboard'
+    | '/_authenticated/templates'
     | '/_guest/'
     | '/login/'
     | '/signup/'
@@ -319,6 +331,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof GuestIndexRouteImport
       parentRoute: typeof GuestRoute
+    }
+    '/_authenticated/templates': {
+      id: '/_authenticated/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof AuthenticatedTemplatesRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
@@ -423,6 +442,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedTemplatesRoute: typeof AuthenticatedTemplatesRoute
   AuthenticatedSettingsReferralRoute: typeof AuthenticatedSettingsReferralRoute
   AuthenticatedClientsIndexRoute: typeof AuthenticatedClientsIndexRoute
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
@@ -437,6 +457,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedTemplatesRoute: AuthenticatedTemplatesRoute,
   AuthenticatedSettingsReferralRoute: AuthenticatedSettingsReferralRoute,
   AuthenticatedClientsIndexRoute: AuthenticatedClientsIndexRoute,
   AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,

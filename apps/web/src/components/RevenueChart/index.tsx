@@ -34,8 +34,8 @@ export default function RevenueChart({ data, isLoading }: RevenueChartProps) {
                   // tickFormatter={formatCurrency}
                 />
                 <Tooltip
-                  formatter={(value: any) => {
-                    console.assert(value instanceof Number);
+                  formatter={(value: number) => {
+                    console.assert(typeof value === "number");
                     return [
                       new Intl.NumberFormat("en-US", {
                         style: "currency",
