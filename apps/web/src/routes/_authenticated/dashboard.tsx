@@ -9,6 +9,7 @@ import type { DashboardStats } from "@/lib/types";
 import { InvoiceSchema, InvoiceStatusSchema, TopStatsSchema } from "@/lib/zod-schema";
 import * as z from "zod";
 import { toast } from "sonner";
+import { useFetch } from "@/hooks/useFetch";
 
 const schema = z.object({
   topStats: TopStatsSchema,
@@ -52,37 +53,36 @@ const defaultStats = {
   recentInvoices: [],
 } as DashboardStats;
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 function RouteComponent() {
   const { setTitle } = useLayout();
   setTitle("Dashboard");
+
   const [dashboardStats, setDashboardStats] = useState<DashboardStats>(defaultStats);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const { doGET } = useFetch();
 
   useEffect(() => {
     (async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`${API_URL}/api/v1/user/dashboard`, {
-          method: "GET",
-          credentials: "include",
-        });
-
-        if (!response.ok) throw new Error("An error occurred while fetching dashboard statistics");
+        const response = await doGET("/api/v1/user/dashboard");
+        if (response instanceof Error) throw response;
 
         const result = await response.json();
-        const parsedResult = schema.parse(result);
+        if (!response.ok) throw new Error(result.message);
+
+        const parsedResult = schema.parse(result.data);
 
         setDashboardStats(parsedResult);
       } catch (error) {
         console.error(error);
-        toast.error("Error fetching dashboard statistics");
+        toast.error(error.message);
       } finally {
         setIsLoading(false);
       }
     })();
-  }, []);
+  }, [doGET]);
 
   return (
     <div className="flex flex-col space-y-6">

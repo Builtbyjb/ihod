@@ -32,7 +32,7 @@ userRouteV1.get("/dashboard", async (c) => {
         return c.json({ message: "An error occurred while fetching all clients" }, 500);
     }
 
-    if (allClients.length === 0) return c.json({ message: "No clients found" }, 200);
+    if (allClients.length === 0) return c.json({ message: "No clients found" }, 404);
 
     const totalClients = allClients.length;
 
@@ -48,20 +48,21 @@ userRouteV1.get("/dashboard", async (c) => {
         allInvoices.push(...clientInvoices);
     }
 
-    const totalRevenue = calculateRevenue(allInvoices);
+    const totalRevenue: number = calculateRevenue(allInvoices);
     const paidInvoices = countPaidInvoices(allInvoices);
     const pendingAmount = countPendingAmount(allInvoices);
     const invoiceData = getInvoiceData(allInvoices);
     const monthlyRevenues = getMonthlyRevenues(allInvoices);
     const recentInvoices = getRecentInvoices(allInvoices);
 
-    const dashboardStats = {
+    const data = {
         topStats: { totalRevenue, paidInvoices, pendingAmount, totalClients },
         invoiceData,
         monthlyRevenues,
         recentInvoices,
     };
-    return c.json(dashboardStats, 200);
+
+    return c.json({ message: "Success", data }, 200);
 });
 
 export default userRouteV1;

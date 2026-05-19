@@ -12,8 +12,8 @@
       "d1_databases": [
         {
           "binding": "DB",
-          "database_name": "ihod",
-          "database_id": "1b57c38f-8062-434e-86cd-cfc073b500ef",
+          "database_name": "acorp-invoice",
+          "database_id": "e82e372a-d351-4b46-b5e0-69d95ebbaed8",
           "migrations_dir": "drizzle/migrations",
         },
       ],
@@ -31,8 +31,8 @@
       "d1_databases": [
         {
           "binding": "DB",
-          "database_name": "ihod-dev",
-          "database_id": "1b57c38f-8062-434e-86cd-cfc073b500e8",
+          "database_name": "dev-db",
+          "database_id": "e82e372a-d351-4b46-b5e0-69d95ebbaed8",
           "migrations_dir": "drizzle/migrations",
         },
       ],

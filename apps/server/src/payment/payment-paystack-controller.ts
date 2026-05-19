@@ -2,7 +2,12 @@ import { Hono } from "hono";
 import { Bindings, TokenPayload } from "@/lib/types";
 import { verifyPaystackSignature } from "@/lib/utils";
 import { plans, freePlan } from "@/lib/store";
-import { PaystackPlanResponseSchema, PaystackSubscriptionSchema } from "./payment-zod-schema";
+import {
+    PaystackPlanResponseSchema,
+    PaystackSubscriptionSchema,
+    PaystackSubscribeSchema,
+    CallbackResponseSchema,
+} from "./payment-zod-schema";
 import { authMiddleware } from "@/middleware/auth-middleware";
 import { zValidator } from "@hono/zod-validator";
 import { drizzle } from "drizzle-orm/d1";
@@ -50,9 +55,8 @@ paymentRouteV1.get("/paystack/plans", async (c) => {
     }
 });
 
-paymentRouteV1.post("/paystack/subscribe", async (c) => {
-    // TODO: Validate data
-    const data = await c.req.json();
+paymentRouteV1.post("/paystack/subscribe", zValidator("json", PaystackSubscribeSchema), async (c) => {
+    const data = c.req.valid("json");
     const jWtPayload = c.get("jwtPayload") as TokenPayload;
 
     try {
@@ -69,10 +73,9 @@ paymentRouteV1.post("/paystack/subscribe", async (c) => {
             }),
         });
 
-        const result = await response.json();
         // TODO: Validate result
+        const result = await response.json();
 
-        // TODO: Save plan Code and plan id to organizations table
         return c.json({ data: result }, 200);
     } catch (error) {
         console.log(error);
@@ -132,6 +135,7 @@ paymentRouteV1.post("/paystack/subcriptions/enable", zValidator("json", Paystack
         });
 
         if (!response.ok) throw new Error("An error occurred while enabling subscription");
+        // TODO: update subscription status to disable
 
         const result: any = await response.json();
 
@@ -159,6 +163,7 @@ paymentRouteV1.post("/paystack/subcriptions/disable", zValidator("json", Paystac
         });
 
         if (!response.ok) throw new Error("An error occurred while disabling subscription");
+        // TODO: update subscription status to disable
 
         const result: any = await response.json();
 
@@ -206,7 +211,8 @@ paymentRouteV1.get("/paystack-fn/callback", async (c) => {
         });
 
         const data: any = await response.json();
-        console.log("Callback: ", data);
+        const parsedData = CallbackResponseSchema.parse(data);
+        // console.log("Callback: ", data);
 
         const url = c.env.FRONTEND_URL;
         if (!url) {
@@ -214,12 +220,16 @@ paymentRouteV1.get("/paystack-fn/callback", async (c) => {
             return c.json({ error: "Internal Server Error" }, 500);
         }
 
-        if (data.status && data.data.status === "success") {
+        if (parsedData.status && parsedData.data.status === "success") {
             // Update db on success
             await db
                 .update(organizations)
-                .set({ paystackSubscriptionStatus: true })
-                .where(eq(organizations.paystackCustomerId, data.data.customer.id));
+                .set({
+                    paystackSubscriptionStatus: "active",
+                    paystackPlanCode: parsedData.data.planCode,
+                    paystackPlanId: parsedData.data.plan.id,
+                })
+                .where(eq(organizations.paystackCustomerId, parsedData.data.customer.id));
         }
 
         return c.redirect(`${url}/settings/billing`);
@@ -240,8 +250,8 @@ paymentRouteV1.post("/paystack-fn/webhook", async (c) => {
     if (!isValidSignature) return c.json({ message: "Invalid signature" }, 401);
 
     // Parse the body and handle events
-    const event = JSON.parse(body);
-    console.log("Webhook: ", event);
+    // const event = JSON.parse(body);
+    // console.log("Webhook: ", event);
 
     // if (event.event === "charge.success") {}
 

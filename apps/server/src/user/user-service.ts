@@ -125,5 +125,6 @@ export function getRecentInvoices(invoices: Invoice[]): Invoice[] {
 
     // Sort the invoices by issue date and return the first 10
     const sortedInvoices = recentInvoices.sort((a, b) => a.issueDate.getMonth() - b.issueDate.getMonth());
+
     return sortedInvoices.slice(0, 10);
 }

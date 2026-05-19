@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "c81be808-25df-4fec-bb1b-e9c89f6e8ee7",
+  "id": "019fb78f-1767-4176-8ab9-b6be381a2f89",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "clients": {
@@ -75,7 +75,7 @@
           "name": "created_at",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch())"
         },
@@ -83,7 +83,7 @@
           "name": "updated_at",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch())"
         }
@@ -122,7 +122,7 @@
           "name": "client_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "issue_date": {
@@ -150,14 +150,15 @@
           "name": "tax_rate",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
         },
         "items": {
           "name": "items",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "'[]'"
         },
@@ -187,7 +188,7 @@
           "name": "created_at",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch())"
         },
@@ -195,7 +196,7 @@
           "name": "updated_at",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch())"
         }
@@ -389,6 +390,50 @@
           "notNull": false,
           "autoincrement": false
         },
+        "invoice_number": {
+          "name": "invoice_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'{\"currentNumber\":0,\"year\":2000}'"
+        },
+        "paystack_customer_code": {
+          "name": "paystack_customer_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "paystack_customer_id": {
+          "name": "paystack_customer_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "paystack_plan_code": {
+          "name": "paystack_plan_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "paystack_plan_id": {
+          "name": "paystack_plan_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "paystack_subscription_status": {
+          "name": "paystack_subscription_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'none'"
+        },
         "deleted": {
           "name": "deleted",
           "type": "integer",
@@ -419,6 +464,20 @@
           "name": "organizations_name_unique",
           "columns": [
             "name"
+          ],
+          "isUnique": true
+        },
+        "organizations_paystack_customer_code_unique": {
+          "name": "organizations_paystack_customer_code_unique",
+          "columns": [
+            "paystack_customer_code"
+          ],
+          "isUnique": true
+        },
+        "organizations_paystack_customer_id_unique": {
+          "name": "organizations_paystack_customer_id_unique",
+          "columns": [
+            "paystack_customer_id"
           ],
           "isUnique": true
         }
@@ -469,7 +528,15 @@
           "default": "(unixepoch())"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "roles_name_unique": {
+          "name": "roles_name_unique",
+          "columns": [
+            "name"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},

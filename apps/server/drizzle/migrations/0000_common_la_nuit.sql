@@ -8,24 +8,24 @@ CREATE TABLE `clients` (
 	`city` text,
 	`country` text,
 	`deleted` integer DEFAULT false NOT NULL,
-	`created_at` integer DEFAULT (unixepoch()),
-	`updated_at` integer DEFAULT (unixepoch()),
+	`created_at` integer DEFAULT (unixepoch()) NOT NULL,
+	`updated_at` integer DEFAULT (unixepoch()) NOT NULL,
 	FOREIGN KEY (`organization_id`) REFERENCES `organizations`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `invoices` (
 	`id` text PRIMARY KEY NOT NULL,
-	`client_id` text,
+	`client_id` text NOT NULL,
 	`issue_date` integer NOT NULL,
 	`due_date` integer NOT NULL,
 	`status` text NOT NULL,
-	`tax_rate` integer,
-	`items` text DEFAULT '[]',
+	`tax_rate` integer DEFAULT 0 NOT NULL,
+	`items` text DEFAULT '[]' NOT NULL,
 	`notes` text,
 	`currency` text NOT NULL,
 	`deleted` integer DEFAULT false NOT NULL,
-	`created_at` integer DEFAULT (unixepoch()),
-	`updated_at` integer DEFAULT (unixepoch()),
+	`created_at` integer DEFAULT (unixepoch()) NOT NULL,
+	`updated_at` integer DEFAULT (unixepoch()) NOT NULL,
 	FOREIGN KEY (`client_id`) REFERENCES `clients`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
@@ -52,13 +52,21 @@ CREATE TABLE `organizations` (
 	`city` text,
 	`country` text,
 	`website` text,
+	`invoice_number` text DEFAULT '{"currentNumber":0,"year":2000}' NOT NULL,
+	`paystack_customer_code` text NOT NULL,
+	`paystack_customer_id` integer NOT NULL,
+	`paystack_plan_code` text,
+	`paystack_plan_id` integer,
+	`paystack_subscription_status` text DEFAULT 'none' NOT NULL,
 	`deleted` integer DEFAULT false NOT NULL,
 	`created_at` integer DEFAULT (unixepoch()),
 	`updated_at` integer DEFAULT (unixepoch())
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `organizations_name_unique` ON `organizations` (`name`);--> statement-breakpoint
-CREATE TABLE IF NOT EXISTS `roles` (
+CREATE UNIQUE INDEX `organizations_paystack_customer_code_unique` ON `organizations` (`paystack_customer_code`);--> statement-breakpoint
+CREATE UNIQUE INDEX `organizations_paystack_customer_id_unique` ON `organizations` (`paystack_customer_id`);--> statement-breakpoint
+CREATE TABLE `roles` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`permissions` text NOT NULL,
@@ -66,6 +74,7 @@ CREATE TABLE IF NOT EXISTS `roles` (
 	`updated_at` integer DEFAULT (unixepoch())
 );
 --> statement-breakpoint
+CREATE UNIQUE INDEX `roles_name_unique` ON `roles` (`name`);--> statement-breakpoint
 CREATE TABLE `users` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`email` text NOT NULL,
