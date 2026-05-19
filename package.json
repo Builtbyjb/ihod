@@ -1,13 +1,13 @@
 {
   "scripts": {
-    "dev-web": "npx turbo dev --filter=@ihod/web",
-    "dev-server": "npx turbo dev --filter=@ihod/server",
+    "dev-web": "npx turbo dev --filter=@invoice/web",
+    "dev-server": "npx turbo dev --filter=@invoice/server",
     "dev": "npx turbo dev",
-    "deploy-web": "npx turbo deploy --filter=@ihod/web",
-    "deploy-server": "npx turbo deploy --filter=@ihod/server",
-    "build-web": "npx turbo build --filter=@ihod/web",
-    "build-server": "npx turbo build --filter=@ihod/server",
-    "lint-web": "npx turbo lint --filter=@ihod/web"
+    "deploy-web": "npx turbo deploy --filter=@invoice/web",
+    "deploy-server": "npx turbo deploy --filter=@invoice/server",
+    "build-web": "npx turbo build --filter=@invoice/web",
+    "build-server": "npx turbo build --filter=@invoice/server",
+    "lint-web": "npx turbo lint --filter=@invoice/web"
   },
   "devDependencies": {
     "drizzle-kit": "^0.31.10",
