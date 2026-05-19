@@ -1,11 +1,11 @@
 import { Hono } from "hono";
-import { Bindings } from "@/lib/types";
+import { Bindings, TokenPayload } from "@/lib/types";
 import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
 import { drizzle } from "drizzle-orm/d1";
 import { eq, and, sql, desc } from "drizzle-orm";
-import { clients, invoices } from "@/db/schema";
-import { generateInvoiceNumber, getCurrentYear } from "@/lib/utils";
+import { clients, invoices, organizations } from "@/db/schema";
+import { getCurrentYear, getNewInvoiceNumber } from "@/lib/utils";
 
 const invoiceRouteV1 = new Hono<{ Bindings: Bindings }>().basePath("/invoices");
 
@@ -73,10 +73,25 @@ invoiceRouteV1.get("/:invoiceId", async (c) => {
 invoiceRouteV1.post("/create", zValidator("json", invoiceFormSchema), async (c) => {
     const db = drizzle(c.env.DB);
     const data = c.req.valid("json");
+    const jwtPayload = c.get("jwtPayload") as TokenPayload;
 
     try {
+        // Get previous organization invoice number
+        const organization = await db
+            .select()
+            .from(organizations)
+            .where(eq(organizations.id, jwtPayload.currentOrgId))
+            .get();
+
+        if (!organization) return c.json({ message: "Organization not found" }, 404);
+
+        const newInvoiceNumber = getNewInvoiceNumber(organization.invoiceNumber);
+
+        const invoiceId = "INV-" + newInvoiceNumber.year + "-" + newInvoiceNumber.currentNumber;
+
+        // Create Invoice
         await db.insert(invoices).values({
-            id: "inv-" + getCurrentYear() + "-" + generateInvoiceNumber(),
+            id: invoiceId,
             clientId: data.clientId,
             issueDate: data.issueDate,
             dueDate: data.dueDate,
@@ -87,10 +102,16 @@ invoiceRouteV1.post("/create", zValidator("json", invoiceFormSchema), async (c) 
             currency: data.currency,
         });
 
+        // Bookkeeping: Updating organizations invoice number
+        await db
+            .update(organizations)
+            .set({ invoiceNumber: newInvoiceNumber })
+            .where(eq(organizations.id, jwtPayload.currentOrgId));
+
         return c.json({ message: "Invoice created" }, 200);
     } catch (error) {
         console.log(error);
-        return c.json({ error: "Internal Server Error" }, 500);
+        return c.json({ message: "Internal Server Error" }, 500);
     }
 });
 

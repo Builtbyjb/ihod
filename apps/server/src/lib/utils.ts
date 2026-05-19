@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { ErrorResult, TokenPayload } from "./types";
+import { ErrorResult, InvoiceNumber, TokenPayload } from "./types";
 import { getCookie } from "hono/cookie";
 import { verify, sign } from "hono/jwt";
 
@@ -8,11 +8,19 @@ export function generateOTP(): string {
     return otp.toString();
 }
 
-export function generateInvoiceNumber(length: number = 4): string {
-    const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-    const array = new Uint8Array(length);
-    crypto.getRandomValues(array);
-    return Array.from(array, (byte) => chars[byte % chars.length]).join("");
+export function getNewInvoiceNumber(invoiceNumber: InvoiceNumber): InvoiceNumber {
+    let year = 0;
+    let currentNumber = 0;
+
+    if (getCurrentYear() > invoiceNumber.year) {
+        year = getCurrentYear();
+        currentNumber = 1;
+    } else {
+        year = invoiceNumber.year;
+        currentNumber = invoiceNumber.currentNumber + 1;
+    }
+
+    return { year, currentNumber };
 }
 
 export async function parseToken(c: Context, tokenName: string): Promise<TokenPayload | ErrorResult> {

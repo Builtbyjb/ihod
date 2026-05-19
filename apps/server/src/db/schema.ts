@@ -1,6 +1,6 @@
 import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
-import { InvoiceItem } from "@/lib/types";
+import { InvoiceItem, InvoiceNumber } from "@/lib/types";
 
 export const users = sqliteTable("users", {
     id: int("id").primaryKey({ autoIncrement: true }),
@@ -24,6 +24,10 @@ export const organizations = sqliteTable("organizations", {
     city: text("city"),
     country: text("country"),
     website: text("website"),
+    invoiceNumber: text("invoice_number", { mode: "json" })
+        .$type<InvoiceNumber>()
+        .notNull()
+        .default({ currentNumber: 0, year: 2000 }),
     paystackCustomerCode: text("paystack_customer_code").notNull().unique(),
     paystackCustomerId: int("paystack_customer_id").notNull().unique(),
     paystackPlanCode: text("paystack_plan_code"),
