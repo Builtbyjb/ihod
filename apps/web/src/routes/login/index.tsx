@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import * as z from "zod";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { ArrowLeft } from "lucide-react";
 import OTP from "@/components/OTP";
 import { useAuth } from "@/hooks/auth";
@@ -35,10 +35,8 @@ function RouteComponent() {
       } catch (error: unknown) {
         if (error instanceof Error) {
           toast.error("Login failed: " + error.message);
-          console.error(error);
-        } else {
-          console.log(String(error));
         }
+        console.error(error);
       }
     },
   });
@@ -81,6 +79,9 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         autoComplete="email"
                       />
+                      <FieldDescription>
+                        Don't have an account?&nbsp;<Link to="/signup">Sign up</Link>{" "}
+                      </FieldDescription>
                       {isInvalid && <FieldError errors={field.state.meta.errors} />}
                     </Field>
                   );
@@ -101,18 +102,18 @@ function RouteComponent() {
         </CardFooter>
       </Card>
       <div className="text-center text-xs text-muted-foreground w-full mt-4">
-        By clicking Submit, you agree to our{" "}
-        <Link to="/terms-of-service" className="hover:font-bold underline">
+        By clicking Submit, you agree to our&nbsp;
+        <Link to="/terms-of-service" className="hover:text-gray-900 underline">
           Terms of Service
         </Link>{" "}
         and{" "}
-        <Link to="/privacy-policy" className="hover:font-bold underline">
+        <Link to="/privacy-policy" className="hover:text-gray-900 underline">
           Privacy Policy
         </Link>
         .
       </div>
       {isVerified && (
-        <p className="text-sm mt-4  mb-4 text-gray-700">
+        <p className="text-sm mt-4  mb-4 text-muted-foreground italic">
           If you don’t see it in your inbox, please check your spam folder.
         </p>
       )}

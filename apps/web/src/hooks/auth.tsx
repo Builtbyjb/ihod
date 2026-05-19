@@ -83,8 +83,9 @@ export function AuthProvider({ children, router }: AuthProviderProps) {
     const response = await doPOST("/api/v1/auth/login", { email });
     if (response instanceof Error) throw response;
 
+    const result = await response.json();
     if (response.ok) return response.ok;
-    else throw new Error("Authentication failed");
+    else throw new Error(result.message);
   };
 
   const verifyOtp = async (otp: string): Promise<boolean> => {
