@@ -24,10 +24,10 @@ jobs:
           d1Token: ${{ secrets.CLOUDFLARE_D1_TOKEN }}
           workingDirectory: "apps/server"
           packageManager: npm
-          command: d1 migrations apply ihod --remote --env=production
+          command: d1 migrations apply acorp-invoice --remote --env=production
 
       - name: Build backend
-        run: npx turbo run build --filter=@ihod/server
+        run: npx turbo run build --filter=@invoice/server
 
       # Deploy Backend (Cloudflare Worker)
       - name: Deploy Backend
@@ -42,7 +42,7 @@ jobs:
       - name: Build Frontend
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
-        run: npx turbo run build --filter=@ihod/web
+        run: npx turbo run build --filter=@invoice/web
 
       # Deploy Frontend (Cloudflare Pages)
       - name: Deploy Frontend

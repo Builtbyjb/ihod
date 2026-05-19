@@ -2,7 +2,7 @@ import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-ro
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Field, FieldGroup } from "@/components/ui/field";
+import { Field, FieldDescription, FieldGroup } from "@/components/ui/field";
 import { useState } from "react";
 import OTP from "@/components/OTP";
 import { ArrowLeft } from "lucide-react";
@@ -28,17 +28,16 @@ function RouteComponent() {
       const response = await doPOST("/api/v1/auth/signup", value);
       if (response instanceof Error) throw response;
 
-      if (!response.ok) throw new Error("Error setting profile");
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message);
 
       setIsVerified(true);
       toast.success("Verification Email Sent");
     } catch (error: unknown) {
       if (error instanceof Error) {
-        console.error(error);
-        toast.error(error.message);
-      } else {
-        console.log(String(error));
+        toast.error("Signup failed: " + error.message);
       }
+      console.error(error);
     }
   });
 
@@ -78,6 +77,9 @@ function RouteComponent() {
               {stepIndex === 0 && <Step1 form={form} />}
               {stepIndex === 1 && <Step2 form={form} />}
               {stepIndex === 2 && <Step3 form={form} />}
+              <FieldDescription>
+                Already have an account?&nbsp;<Link to="/login">Login</Link>
+              </FieldDescription>
             </FieldGroup>
           </form>
         </CardContent>

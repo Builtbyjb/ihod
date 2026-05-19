@@ -75,9 +75,11 @@ function RouteComponent() {
         const parsedResult = schema.parse(result.data);
 
         setDashboardStats(parsedResult);
-      } catch (error) {
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        }
         console.error(error);
-        toast.error(error.message);
       } finally {
         setIsLoading(false);
       }

@@ -38,7 +38,12 @@ export default function StatusChart({ data, isLoading }: StatusChartProps) {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value: number, name: string) => [value, name]}
+                  formatter={(value: any, name: any) => {
+                    console.assert(value instanceof Number);
+                    console.assert(name instanceof String);
+
+                    return [value, name];
+                  }}
                   contentStyle={{
                     backgroundColor: "var(--card)",
                     border: "1px solid var(--border)",
