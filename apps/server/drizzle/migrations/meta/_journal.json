@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1777489053429,
-      "tag": "0000_wise_celestials",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1777494949541,
-      "tag": "0001_gray_doorman",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1778599399790,
-      "tag": "0002_sparkling_justin_hammer",
+      "when": 1779206629272,
+      "tag": "0000_common_la_nuit",
       "breakpoints": true
     }
   ]

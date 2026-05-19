@@ -5,7 +5,7 @@ import { zValidator } from "@hono/zod-validator";
 import { drizzle } from "drizzle-orm/d1";
 import { eq, and, sql, desc } from "drizzle-orm";
 import { clients, invoices, organizations } from "@/db/schema";
-import { getCurrentYear, getNewInvoiceNumber } from "@/lib/utils";
+import { getNewInvoiceNumber } from "@/lib/utils";
 
 const invoiceRouteV1 = new Hono<{ Bindings: Bindings }>().basePath("/invoices");
 
