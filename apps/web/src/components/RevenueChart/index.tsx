@@ -34,13 +34,16 @@ export default function RevenueChart({ data, isLoading }: RevenueChartProps) {
                   // tickFormatter={formatCurrency}
                 />
                 <Tooltip
-                  formatter={(value) => [
-                    new Intl.NumberFormat("en-US", {
-                      style: "currency",
-                      currency: "USD",
-                    }).format(value),
-                    "Revenue",
-                  ]}
+                  formatter={(value: any) => {
+                    console.assert(value instanceof Number);
+                    return [
+                      new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                      }).format(value),
+                      "Revenue",
+                    ];
+                  }}
                   contentStyle={{
                     backgroundColor: "var(--card)",
                     border: "1px solid var(--border)",
