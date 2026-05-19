@@ -69,7 +69,7 @@ export function getBadgeVariant(badge: string): string {
         case "disabled":
             return "bg-red-50 text-red-700";
         default:
-            return "bg-secondary text-secondary";
+            return "bg-gray-200 text-gray-700";
     }
 }
 

@@ -4,20 +4,29 @@ import { useLayout } from "@/hooks/useLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Copy, Users } from "lucide-react";
+import { Copy, Users, BadgeInfo } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { getBadgeVariant, formatCurrency } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Item, ItemContent, ItemMedia, ItemTitle } from "@/components/ui/item";
 
 function RouteComponent() {
   const { setTitle } = useLayout();
   setTitle("Referrals");
-  const referralLink = "https://app.example.com/ref/USER12345";
+  const referralLink = "https://invoice.acorp.app/ref/USER12345";
 
   const [referralEnabled, setReferralEnabled] = useState(true);
 
   return (
     <div className="space-y-8 mb-8">
+      <Item className="outline bg-sky-100">
+        <ItemMedia>
+          <BadgeInfo />
+        </ItemMedia>
+        <ItemContent>
+          <ItemTitle>Coming soon !!!</ItemTitle>
+        </ItemContent>
+      </Item>
       <Card>
         <CardHeader>
           <CardTitle>Join Our Referral Program</CardTitle>
@@ -44,7 +53,7 @@ function RouteComponent() {
               </CardHeader>
               <CardContent>
                 <span className="flex gap-4 items-center">
-                  <Users className={getBadgeVariant("blue")} />
+                  <Users className="text-sky-700" />
                   <h1 className="text-4xl">1578</h1>
                 </span>
               </CardContent>
@@ -55,7 +64,7 @@ function RouteComponent() {
               </CardHeader>
               <CardContent>
                 <span className="flex gap-4 items-center">
-                  <Users className={getBadgeVariant("green")} />
+                  <Users className="text-green-700" />
                   <h1 className="text-4xl">127</h1>
                 </span>
               </CardContent>
@@ -72,26 +81,16 @@ function RouteComponent() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Avg. Monthly Earnings</CardTitle>
+                <CardTitle>Current Month's Payout</CardTitle>
               </CardHeader>
               <CardContent>
-                <span className="flex gap-4 items-center">
-                  <h1 className="text-2xl">{formatCurrency(52_780, "NGN")}</h1>
+                <span className="flex gap-4 items-center mb-4">
+                  <h1 className="text-2xl">{formatCurrency(35_420, "NGN")}</h1>
+                  <Badge className={getBadgeVariant("active")}>Paid</Badge>
                 </span>
               </CardContent>
             </Card>
           </div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Available Balance</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <span className="flex gap-4 items-center mb-4">
-                <h1 className="text-2xl">{formatCurrency(35_420, "NGN")}</h1>
-              </span>
-              <Button>Withdraw</Button>
-            </CardContent>
-          </Card>
           <Card>
             <CardHeader>
               <CardTitle>Your Referral Link</CardTitle>
