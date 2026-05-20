@@ -25,7 +25,7 @@ export default function NumberInput({ field, id, label, shouldLabel = true }: Nu
         value={field.state.value}
         onBlur={field.handleBlur}
         onChange={(e) => {
-          if (Number(e.target.value) === 0 || e.target.value.length === 0) {
+          if (e.target.value.length === 0) {
             field.clearValues();
           } else {
             field.handleChange(Number(e.target.value));
