@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "scripts": {
     "dev-web": "npx turbo dev --filter=@invoice/web",
     "dev-server": "npx turbo dev --filter=@invoice/server",
@@ -7,10 +8,12 @@
     "deploy-server": "npx turbo deploy --filter=@invoice/server",
     "build-web": "npx turbo build --filter=@invoice/web",
     "build-server": "npx turbo build --filter=@invoice/server",
-    "lint-web": "npx turbo lint --filter=@invoice/web"
+    "lint-web": "npx turbo lint --filter=@invoice/web",
+    "prepare": "husky"
   },
   "devDependencies": {
     "drizzle-kit": "^0.31.10",
+    "husky": "^9.1.7",
     "turbo": "^2.9.8",
     "wrangler": "^4.83.0"
   },

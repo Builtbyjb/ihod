@@ -1,14 +1,14 @@
-import js from "@eslint/js";
+import { defineConfig, globalIgnores } from "eslint/config";
 import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
-export default [
+export default defineConfig([
+  globalIgnores(["node_modules/*", ".git/*", "apps/web/dist/*", "apps/web/node_modules/*"]),
   {
-    ignores: ["dist", "routeTree.gen.ts"],
+    ignores: ["dist/", "routeTree.gen.ts", "node_modules/"],
   },
-  js.configs.recommended,
   ...tseslint.configs.recommended,
   reactHooks.configs.flat.recommended,
   reactRefresh.configs.vite,
@@ -39,4 +39,4 @@ export default [
       ],
     },
   },
-];
+]);

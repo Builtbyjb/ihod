@@ -44,7 +44,7 @@ export default function RecentInvoices({ invoices, isLoading }: RecentInvoicesPr
                 </div>
                 <div className="flex flex-col items-end gap-1">
                   <span className="font-semibold">
-                    {formatCurrency(calculateTotalAmount(invoice.items, invoice.taxRate))}
+                    {formatCurrency(calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount))}
                   </span>
                   <span className="text-xs text-muted-foreground">
                     {format(new Date(invoice.issueDate), "MMM d, yyyy")}

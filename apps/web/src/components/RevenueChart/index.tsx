@@ -2,6 +2,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import type { MonthRevenue } from "@/lib/types";
 import { SkeletonBarChart } from "@/components/Skeleton";
+import { formatCurrency } from "@/lib/utils";
+import type { ValueType } from "recharts/types/component/DefaultTooltipContent";
 
 interface RevenueChartProps {
   data: MonthRevenue[];
@@ -34,15 +36,9 @@ export default function RevenueChart({ data, isLoading }: RevenueChartProps) {
                   // tickFormatter={formatCurrency}
                 />
                 <Tooltip
-                  formatter={(value: number) => {
-                    console.assert(typeof value === "number");
-                    return [
-                      new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                      }).format(value),
-                      "Revenue",
-                    ];
+                  formatter={(value: ValueType | undefined) => {
+                    if (!value) return;
+                    return [formatCurrency(Number(value)), "Revenue"];
                   }}
                   contentStyle={{
                     backgroundColor: "var(--card)",
