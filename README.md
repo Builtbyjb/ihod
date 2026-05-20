@@ -1,4 +1,4 @@
-# IHOD
+# ACORP Invoice
 
 #### Getting Started
 ```sh
@@ -17,5 +17,5 @@ npm run dev
 cd apps/server && npx drizzle-kit generate
 
 # Apply database migrations
-cd apps/server && npx npx wrangler d1 migrations apply 'ihod-dev' --env=dev --local
+cd apps/server && npx npx wrangler d1 migrations apply 'dev-db' --env=dev --local
 ```
