@@ -14,7 +14,7 @@ function AuthenticatedLayout() {
       <Sidebar businessname={user?.organizationName} username={user?.username} email={user?.email} />
       <SidebarInset>
         <header className="flex items-center gap-2 ml-4 mt-4">
-          <SidebarTrigger />
+          <SidebarTrigger className="h-12 w-12 bg-accent hover:bg-accent" size={"icon-lg"} />
           <Separator orientation="vertical" />
           <Header title={title} />
         </header>

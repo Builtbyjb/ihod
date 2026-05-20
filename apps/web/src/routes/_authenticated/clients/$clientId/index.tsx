@@ -19,7 +19,10 @@ function RouteComponent() {
   const { doGET } = useFetch();
 
   const { setTitle } = useLayout();
-  if (clientInfo?.name) setTitle(clientInfo.name);
+
+  useEffect(() => {
+    if (clientInfo?.name) setTitle(clientInfo.name);
+  }, [setTitle, clientInfo]);
 
   const navigate = useNavigate();
 

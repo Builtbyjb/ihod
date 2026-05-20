@@ -25,7 +25,10 @@ function RouteComponent() {
   const { ref, download } = useDownloadPDF();
 
   const { setTitle } = useLayout();
-  if (invoice?.id) setTitle(invoice.id);
+
+  useEffect(() => {
+    if (invoice?.id) setTitle(invoice.id);
+  }, [invoice, setTitle]);
 
   useEffect(() => {
     (async () => {

@@ -101,33 +101,41 @@
       position: absolute;
       top: 0;
       left: 0;
-      z-index: -1; /* Behind other elements */
-      opacity: 0.01; /* Nearly invisible but still "rendered" */
-      width: 794px; /* Fixed width (A4 equivalent) */
+      z-index: -1;
+      opacity: 0.01;
+      width: 210mm;
       pointer-events: none;
+      transform-origin: top left;
     }
   }
+}
 
-  @media print {
-    body {
-      margin: 0;
-      padding: 0;
-    }
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
 
-    .print-section,
-    .print-section * {
-      visibility: visible;
-    }
-    .print-section {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-    }
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    width: 210mm;
+    height: 297mm;
+    overflow: hidden;
+  }
 
-    @page {
-      size: A4;
-      margin: 0;
-    }
+  .print-section {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 210mm;
+    height: 297mm;
+    overflow: hidden;
+  }
+
+  .print-section,
+  .print-section * {
+    visibility: visible;
   }
 }

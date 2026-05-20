@@ -60,6 +60,10 @@ export default function InvoicesTable({ invoices, onDelete, clientId }: Invoices
     }
   };
 
+  const handleNavigate = (clientId: string, invoiceId: string) => {
+    navigate({ to: `/clients/${clientId}/invoices/${invoiceId}` });
+  };
+
   return (
     <>
       <div className="rounded-lg border border-border">
@@ -86,24 +90,33 @@ export default function InvoicesTable({ invoices, onDelete, clientId }: Invoices
                 ) : (
                   invoices.map((invoice) => (
                     <TableRow key={invoice.id}>
-                      <TableCell>
+                      <TableCell className="cursor-pointer" onClick={() => handleNavigate(clientId, invoice.id)}>
                         <div className="flex flex-col">
                           <span className="font-medium">{invoice.id}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="hidden md:table-cell text-sm">
+                      <TableCell
+                        className="hidden md:table-cell text-sm cursor-pointer"
+                        onClick={() => handleNavigate(clientId, invoice.id)}
+                      >
                         {format(new Date(invoice.issueDate), "MMM d, yyyy")}
                       </TableCell>
-                      <TableCell className="hidden lg:table-cell text-sm">
+                      <TableCell
+                        className="hidden lg:table-cell text-sm cursor-pointer"
+                        onClick={() => handleNavigate(clientId, invoice.id)}
+                      >
                         {format(new Date(invoice.dueDate), "MMM d, yyyy")}
                       </TableCell>
-                      <TableCell className="font-semibold">
+                      <TableCell
+                        className="font-semibold cursor-pointer"
+                        onClick={() => handleNavigate(clientId, invoice.id)}
+                      >
                         {formatCurrency(
                           calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount),
                           invoice.currency,
                         )}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="cursor-pointer" onClick={() => handleNavigate(clientId, invoice.id)}>
                         <Badge className={`capitalize ${getStatusVariant(invoice.status)}`}>{invoice.status}</Badge>
                       </TableCell>
                       <TableCell>

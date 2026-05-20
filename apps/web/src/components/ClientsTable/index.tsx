@@ -21,7 +21,7 @@ import { MoreHorizontal, Pencil, Trash2, Mail, Phone, Eye } from "lucide-react";
 import type { Client } from "@/lib/types";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 
 interface ClientsTableProps {
   onEdit: (client: Client) => void;
@@ -32,6 +32,8 @@ interface ClientsTableProps {
 const API_URL = import.meta.env.VITE_API_URL;
 export default function ClientsTable({ onEdit, clients, deleteClient }: ClientsTableProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const navigate = useNavigate();
 
   const handleDelete = async () => {
     if (deleteId) {
@@ -58,6 +60,10 @@ export default function ClientsTable({ onEdit, clients, deleteClient }: ClientsT
     }
   };
 
+  const handleNavigate = (clientId: string) => {
+    navigate({ to: `/clients/${clientId}` });
+  };
+
   return (
     <>
       <div className="rounded-lg border border-border">
@@ -81,13 +87,16 @@ export default function ClientsTable({ onEdit, clients, deleteClient }: ClientsT
             ) : (
               clients.map((client) => (
                 <TableRow key={client.id}>
-                  <TableCell>
+                  <TableCell onClick={() => handleNavigate(client.id)} className="cursor-pointer">
                     <div className="flex flex-col">
                       <span className="font-medium">{client.name}</span>
                       <span className="text-sm text-muted-foreground sm:hidden">{client.email}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="hidden sm:table-cell">
+                  <TableCell
+                    className="hidden sm:table-cell hover:cursor-pointer"
+                    onClick={() => handleNavigate(client.id)}
+                  >
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-1.5 text-sm">
                         <Mail className="h-3.5 w-3.5 text-muted-foreground" />
@@ -101,13 +110,16 @@ export default function ClientsTable({ onEdit, clients, deleteClient }: ClientsT
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell className="hidden md:table-cell cursor-pointer" onClick={() => handleNavigate(client.id)}>
                     <div className="flex flex-col text-sm">
                       <span>{client.city}</span>
                       <span className="text-muted-foreground">{client.country}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">
+                  <TableCell
+                    className="hidden lg:table-cell text-sm text-muted-foreground cursor-pointer"
+                    onClick={() => handleNavigate(client.id)}
+                  >
                     {format(new Date(client.createdAt), "MMM d, yyyy")}
                   </TableCell>
                   <TableCell>
