@@ -13,7 +13,7 @@ type InvoicePDFProps = {
 
 export const DefaultInvoiceTemplate = forwardRef<HTMLDivElement, InvoicePDFProps>(
   ({ invoice, client, bussinessname }, ref) => (
-    <main ref={ref} className="bg-white w-[210mm] min-h-[295mm] mx-auto p-[10mm] text-gray-800 print:p-[10mm]">
+    <main ref={ref} className="bg-white w-[210mm] min-h-[290mm] mx-auto p-[10mm] text-gray-900 print:p-[10mm]">
       <div className="h-full flex flex-col justify-between">
         {/* Top Content */}
         <div className="space-y-8">
