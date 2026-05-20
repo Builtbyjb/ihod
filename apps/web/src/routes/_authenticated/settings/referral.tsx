@@ -52,7 +52,7 @@ function RouteComponent() {
               <CardContent>
                 <span className="flex gap-4 items-center">
                   <Users className="text-sky-700" />
-                  <h1 className="text-4xl">1578</h1>
+                  <h1 className="text-2xl md:text-4xl">1578</h1>
                 </span>
               </CardContent>
             </Card>
@@ -63,7 +63,7 @@ function RouteComponent() {
               <CardContent>
                 <span className="flex gap-4 items-center">
                   <Users className="text-green-700" />
-                  <h1 className="text-4xl">127</h1>
+                  <h1 className="text-2xl md:text-4xl">127</h1>
                 </span>
               </CardContent>
             </Card>
@@ -72,20 +72,16 @@ function RouteComponent() {
                 <CardTitle>Total Earnings</CardTitle>
               </CardHeader>
               <CardContent>
-                <span className="flex gap-4 items-center">
-                  <h1 className="text-2xl">{formatCurrency(350_542, "NGN")}</h1>
-                </span>
+                <h1 className="text-xl md:text-2xl">{formatCurrency(350_542, "NGN")}</h1>
               </CardContent>
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Current Month's Payout</CardTitle>
+                <CardTitle>Payout</CardTitle>
               </CardHeader>
               <CardContent>
-                <span className="flex gap-4 items-center mb-4">
-                  <h1 className="text-2xl">{formatCurrency(35_420, "NGN")}</h1>
-                  <Badge className={getBadgeVariant("active")}>Paid</Badge>
-                </span>
+                <h1 className="text-xl md:text-2xl">{formatCurrency(35_420, "NGN")}</h1>
+                <Badge className={getBadgeVariant("active")}>Paid</Badge>
               </CardContent>
             </Card>
           </div>
