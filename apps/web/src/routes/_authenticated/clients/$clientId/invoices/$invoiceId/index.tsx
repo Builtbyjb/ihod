@@ -53,149 +53,161 @@ function RouteComponent() {
     documentTitle: "Invoice",
   });
 
-  if (!invoice) {
-    return (
-      <main className="flex-1 p-4 md:p-6 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">Invoice not found</h2>
-          <p className="text-muted-foreground mb-4">The invoice you&apos;re looking for doesn&apos;t exist.</p>
-          <Button onClick={() => navigate({ to: "/clients/$clientId", params: { clientId } })}>Back to Invoices</Button>
-        </div>
-      </main>
-    );
-  }
   return (
     <div className="space-y-6 w-full">
-      <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
-        <Button variant="ghost" onClick={() => router.history.back()} className="w-fit">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant="outline"
-            onClick={() =>
-              navigate({
-                to: "/clients/$clientId/invoices/$invoiceId/edit",
-                params: { invoiceId, clientId },
-              })
-            }
-          >
-            <Pencil className="mr-2 h-4 w-4" />
-            Edit
-          </Button>
-          <Button variant="outline" onClick={handlePrint}>
-            <Printer className="mr-3 h-4 w-4" />
-            Print
-          </Button>
-          <Button onClick={download}>
-            <Download className="mr-2 h-4 w-4" />
-            Download PDF
-          </Button>
+      {invoice ? (
+        <>
+          <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+            <Button variant="ghost" onClick={() => router.history.back()} className="w-fit">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                onClick={() =>
+                  navigate({
+                    to: "/clients/$clientId/invoices/$invoiceId/edit",
+                    params: { invoiceId, clientId },
+                  })
+                }
+              >
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit
+              </Button>
+              <Button variant="outline" onClick={handlePrint}>
+                <Printer className="mr-3 h-4 w-4" />
+                Print
+              </Button>
+              <Button onClick={download}>
+                <Download className="mr-2 h-4 w-4" />
+                Download PDF
+              </Button>
+            </div>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-3">
+            <Card className="lg:col-span-2">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="text-2xl">{invoice.id}</CardTitle>
+                  <p className="text-sm text-muted-foreground mt-1">Issued on {formatDate(invoice.issueDate)}</p>
+                </div>
+                <Badge className={`capitalize text-sm ${getStatusVariant(invoice.status)}`}>{invoice.status}</Badge>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground mb-2">Bill To</h3>
+                    <p className="font-semibold">{client?.name}</p>
+                    <p className="text-sm text-muted-foreground">{client?.email}</p>
+                    {client?.phone && <p className="text-sm text-muted-foreground">{client.phone}</p>}
+                    {client?.address && <p className="text-sm text-muted-foreground">{client.address}</p>}
+                    <p className="text-sm text-muted-foreground">
+                      {client?.city}, {client?.country}
+                    </p>
+                  </div>
+                  <div className="sm:text-right">
+                    <h3 className="text-sm font-medium text-muted-foreground mb-2">Due Date</h3>
+                    <p className="font-semibold">{formatDate(invoice.dueDate)}</p>
+                  </div>
+                </div>
+
+                <div className="rounded-lg border border-border overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Description</TableHead>
+                        <TableHead className="text-center">Qty</TableHead>
+                        <TableHead className="text-right">Unit Price</TableHead>
+                        <TableHead className="text-right">Total</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {invoice.items.map((item, idx) => (
+                        <TableRow key={idx}>
+                          <TableCell className="font-medium">{item.description}</TableCell>
+                          <TableCell className="text-center">{item.quantity}</TableCell>
+                          <TableCell className="text-right">
+                            {formatCurrency(item.unitPrice, invoice.currency)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {formatCurrency(item.unitPrice, invoice.currency)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {invoice.notes && (
+                  <div className="bg-background p-4 rounded-lg">
+                    <h3 className="text-sm font-medium mb-2">Notes</h3>
+                    <p className="text-sm text-muted-foreground">{invoice.notes}</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span>{formatCurrency(calculateSubTotal(invoice.items), invoice.currency)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Discount ({invoice.discount}%)</span>
+                  <span>
+                    {formatCurrency(
+                      calculateTaxAmount(calculateSubTotal(invoice.items), invoice.discount),
+                      invoice.currency,
+                    )}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Tax ({invoice.taxRate}%)</span>
+                  <span>
+                    {formatCurrency(
+                      calculateTaxAmount(calculateSubTotal(invoice.items), invoice.taxRate),
+                      invoice.currency,
+                    )}
+                  </span>
+                </div>
+                <div className="flex justify-between pt-4 border-t border-border">
+                  <span className="font-semibold">Total</span>
+                  <span className="text-xl font-bold">
+                    {formatCurrency(
+                      calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount),
+                      invoice.currency,
+                    )}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          <div className="print-section">
+            <DefaultInvoiceTemplate
+              ref={ref}
+              invoice={invoice}
+              client={client}
+              bussinessname={user?.organizationName}
+            />
+          </div>
+        </>
+      ) : (
+        <div className="p-4 md:p-6 flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold mb-2">Invoice not found</h2>
+            <p className="text-muted-foreground mb-4">The invoice you&apos;re looking for doesn&apos;t exist.</p>
+            <Button onClick={() => navigate({ to: "/clients/$clientId", params: { clientId } })}>
+              Back to Invoices
+            </Button>
+          </div>
         </div>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="text-2xl">{invoice.id}</CardTitle>
-              <p className="text-sm text-muted-foreground mt-1">Issued on {formatDate(invoice.issueDate)}</p>
-            </div>
-            <Badge className={`capitalize text-sm ${getStatusVariant(invoice.status)}`}>{invoice.status}</Badge>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid gap-6 sm:grid-cols-2">
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">Bill To</h3>
-                <p className="font-semibold">{client?.name}</p>
-                <p className="text-sm text-muted-foreground">{client?.email}</p>
-                {client?.phone && <p className="text-sm text-muted-foreground">{client.phone}</p>}
-                {client?.address && <p className="text-sm text-muted-foreground">{client.address}</p>}
-                <p className="text-sm text-muted-foreground">
-                  {client?.city}, {client?.country}
-                </p>
-              </div>
-              <div className="sm:text-right">
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">Due Date</h3>
-                <p className="font-semibold">{formatDate(invoice.dueDate)}</p>
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-border overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Description</TableHead>
-                    <TableHead className="text-center">Qty</TableHead>
-                    <TableHead className="text-right">Unit Price</TableHead>
-                    <TableHead className="text-right">Total</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {invoice.items.map((item, idx) => (
-                    <TableRow key={idx}>
-                      <TableCell className="font-medium">{item.description}</TableCell>
-                      <TableCell className="text-center">{item.quantity}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(item.unitPrice, invoice.currency)}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(item.unitPrice, invoice.currency)}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-
-            {invoice.notes && (
-              <div className="bg-background p-4 rounded-lg">
-                <h3 className="text-sm font-medium mb-2">Notes</h3>
-                <p className="text-sm text-muted-foreground">{invoice.notes}</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Summary</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span>{formatCurrency(calculateSubTotal(invoice.items), invoice.currency)}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Discount ({invoice.discount}%)</span>
-              <span>
-                {formatCurrency(
-                  calculateTaxAmount(calculateSubTotal(invoice.items), invoice.discount),
-                  invoice.currency,
-                )}
-              </span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Tax ({invoice.taxRate}%)</span>
-              <span>
-                {formatCurrency(
-                  calculateTaxAmount(calculateSubTotal(invoice.items), invoice.taxRate),
-                  invoice.currency,
-                )}
-              </span>
-            </div>
-            <div className="flex justify-between pt-4 border-t border-border">
-              <span className="font-semibold">Total</span>
-              <span className="text-xl font-bold">
-                {formatCurrency(
-                  calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount),
-                  invoice.currency,
-                )}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      <div className="print-section">
-        <DefaultInvoiceTemplate ref={ref} invoice={invoice} client={client} bussinessname={user?.organizationName} />
-      </div>
+      )}
     </div>
   );
 }
