@@ -25,7 +25,10 @@ const clientsResponseSchema = z.array(
 
 function RouteComponent() {
   const { setTitle } = useLayout();
-  setTitle("Clients");
+
+  useEffect(() => {
+    setTitle("Clients");
+  }, [setTitle]);
 
   const { doGET } = useFetch();
 

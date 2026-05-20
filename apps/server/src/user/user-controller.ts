@@ -20,17 +20,10 @@ userRouteV1.get("/dashboard", async (c) => {
     const db = drizzle(c.env.DB);
     const jwtPayload = c.get("jwtPayload") as TokenPayload;
 
-    let allClients: Client[] = [];
-
-    try {
-        allClients = await db
-            .select()
-            .from(clients)
-            .where(and(eq(clients.organizationId, jwtPayload.currentOrgId), eq(clients.deleted, false)));
-    } catch (error) {
-        console.log(error);
-        return c.json({ message: "An error occurred while fetching all clients" }, 500);
-    }
+    const allClients: Client[] = await db
+        .select()
+        .from(clients)
+        .where(and(eq(clients.organizationId, jwtPayload.currentOrgId), eq(clients.deleted, false)));
 
     if (allClients.length === 0) return c.json({ message: "No clients found" }, 404);
 

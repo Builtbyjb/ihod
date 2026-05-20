@@ -38,9 +38,9 @@ export default function StatusChart({ data, isLoading }: StatusChartProps) {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value: any, name: any) => {
-                    console.assert(value instanceof Number);
-                    console.assert(name instanceof String);
+                  formatter={(value: number, name: string) => {
+                    console.assert(typeof value === "number");
+                    console.assert(typeof name === "string");
 
                     return [value, name];
                   }}

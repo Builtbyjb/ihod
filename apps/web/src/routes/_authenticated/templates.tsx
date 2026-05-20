@@ -1,22 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
-import Pricing from "@/components/Pricing";
 import { useLayout } from "@/hooks/useLayout";
 import { useEffect } from "react";
+import Banner from "@/components/Banner";
+import { BadgeInfo } from "lucide-react";
 
 function RouteComponent() {
   const { setTitle } = useLayout();
 
   useEffect(() => {
-    setTitle("Subscribe");
+    setTitle("Choose a Template");
   }, [setTitle]);
 
   return (
-    <div className="mt-8">
-      <Pricing />
-    </div>
+    <>
+      <Banner backgroundColor="bg-sky-100" icon={<BadgeInfo />} text="Coming soon!" />
+    </>
   );
 }
 
-export const Route = createFileRoute("/_authenticated/settings/billing/subscribe")({
+export const Route = createFileRoute("/_authenticated/templates")({
   component: RouteComponent,
 });

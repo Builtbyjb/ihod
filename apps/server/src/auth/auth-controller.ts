@@ -13,8 +13,6 @@ import { loginSchema, otpSchema, signupSchema, PaystackCustomerResponseSchema } 
 
 const authRouteV1 = new Hono<{ Bindings: Bindings }>().basePath("/auth");
 
-// TODO: Improved error handling
-
 authRouteV1.post("/login", zValidator("json", loginSchema), async (c) => {
     const { email } = c.req.valid("json");
     const db = drizzle(c.env.DB);
@@ -148,8 +146,6 @@ authRouteV1.post("/signup", zValidator("json", signupSchema), async (c) => {
 
         return c.json({ message: "Sign up completed" }, 200);
     } catch (error) {
-        console.log(error);
-
         // Clean up on failure
         if (error instanceof DrizzleQueryError) {
             if (user?.id) await db.delete(users).where(eq(users.id, user.id));
@@ -157,7 +153,7 @@ authRouteV1.post("/signup", zValidator("json", signupSchema), async (c) => {
             if (member?.id) await db.delete(members).where(eq(members.id, member.id));
         }
 
-        return c.json({ message: "internal server error" }, 500);
+        throw error;
     }
 });
 

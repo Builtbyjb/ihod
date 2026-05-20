@@ -98,7 +98,10 @@ export default function InvoicesTable({ invoices, onDelete, clientId }: Invoices
                         {format(new Date(invoice.dueDate), "MMM d, yyyy")}
                       </TableCell>
                       <TableCell className="font-semibold">
-                        {formatCurrency(calculateTotalAmount(invoice.items, invoice.taxRate), invoice.currency)}
+                        {formatCurrency(
+                          calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount),
+                          invoice.currency,
+                        )}
                       </TableCell>
                       <TableCell>
                         <Badge className={`capitalize ${getStatusVariant(invoice.status)}`}>{invoice.status}</Badge>

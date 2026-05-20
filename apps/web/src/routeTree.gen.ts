@@ -15,6 +15,7 @@ import { Route as SplatRouteImport } from './routes/$'
 import { Route as SignupIndexRouteImport } from './routes/signup/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as GuestIndexRouteImport } from './routes/_guest/index'
+import { Route as AuthenticatedTemplatesRouteImport } from './routes/_authenticated/templates'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as GuestTermsOfServiceIndexRouteImport } from './routes/_guest/terms-of-service/index'
 import { Route as GuestPrivacyPolicyIndexRouteImport } from './routes/_guest/privacy-policy/index'
@@ -22,6 +23,7 @@ import { Route as GuestPricingIndexRouteImport } from './routes/_guest/pricing/i
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated/clients/index'
 import { Route as AuthenticatedSettingsReferralRouteImport } from './routes/_authenticated/settings/referral'
+import { Route as AuthenticatedSettingsFeedbackRouteImport } from './routes/_authenticated/settings/feedback'
 import { Route as AuthenticatedSettingsBillingIndexRouteImport } from './routes/_authenticated/settings/billing/index'
 import { Route as AuthenticatedClientsClientIdIndexRouteImport } from './routes/_authenticated/clients/$clientId/index'
 import { Route as AuthenticatedSettingsBillingSubscribeRouteImport } from './routes/_authenticated/settings/billing/subscribe'
@@ -57,6 +59,11 @@ const GuestIndexRoute = GuestIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => GuestRoute,
+} as any)
+const AuthenticatedTemplatesRoute = AuthenticatedTemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
@@ -95,6 +102,12 @@ const AuthenticatedSettingsReferralRoute =
   AuthenticatedSettingsReferralRouteImport.update({
     id: '/settings/referral',
     path: '/settings/referral',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedSettingsFeedbackRoute =
+  AuthenticatedSettingsFeedbackRouteImport.update({
+    id: '/settings/feedback',
+    path: '/settings/feedback',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedSettingsBillingIndexRoute =
@@ -144,8 +157,10 @@ export interface FileRoutesByFullPath {
   '/$': typeof SplatRoute
   '/': typeof GuestIndexRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/templates': typeof AuthenticatedTemplatesRoute
   '/login/': typeof LoginIndexRoute
   '/signup/': typeof SignupIndexRoute
+  '/settings/feedback': typeof AuthenticatedSettingsFeedbackRoute
   '/settings/referral': typeof AuthenticatedSettingsReferralRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
@@ -164,8 +179,10 @@ export interface FileRoutesByTo {
   '/$': typeof SplatRoute
   '/': typeof GuestIndexRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/templates': typeof AuthenticatedTemplatesRoute
   '/login': typeof LoginIndexRoute
   '/signup': typeof SignupIndexRoute
+  '/settings/feedback': typeof AuthenticatedSettingsFeedbackRoute
   '/settings/referral': typeof AuthenticatedSettingsReferralRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
@@ -186,9 +203,11 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/_guest': typeof GuestRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/templates': typeof AuthenticatedTemplatesRoute
   '/_guest/': typeof GuestIndexRoute
   '/login/': typeof LoginIndexRoute
   '/signup/': typeof SignupIndexRoute
+  '/_authenticated/settings/feedback': typeof AuthenticatedSettingsFeedbackRoute
   '/_authenticated/settings/referral': typeof AuthenticatedSettingsReferralRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
@@ -209,8 +228,10 @@ export interface FileRouteTypes {
     | '/$'
     | '/'
     | '/dashboard'
+    | '/templates'
     | '/login/'
     | '/signup/'
+    | '/settings/feedback'
     | '/settings/referral'
     | '/clients/'
     | '/settings/'
@@ -229,8 +250,10 @@ export interface FileRouteTypes {
     | '/$'
     | '/'
     | '/dashboard'
+    | '/templates'
     | '/login'
     | '/signup'
+    | '/settings/feedback'
     | '/settings/referral'
     | '/clients'
     | '/settings'
@@ -250,9 +273,11 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/_guest'
     | '/_authenticated/dashboard'
+    | '/_authenticated/templates'
     | '/_guest/'
     | '/login/'
     | '/signup/'
+    | '/_authenticated/settings/feedback'
     | '/_authenticated/settings/referral'
     | '/_authenticated/clients/'
     | '/_authenticated/settings/'
@@ -320,6 +345,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuestIndexRouteImport
       parentRoute: typeof GuestRoute
     }
+    '/_authenticated/templates': {
+      id: '/_authenticated/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof AuthenticatedTemplatesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -367,6 +399,13 @@ declare module '@tanstack/react-router' {
       path: '/settings/referral'
       fullPath: '/settings/referral'
       preLoaderRoute: typeof AuthenticatedSettingsReferralRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings/feedback': {
+      id: '/_authenticated/settings/feedback'
+      path: '/settings/feedback'
+      fullPath: '/settings/feedback'
+      preLoaderRoute: typeof AuthenticatedSettingsFeedbackRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/settings/billing/': {
@@ -423,6 +462,8 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedTemplatesRoute: typeof AuthenticatedTemplatesRoute
+  AuthenticatedSettingsFeedbackRoute: typeof AuthenticatedSettingsFeedbackRoute
   AuthenticatedSettingsReferralRoute: typeof AuthenticatedSettingsReferralRoute
   AuthenticatedClientsIndexRoute: typeof AuthenticatedClientsIndexRoute
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
@@ -437,6 +478,8 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedTemplatesRoute: AuthenticatedTemplatesRoute,
+  AuthenticatedSettingsFeedbackRoute: AuthenticatedSettingsFeedbackRoute,
   AuthenticatedSettingsReferralRoute: AuthenticatedSettingsReferralRoute,
   AuthenticatedClientsIndexRoute: AuthenticatedClientsIndexRoute,
   AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,

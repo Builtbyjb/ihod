@@ -15,7 +15,7 @@ export default function Header({ title }: HeaderProps) {
   return (
     <Breadcrumb>
       <BreadcrumbList>
-        <BreadcrumbItem className="hidden md:block">
+        <BreadcrumbItem>
           <BreadcrumbLink href="#" className="text-lg text-gray-900 font-medium">
             {title}
           </BreadcrumbLink>

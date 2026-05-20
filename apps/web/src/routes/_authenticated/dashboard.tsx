@@ -55,7 +55,10 @@ const defaultStats = {
 
 function RouteComponent() {
   const { setTitle } = useLayout();
-  setTitle("Dashboard");
+
+  useEffect(() => {
+    setTitle("Dashboard");
+  }, [setTitle]);
 
   const [dashboardStats, setDashboardStats] = useState<DashboardStats>(defaultStats);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -77,7 +80,7 @@ function RouteComponent() {
         setDashboardStats(parsedResult);
       } catch (error: unknown) {
         if (error instanceof Error) {
-          toast.error(error.message);
+          if (error.message !== "No clients found") toast.error(error.message);
         }
         console.error(error);
       } finally {

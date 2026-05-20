@@ -17,7 +17,7 @@ export default function RevenueChart({ data, isLoading }: RevenueChartProps) {
       </CardHeader>
       <CardContent>
         {!isLoading ? (
-          <div className="h-75">
+          <div className="h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
@@ -34,8 +34,8 @@ export default function RevenueChart({ data, isLoading }: RevenueChartProps) {
                   // tickFormatter={formatCurrency}
                 />
                 <Tooltip
-                  formatter={(value: any) => {
-                    console.assert(value instanceof Number);
+                  formatter={(value: number) => {
+                    console.assert(typeof value === "number");
                     return [
                       new Intl.NumberFormat("en-US", {
                         style: "currency",

@@ -59,9 +59,36 @@ export function useFetch(): FetchInstance {
         [],
     );
 
-    const doDELETE = () => {};
+    const doPUT = useCallback(
+        async (url: string, data: any, contentType = "application/json"): Promise<Response | Error> => {
+            let maxRetries = 3;
+            while (maxRetries > 0) {
+                try {
+                    const response = await fetch(`${API_URL}${url}`, {
+                        method: "PUT",
+                        credentials: "include",
+                        headers: { "Content-Type": contentType },
+                        body: contentType === "application/json" ? JSON.stringify(data) : data,
+                    });
 
-    const doPUT = () => {};
+                    return response;
+                } catch (error) {
+                    console.error(error);
+                    maxRetries -= 1;
+
+                    if (maxRetries > 0) {
+                        toast.error("Network Error: Retrying...");
+                        await new Promise((resolve) => setTimeout(resolve, RETRY_INTERVAL));
+                        continue;
+                    }
+                }
+            }
+            return new Error("Request failed due to a network error");
+        },
+        [],
+    );
+
+    const doDELETE = () => {};
 
     return { doGET, doPOST, doDELETE, doPUT };
 }
