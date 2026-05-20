@@ -19,21 +19,16 @@ clientRouteV1.get("/", async (c) => {
     const member = await db.select().from(members).where(eq(members.userId, jwtPayload.userId));
     if (member.length == 0) return c.json("User is not part of an organization", 400);
 
-    try {
-        // TODO: Pagination
-        const result = await db
-            .select()
-            .from(clients)
-            .where(and(eq(clients.organizationId, member[0].organizationId), eq(clients.deleted, false)))
-            .orderBy(desc(clients.createdAt));
+    // TODO: Pagination
+    const result = await db
+        .select()
+        .from(clients)
+        .where(and(eq(clients.organizationId, member[0].organizationId), eq(clients.deleted, false)))
+        .orderBy(desc(clients.createdAt));
 
-        const parsedResult = clientListSchema.parse(result);
+    const parsedResult = clientListSchema.parse(result);
 
-        return c.json({ message: "All Clients", clients: parsedResult }, 200);
-    } catch (error) {
-        console.log(error);
-        return c.json({ error: "Internal server error" }, 500);
-    }
+    return c.json({ message: "All Clients", clients: parsedResult }, 200);
 });
 
 clientRouteV1.get("/:id", async (c) => {
@@ -63,43 +58,33 @@ clientRouteV1.post("/create", zValidator("json", clientFormSchema), async (c) =>
     const member = await db.select().from(members).where(eq(members.userId, jwtPayload.userId));
     if (member.length == 0) return c.json("User is not part of an organization", 400);
 
-    try {
-        const client = await db
-            .insert(clients)
-            .values({
-                id: crypto.randomUUID(),
-                organizationId: member[0].organizationId,
-                name: data.name,
-                email: data.email,
-                phone: data.phone,
-                address: data.address,
-                city: data.city,
-                country: data.country,
-            })
-            .returning()
-            .get();
+    const client = await db
+        .insert(clients)
+        .values({
+            id: crypto.randomUUID(),
+            organizationId: member[0].organizationId,
+            name: data.name,
+            email: data.email,
+            phone: data.phone,
+            address: data.address,
+            city: data.city,
+            country: data.country,
+        })
+        .returning()
+        .get();
 
-        const parsedClient = clientSchema.parse(client);
+    const parsedClient = clientSchema.parse(client);
 
-        return c.json({ message: "Client created", client: parsedClient }, 200);
-    } catch (error) {
-        console.log(error);
-        return c.json({ error: "Internal Server Error" }, 500);
-    }
+    return c.json({ message: "Client created", client: parsedClient }, 200);
 });
 
 clientRouteV1.delete("/delete/:id", async (c) => {
     const db = drizzle(c.env.DB);
     const id = c.req.param("id");
 
-    try {
-        await db.update(clients).set({ deleted: true }).where(eq(clients.id, id));
+    await db.update(clients).set({ deleted: true }).where(eq(clients.id, id));
 
-        return c.json({ message: "Client Deleted" }, 200);
-    } catch (error) {
-        console.log(error);
-        return c.json({ error: "Internal Server Error" }, 500);
-    }
+    return c.json({ message: "Client Deleted" }, 200);
 });
 
 clientRouteV1.put("/edit/:id", zValidator("json", clientFormSchema), async (c) => {
@@ -107,25 +92,20 @@ clientRouteV1.put("/edit/:id", zValidator("json", clientFormSchema), async (c) =
     const data = c.req.valid("json");
     const id = c.req.param("id");
 
-    try {
-        await db
-            .update(clients)
-            .set({
-                name: data.name,
-                email: data.email,
-                phone: data.phone,
-                address: data.address,
-                city: data.city,
-                country: data.country,
-                updatedAt: sql`(unixepoch())`,
-            })
-            .where(eq(clients.id, id));
+    await db
+        .update(clients)
+        .set({
+            name: data.name,
+            email: data.email,
+            phone: data.phone,
+            address: data.address,
+            city: data.city,
+            country: data.country,
+            updatedAt: sql`(unixepoch())`,
+        })
+        .where(eq(clients.id, id));
 
-        return c.json({ message: "Client data edited" }, 200);
-    } catch (error) {
-        console.log(error);
-        return c.json({ error: "Internal Server Error" }, 500);
-    }
+    return c.json({ message: "Client data edited" }, 200);
 });
 
 clientRouteV1.post("/search", async (c) => {
@@ -136,23 +116,18 @@ clientRouteV1.post("/search", async (c) => {
     const member = await db.select().from(members).where(eq(members.userId, jwtPayload.userId));
     if (member.length == 0) return c.json("User is not part of an organization", 400);
 
-    try {
-        const result = await db
-            .select()
-            .from(clients)
-            .where(
-                and(
-                    eq(clients.organizationId, member[0].organizationId),
-                    like(clients.name, `%${data.query}%`),
-                    eq(clients.deleted, false),
-                ),
-            );
+    const result = await db
+        .select()
+        .from(clients)
+        .where(
+            and(
+                eq(clients.organizationId, member[0].organizationId),
+                like(clients.name, `%${data.query}%`),
+                eq(clients.deleted, false),
+            ),
+        );
 
-        return c.json({ data: result }, 200);
-    } catch (error) {
-        console.log(error);
-        return c.json({ error: "Internal Server Error" }, 500);
-    }
+    return c.json({ data: result }, 200);
 });
 
 /* Links the invoice routes to the clients route */

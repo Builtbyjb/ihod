@@ -3,9 +3,9 @@ import type { Currency } from "./types";
 export const APP_NAME = "ACORP Invoice";
 
 export const CURRENCIES = [
-    { name: "Naira", value: "NGN" },
-    { name: "Canadian Dollar", value: "CAD" },
-    { name: "US Dollar", value: "USD" },
+    { label: "Naira", value: "NGN" },
+    { label: "Canadian Dollar", value: "CAD" },
+    { label: "US Dollar", value: "USD" },
 ];
 
 export const CURRENCY_MAP: Record<string, Currency> = {

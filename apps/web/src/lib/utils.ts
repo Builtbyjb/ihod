@@ -18,6 +18,8 @@ export function formatCurrency(amount: number, currency?: string): string {
     } else {
         return new Intl.NumberFormat("en-US", {
             style: "decimal",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
         }).format(amount);
     }
 }
@@ -26,21 +28,23 @@ export function formatDate(date: string): string {
     return format(new Date(date), "MMMM d, yyyy");
 }
 
-export function calculateTotalAmount(items: InvoiceItem[], taxRate: number): number {
-    const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-    const taxAmount = subtotal * (taxRate / 100);
-    return subtotal + taxAmount;
+export function calculateTotalAmount(items: InvoiceItem[], taxRate: number, discount: number): number {
+    const subtotal = calculateSubTotal(items);
+    const taxAmount = calculateTaxAmount(subtotal, taxRate);
+    const discountAmount = calculateDiscount(subtotal, discount);
+    return subtotal + taxAmount - discountAmount;
 }
 
-export function calculateTaxAmount(items: InvoiceItem[], taxRate: number): number {
-    const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-    const taxAmount = subtotal * (taxRate / 100);
-    return taxAmount;
+export function calculateTaxAmount(subtotal: number, taxRate: number): number {
+    return subtotal * (taxRate / 100);
+}
+
+export function calculateDiscount(subtotal: number, discount: number): number {
+    return subtotal * (discount / 100);
 }
 
 export function calculateSubTotal(items: InvoiceItem[]): number {
-    const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-    return subtotal;
+    return items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
 }
 
 export function getStatusVariant(status: Invoice["status"]): string {

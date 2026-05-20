@@ -164,13 +164,30 @@ function RouteComponent() {
               <span>{formatCurrency(calculateSubTotal(invoice.items), invoice.currency)}</span>
             </div>
             <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Discount ({invoice.discount}%)</span>
+              <span>
+                {formatCurrency(
+                  calculateTaxAmount(calculateSubTotal(invoice.items), invoice.discount),
+                  invoice.currency,
+                )}
+              </span>
+            </div>
+            <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Tax ({invoice.taxRate}%)</span>
-              <span>{formatCurrency(calculateTaxAmount(invoice.items, invoice.taxRate), invoice.currency)}</span>
+              <span>
+                {formatCurrency(
+                  calculateTaxAmount(calculateSubTotal(invoice.items), invoice.taxRate),
+                  invoice.currency,
+                )}
+              </span>
             </div>
             <div className="flex justify-between pt-4 border-t border-border">
               <span className="font-semibold">Total</span>
               <span className="text-xl font-bold">
-                {formatCurrency(calculateTotalAmount(invoice.items, invoice.taxRate), invoice.currency)}
+                {formatCurrency(
+                  calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount),
+                  invoice.currency,
+                )}
               </span>
             </div>
           </CardContent>

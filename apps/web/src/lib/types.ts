@@ -33,6 +33,7 @@ export type Invoice = {
     clientId: string;
     items: InvoiceItem[];
     taxRate: number;
+    discount: number;
     status: InvoiceStatus;
     issueDate: string;
     dueDate: string;
@@ -100,6 +101,11 @@ export type SignupFormField =
 export type FetchInstance = {
     doGET: (url: string) => Promise<Response | Error>;
     doPOST: (url: string, data: any, contentType?: string) => Promise<Response | Error>;
+    doPUT: (url: string, data: any, contentType?: string) => Promise<Response | Error>;
     doDELETE: () => void;
-    doPUT: () => void;
+};
+
+export type SelectData = {
+    label: string;
+    value: string;
 };

@@ -93,6 +93,7 @@ export const invoices = sqliteTable("invoices", {
     dueDate: int("due_date", { mode: "timestamp" }).notNull(),
     status: text("status").notNull(),
     taxRate: int("tax_rate", { mode: "number" }).notNull().default(0),
+    discount: int("discount", { mode: "number" }).default(0),
     items: text("items", { mode: "json" })
         .$type<InvoiceItem[]>()
         .notNull()
