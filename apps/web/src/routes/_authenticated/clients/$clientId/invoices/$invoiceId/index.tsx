@@ -65,7 +65,7 @@ function RouteComponent() {
     );
   }
   return (
-    <main className="space-y-6">
+    <div className="space-y-6 w-full">
       <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
         <Button variant="ghost" onClick={() => router.history.back()} className="w-fit">
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -196,7 +196,7 @@ function RouteComponent() {
       <div className="print-section">
         <DefaultInvoiceTemplate ref={ref} invoice={invoice} client={client} bussinessname={user?.organizationName} />
       </div>
-    </main>
+    </div>
   );
 }
 
