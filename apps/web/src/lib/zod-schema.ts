@@ -25,6 +25,7 @@ export const InvoiceSchema = z.object({
     clientId: z.string(),
     items: z.array(InvoiceItemSchema),
     taxRate: z.number(),
+    discount: z.number(),
     status: InvoiceStatusSchema,
     issueDate: z.string(),
     dueDate: z.string(),

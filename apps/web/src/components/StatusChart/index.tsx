@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import type { InvoiceStatusData } from "@/lib/types";
 import { SkeletonPieChart } from "@/components/Skeleton";
+import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
 
 interface StatusChartProps {
   data: InvoiceStatusData[];
@@ -38,10 +39,8 @@ export default function StatusChart({ data, isLoading }: StatusChartProps) {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value: number, name: string) => {
-                    console.assert(typeof value === "number");
-                    console.assert(typeof name === "string");
-
+                  formatter={(value: ValueType | undefined, name: NameType | undefined) => {
+                    if (!value || !name) return;
                     return [value, name];
                   }}
                   contentStyle={{
