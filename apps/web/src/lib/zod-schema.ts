@@ -22,6 +22,7 @@ export const InvoiceItemSchema = z.object({
 
 export const InvoiceSchema = z.object({
     id: z.string(),
+    invoiceNumber: z.string(),
     clientId: z.string(),
     items: z.array(InvoiceItemSchema),
     taxRate: z.number(),

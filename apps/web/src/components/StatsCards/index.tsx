@@ -31,7 +31,7 @@ export default function StatsCards({ stats, isLoading }: StatsCardsProps) {
     },
     {
       title: "Pending Amount",
-      value: stats ? formatCurrency(stats.pendingAmount) : STATS_ERROR,
+      value: stats ? stats.pendingAmount : STATS_ERROR,
       description: "Awaiting payment",
       icon: Clock,
       iconBg: "bg-amber-100",
@@ -60,7 +60,7 @@ export default function StatsCards({ stats, isLoading }: StatsCardsProps) {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{card.value}</div>
+                <div className="text-2xl font-medium">{card.value}</div>
                 <p className="text-xs text-muted-foreground mt-1">{card.description}</p>
               </CardContent>
             </Card>

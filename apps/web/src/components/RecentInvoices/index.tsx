@@ -37,14 +37,17 @@ export default function RecentInvoices({ invoices, isLoading }: RecentInvoicesPr
               <div key={invoice.id} className="flex items-center justify-between p-3 rounded-lg border border-border">
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">{invoice.id}</span>
+                    <span className="font-medium">{invoice.invoiceNumber}</span>
                     <Badge className={`${getStatusVariant(invoice.status)} capitalize`}>{invoice.status}</Badge>
                   </div>
                   {/*<span className="text-sm text-muted-foreground">{invoice.client.name}</span>*/}
                 </div>
                 <div className="flex flex-col items-end gap-1">
                   <span className="font-semibold">
-                    {formatCurrency(calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount))}
+                    {formatCurrency(
+                      calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount),
+                      invoice.currency,
+                    )}
                   </span>
                   <span className="text-xs text-muted-foreground">
                     {format(new Date(invoice.issueDate), "MMM d, yyyy")}

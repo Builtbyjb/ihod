@@ -92,7 +92,7 @@ export default function InvoicesTable({ invoices, onDelete, clientId }: Invoices
                     <TableRow key={invoice.id}>
                       <TableCell className="cursor-pointer" onClick={() => handleNavigate(clientId, invoice.id)}>
                         <div className="flex flex-col">
-                          <span className="font-medium">{invoice.id}</span>
+                          <span className="font-medium">{invoice.invoiceNumber}</span>
                         </div>
                       </TableCell>
                       <TableCell

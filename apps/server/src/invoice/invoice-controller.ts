@@ -3,7 +3,7 @@ import { Bindings, TokenPayload } from "@/lib/types";
 import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
 import { drizzle } from "drizzle-orm/d1";
-import { eq, and, sql, desc } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { clients, invoices, organizations } from "@/db/schema";
 import { getNewInvoiceNumber } from "@/lib/utils";
 
@@ -59,7 +59,7 @@ invoiceRouteV1.get("/:invoiceId", async (c) => {
     const invoiceResult = await db
         .select()
         .from(invoices)
-        .where(and(eq(invoices.clientId, clientId), eq(invoices.id, invoiceId)))
+        .where(and(eq(invoices.clientId, clientId), eq(invoices.id, invoiceId), eq(invoices.deleted, false)))
         .get();
     if (!invoiceResult) return c.json({ message: "Invoice not found" }, 404);
 
@@ -90,11 +90,12 @@ invoiceRouteV1.post(
 
         const newInvoiceNumber = getNewInvoiceNumber(organization.invoiceNumber);
 
-        const invoiceId = "INV-" + newInvoiceNumber.year + "-" + newInvoiceNumber.currentNumber;
+        const invoiceNumber = "INV-" + newInvoiceNumber.year + "-" + newInvoiceNumber.currentNumber;
 
         // Create Invoice
         await db.insert(invoices).values({
-            id: invoiceId,
+            id: crypto.randomUUID(),
+            invoiceNumber: invoiceNumber,
             clientId: data.clientId,
             issueDate: data.issueDate,
             dueDate: data.dueDate,
@@ -140,7 +141,6 @@ invoiceRouteV1.put(
                 items: data.items,
                 notes: data.notes,
                 currency: data.currency,
-                updatedAt: sql`(unixepoch())`,
             })
             .where(eq(invoices.id, invoiceId));
 

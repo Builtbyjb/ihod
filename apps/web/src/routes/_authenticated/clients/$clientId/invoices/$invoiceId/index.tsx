@@ -4,44 +4,44 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Download, Pencil, Printer } from "lucide-react";
+import { ArrowLeft, Download, Pencil, View } from "lucide-react";
 import type { Client, Invoice } from "@/lib/types";
 import { DefaultInvoiceTemplate } from "@/components/InvoiceTemplates/DefaultTemplate";
 import { calculateSubTotal, calculateTaxAmount, calculateTotalAmount } from "@/lib/utils";
-import { useReactToPrint } from "react-to-print";
 import { formatCurrency, getStatusVariant, formatDate } from "@/lib/utils";
 import { useAuth } from "@/hooks/auth";
 import { useDownloadPDF } from "@/hooks/useDownloadPDF";
 import { useLayout } from "@/hooks/useLayout";
+import { useFetch } from "@/hooks/useFetch";
 
-const API_URL = import.meta.env.VITE_API_URL;
 function RouteComponent() {
   const { clientId, invoiceId } = Route.useParams();
-  const navigate = useNavigate();
-  const router = useRouter();
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [client, setClient] = useState<Client | null>(null);
+  const [shouldPreview, setShouldPreview] = useState<boolean>(false);
+
+  const navigate = useNavigate();
+  const router = useRouter();
   const { user } = useAuth();
   const { ref, download } = useDownloadPDF();
+  const { doGET } = useFetch();
 
   const { setTitle } = useLayout();
 
   useEffect(() => {
-    if (invoice?.id) setTitle(invoice.id);
+    if (invoice?.invoiceNumber) setTitle(invoice.invoiceNumber);
   }, [invoice, setTitle]);
 
   useEffect(() => {
     (async () => {
       try {
-        const response = await fetch(`${API_URL}/api/v1/clients/${clientId}/invoices/${invoiceId}`, {
-          method: "GET",
-          credentials: "include",
-        });
+        const response = await doGET(`/api/v1/clients/${clientId}/invoices/${invoiceId}`);
+        if (response instanceof Error) throw response;
 
-        if (!response.ok) throw new Error("Failed to get invoice");
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message);
 
         // TODO: Zod validate
-        const result = await response.json();
         setInvoice(result.invoice);
         // console.log(result.invoice);
         setClient(result.client);
@@ -49,12 +49,11 @@ function RouteComponent() {
         console.log(error);
       }
     })();
-  }, [clientId, invoiceId]);
+  }, [clientId, invoiceId, doGET]);
 
-  const handlePrint = useReactToPrint({
-    contentRef: ref,
-    documentTitle: "Invoice",
-  });
+  const handlePreview = () => {
+    setShouldPreview(true);
+  };
 
   return (
     <div className="space-y-6 w-full">
@@ -78,9 +77,9 @@ function RouteComponent() {
                 <Pencil className="mr-2 h-4 w-4" />
                 Edit
               </Button>
-              <Button variant="outline" onClick={handlePrint}>
-                <Printer className="mr-3 h-4 w-4" />
-                Print
+              <Button variant="outline" onClick={handlePreview}>
+                <View className="mr-2 h-4 w-4" />
+                Preview
               </Button>
               <Button onClick={download}>
                 <Download className="mr-2 h-4 w-4" />
@@ -93,7 +92,7 @@ function RouteComponent() {
             <Card className="lg:col-span-2">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                  <CardTitle className="text-2xl">{invoice.id}</CardTitle>
+                  <CardTitle className="text-2xl">{invoice.invoiceNumber}</CardTitle>
                   <p className="text-sm text-muted-foreground mt-1">Issued on {formatDate(invoice.issueDate)}</p>
                 </div>
                 <Badge className={`capitalize text-sm ${getStatusVariant(invoice.status)}`}>{invoice.status}</Badge>
@@ -191,16 +190,9 @@ function RouteComponent() {
               </CardContent>
             </Card>
           </div>
-          <div className="print-section">
-            <DefaultInvoiceTemplate
-              ref={ref}
-              invoice={invoice}
-              client={client}
-              bussinessname={user?.organizationName}
-            />
-          </div>
         </>
       ) : (
+        // TODO: Add loading state
         <div className="p-4 md:p-6 flex items-center justify-center">
           <div className="text-center">
             <h2 className="text-xl font-semibold mb-2">Invoice not found</h2>
@@ -209,6 +201,11 @@ function RouteComponent() {
               Back to Invoices
             </Button>
           </div>
+        </div>
+      )}
+      {invoice && (
+        <div className="print-section">
+          <DefaultInvoiceTemplate ref={ref} invoice={invoice} client={client} bussinessname={user?.organizationName} />
         </div>
       )}
     </div>

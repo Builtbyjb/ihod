@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { Bindings, TokenPayload } from "@/lib/types";
 import { zValidator } from "@hono/zod-validator";
 import { drizzle } from "drizzle-orm/d1";
-import { eq, and, sql, like, desc } from "drizzle-orm";
+import { eq, and, like, desc } from "drizzle-orm";
 import { clients, invoices, members } from "@/db/schema";
 import invoiceRouteV1 from "@/invoice/invoice-controller";
 import { clientFormSchema, clientListSchema, clientSchema } from "./client-zod-schema";
@@ -101,7 +101,6 @@ clientRouteV1.put("/edit/:id", zValidator("json", clientFormSchema), async (c) =
             address: data.address,
             city: data.city,
             country: data.country,
-            updatedAt: sql`(unixepoch())`,
         })
         .where(eq(clients.id, id));
 

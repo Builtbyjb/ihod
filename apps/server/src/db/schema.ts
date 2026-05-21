@@ -12,8 +12,13 @@ export const users = sqliteTable("users", {
     lastname: text("lastname"),
     username: text("username").notNull(),
     deleted: int("deleted", { mode: "boolean" }).notNull().default(false),
-    createdAt: int("created_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
-    updatedAt: int("updated_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
+    createdAt: int("created_at", { mode: "timestamp" })
+        .notNull()
+        .default(sql`(unixepoch())`),
+    updatedAt: int("updated_at", { mode: "timestamp" })
+        .notNull()
+        .default(sql`(unixepoch())`)
+        .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
 });
 
 export const organizations = sqliteTable("organizations", {
@@ -36,8 +41,13 @@ export const organizations = sqliteTable("organizations", {
         .notNull()
         .default("none"),
     deleted: int("deleted", { mode: "boolean" }).notNull().default(false),
-    createdAt: int("created_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
-    updatedAt: int("updated_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
+    createdAt: int("created_at", { mode: "timestamp" })
+        .notNull()
+        .default(sql`(unixepoch())`),
+    updatedAt: int("updated_at", { mode: "timestamp" })
+        .notNull()
+        .default(sql`(unixepoch())`)
+        .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
 });
 
 export const members = sqliteTable("members", {
@@ -54,16 +64,26 @@ export const members = sqliteTable("members", {
     startDate: int("start_date", { mode: "timestamp" }).default(sql`(unixepoch())`),
     endDate: int("end_date", { mode: "timestamp" }),
     deleted: int("deleted", { mode: "boolean" }).notNull().default(false),
-    createdAt: int("created_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
-    updatedAt: int("updated_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
+    createdAt: int("created_at", { mode: "timestamp" })
+        .notNull()
+        .default(sql`(unixepoch())`),
+    updatedAt: int("updated_at", { mode: "timestamp" })
+        .notNull()
+        .default(sql`(unixepoch())`)
+        .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
 });
 
 export const roles = sqliteTable("roles", {
     id: int("id").primaryKey({ autoIncrement: true }),
     name: text("name").notNull().unique(),
     permissions: text("permissions").notNull(),
-    createdAt: int("created_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
-    updatedAt: int("updated_at", { mode: "timestamp" }).default(sql`(unixepoch())`),
+    createdAt: int("created_at", { mode: "timestamp" })
+        .notNull()
+        .default(sql`(unixepoch())`),
+    updatedAt: int("updated_at", { mode: "timestamp" })
+        .notNull()
+        .default(sql`(unixepoch())`)
+        .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
 });
 
 export const clients = sqliteTable("clients", {
@@ -81,11 +101,13 @@ export const clients = sqliteTable("clients", {
         .default(sql`(unixepoch())`),
     updatedAt: int("updated_at", { mode: "timestamp" })
         .notNull()
-        .default(sql`(unixepoch())`),
+        .default(sql`(unixepoch())`)
+        .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
 });
 
 export const invoices = sqliteTable("invoices", {
     id: text("id").primaryKey(),
+    invoiceNumber: text("invoice_number"),
     clientId: text("client_id")
         .references(() => clients.id)
         .notNull(),
@@ -93,7 +115,7 @@ export const invoices = sqliteTable("invoices", {
     dueDate: int("due_date", { mode: "timestamp" }).notNull(),
     status: text("status").notNull(),
     taxRate: int("tax_rate", { mode: "number" }).notNull().default(0),
-    discount: int("discount", { mode: "number" }).default(0),
+    discount: int("discount", { mode: "number" }).notNull().default(0),
     items: text("items", { mode: "json" })
         .$type<InvoiceItem[]>()
         .notNull()
@@ -106,5 +128,6 @@ export const invoices = sqliteTable("invoices", {
         .default(sql`(unixepoch())`),
     updatedAt: int("updated_at", { mode: "timestamp" })
         .notNull()
-        .default(sql`(unixepoch())`),
+        .default(sql`(unixepoch())`)
+        .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
 });

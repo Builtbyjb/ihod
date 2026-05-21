@@ -30,6 +30,7 @@ export type InvoiceStatusData = {
 
 export type Invoice = {
     id: string;
+    invoiceNumber: string;
     clientId: string;
     items: InvoiceItem[];
     taxRate: number;

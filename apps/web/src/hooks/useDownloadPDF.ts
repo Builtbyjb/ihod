@@ -3,7 +3,7 @@ import { toBlob } from "html-to-image";
 import jsPDF from "jspdf";
 
 export function useDownloadPDF(filename = "document.pdf") {
-    const ref = useRef(null);
+    const ref = useRef<HTMLDivElement>(null);
 
     const download = async () => {
         const element = ref.current;
