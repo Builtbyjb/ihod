@@ -134,7 +134,7 @@ function RouteComponent() {
                             {formatCurrency(item.unitPrice, invoice.currency)}
                           </TableCell>
                           <TableCell className="text-right">
-                            {formatCurrency(item.unitPrice, invoice.currency)}
+                            {formatCurrency(item.quantity * item.unitPrice, invoice.currency)}
                           </TableCell>
                         </TableRow>
                       ))}
