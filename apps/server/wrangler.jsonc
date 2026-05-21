@@ -13,7 +13,7 @@
         {
           "binding": "DB",
           "database_name": "acorp-invoice",
-          "database_id": "e82e372a-d351-4b46-b5e0-69d95ebbaed8",
+          "database_id": "18f70db9-95a9-492b-a230-722cc95baa9c",
           "migrations_dir": "drizzle/migrations",
         },
       ],
@@ -32,7 +32,7 @@
         {
           "binding": "DB",
           "database_name": "dev-db",
-          "database_id": "e82e372a-d351-4b46-b5e0-69d95ebbaed8",
+          "database_id": "18f70db9-95a9-492b-a230-722cc95baa9c",
           "migrations_dir": "drizzle/migrations",
         },
       ],
