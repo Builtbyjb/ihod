@@ -5,43 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1779206629272,
-      "tag": "0000_common_la_nuit",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1779296640035,
-      "tag": "0001_faithful_shiva",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1779329875018,
-      "tag": "0002_moaning_doctor_faustus",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1779378247254,
-      "tag": "0003_flowery_changeling",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1779378382353,
-      "tag": "0004_serious_the_watchers",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1779378478805,
-      "tag": "0005_parallel_hammerhead",
+      "when": 1779381000594,
+      "tag": "0000_abnormal_callisto",
       "breakpoints": true
     }
   ]

@@ -61,6 +61,7 @@ invoiceRouteV1.get("/:invoiceId", async (c) => {
         .from(invoices)
         .where(and(eq(invoices.clientId, clientId), eq(invoices.id, invoiceId), eq(invoices.deleted, false)))
         .get();
+
     if (!invoiceResult) return c.json({ message: "Invoice not found" }, 404);
 
     return c.json({ invoice: invoiceResult, client: clientResult }, 200);
@@ -152,7 +153,9 @@ invoiceRouteV1.delete("/:invoiceId/delete", async (c) => {
     const invoiceId = c.req.param("invoiceId");
     const db = drizzle(c.env.DB);
 
-    await db.update(invoices).set({ deleted: false }).where(eq(invoices.id, invoiceId));
+    console.log(invoiceId);
+
+    await db.update(invoices).set({ deleted: true }).where(eq(invoices.id, invoiceId));
     return c.json({ message: "Invoice deleted" }, 200);
 });
 

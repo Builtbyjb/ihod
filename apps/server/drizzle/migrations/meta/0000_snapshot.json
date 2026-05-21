@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "019fb78f-1767-4176-8ab9-b6be381a2f89",
+  "id": "02c17b32-6ed8-44d0-818b-d9aa3b81724b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "clients": {
@@ -118,6 +118,13 @@
           "notNull": true,
           "autoincrement": false
         },
+        "invoice_number": {
+          "name": "invoice_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "client_id": {
           "name": "client_id",
           "type": "text",
@@ -148,6 +155,14 @@
         },
         "tax_rate": {
           "name": "tax_rate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "discount": {
+          "name": "discount",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -279,7 +294,7 @@
           "name": "created_at",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch())"
         },
@@ -287,7 +302,7 @@
           "name": "updated_at",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch())"
         }
@@ -446,7 +461,7 @@
           "name": "created_at",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch())"
         },
@@ -454,7 +469,7 @@
           "name": "updated_at",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch())"
         }
@@ -515,7 +530,7 @@
           "name": "created_at",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch())"
         },
@@ -523,7 +538,7 @@
           "name": "updated_at",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch())"
         }
@@ -599,7 +614,7 @@
           "name": "created_at",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch())"
         },
@@ -607,7 +622,7 @@
           "name": "updated_at",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch())"
         }

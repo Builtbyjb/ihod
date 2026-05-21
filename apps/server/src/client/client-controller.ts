@@ -44,7 +44,10 @@ clientRouteV1.get("/:id", async (c) => {
         .get();
     if (!client) return c.json("Client not found", 404);
 
-    const invoicesResult = await db.select().from(invoices).where(eq(invoices.clientId, client.id));
+    const invoicesResult = await db
+        .select()
+        .from(invoices)
+        .where(and(eq(invoices.clientId, client.id), eq(invoices.deleted, false)));
 
     return c.json({ clientInfo: client, invoices: invoicesResult }, 200);
 });

@@ -1,1 +1,0 @@
-ALTER TABLE `invoices` ADD `discount` integer DEFAULT 0;

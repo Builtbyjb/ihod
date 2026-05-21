@@ -24,6 +24,7 @@ import { format } from "date-fns";
 import { useNavigate } from "@tanstack/react-router";
 import { calculateTotalAmount, formatCurrency, getStatusVariant } from "@/lib/utils";
 import { toast } from "sonner";
+import { useFetch } from "@/hooks/useFetch";
 
 interface InvoicesTableProps {
   clientId: string;
@@ -31,29 +32,25 @@ interface InvoicesTableProps {
   onDelete: (id: string) => void;
 }
 
-const API_URL = import.meta.env.VITE_API_URL;
 export default function InvoicesTable({ invoices, onDelete, clientId }: InvoicesTableProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
+
   const navigate = useNavigate();
+  const { doDELETE } = useFetch();
 
   const handleDelete = async () => {
     if (deleteId) {
       try {
-        const response = await fetch(`${API_URL}/api/v1/clients/${clientId}/invoices/${deleteId}/delete`, {
-          method: "GET",
-          credentials: "include",
-        });
+        const response = await doDELETE(`/api/v1/clients/${clientId}/invoices/${deleteId}/delete`);
+        if (response instanceof Error) throw response;
 
         if (!response.ok) throw new Error("An error occurred while deleting the invoice");
 
         onDelete(deleteId);
+        toast.success("Invoice Deleted");
       } catch (error: unknown) {
-        if (error instanceof Error) {
-          console.log(error);
-          toast.error("Failed to delete invoice: " + error.message);
-        } else {
-          console.log(String(error));
-        }
+        if (error instanceof Error) toast.error(error.message);
+        console.log(error);
       } finally {
         setDeleteId(null);
       }
