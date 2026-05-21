@@ -107,7 +107,7 @@ export const clients = sqliteTable("clients", {
 
 export const invoices = sqliteTable("invoices", {
     id: text("id").primaryKey(),
-    invoiceNumber: text("invoice_number"),
+    invoiceNumber: text("invoice_number").notNull(),
     clientId: text("client_id")
         .references(() => clients.id)
         .notNull(),

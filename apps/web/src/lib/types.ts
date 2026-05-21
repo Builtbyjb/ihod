@@ -103,7 +103,7 @@ export type FetchInstance = {
     doGET: (url: string) => Promise<Response | Error>;
     doPOST: (url: string, data: any, contentType?: string) => Promise<Response | Error>;
     doPUT: (url: string, data: any, contentType?: string) => Promise<Response | Error>;
-    doDELETE: () => void;
+    doDELETE: (url: string) => Promise<Response | Error>;
 };
 
 export type SelectData = {
