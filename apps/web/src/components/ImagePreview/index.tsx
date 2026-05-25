@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 type ImagePreviewProps = {
-  source: string | File | null;
+  source: string | Blob | null;
 };
 
 export default function ImagePreview({ source }: ImagePreviewProps) {
@@ -12,7 +12,7 @@ export default function ImagePreview({ source }: ImagePreviewProps) {
     (() => {
       if (source === null) return;
 
-      if (source instanceof File) {
+      if (source instanceof Blob) {
         previewUrl = URL.createObjectURL(source);
         setUrl(previewUrl);
       } else {
@@ -27,7 +27,7 @@ export default function ImagePreview({ source }: ImagePreviewProps) {
 
   return (
     <div>
-      <img src={url} alt="Preview" className="rounded-2xl w-24" />
+      <img src={url ? url : "/placeholder-image.png"} alt="Preview" className="rounded-2xl w-24" />
     </div>
   );
 }

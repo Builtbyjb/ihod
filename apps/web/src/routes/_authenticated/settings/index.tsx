@@ -17,17 +17,17 @@ import ImagePreview from "@/components/ImagePreview";
 
 const UserSettingsSchema = z.object({
   username: z.string(),
-  avatar_url: z.string().optional(),
+  avatarURL: z.string().nullable(),
 });
 
 const UserSchema = z.object({
   username: z.string(),
   avatar: z
-    .instanceof(File)
+    .instanceof(Blob)
     .optional()
-    .refine((file) => !file || file?.size <= MAX_IMAGE_SIZE, `Max image size is 5mb.`)
+    .refine((blob) => !blob || blob?.size <= MAX_IMAGE_SIZE, `Max image size is 5mb.`)
     .refine(
-      (file) => !file || ACCEPTED_IMAGE_TYPES.includes(file?.type),
+      (blob) => !blob || ACCEPTED_IMAGE_TYPES.includes(blob?.type),
       "Only .jpg, .jpeg, .png and .webp formats are supported.",
     ),
 });
@@ -36,13 +36,13 @@ type UserSettingType = z.infer<typeof UserSettingsSchema>;
 
 function UserSettings({ settings }: { settings: UserSettingType }) {
   const { doPUT } = useFetch();
-  const [avatar, setAvatar] = useState<File | string | null>(null);
+  const [avatar, setAvatar] = useState<Blob | string | null>(null);
 
   const form = useForm({
     defaultValues: {
       username: "",
-      avatar: undefined as File | undefined,
-    } as { username: string; avatar?: File | undefined },
+      avatar: undefined as Blob | undefined,
+    } as { username: string; avatar?: Blob | undefined },
     validators: {
       onSubmit: UserSchema,
     },
@@ -70,7 +70,7 @@ function UserSettings({ settings }: { settings: UserSettingType }) {
     (() => {
       if (settings) {
         form.setFieldValue("username", settings.username);
-        if (settings.avatar_url) setAvatar(settings.avatar_url);
+        if (settings.avatarURL) setAvatar(settings.avatarURL);
       }
     })();
   }, [settings, form]);
@@ -138,10 +138,10 @@ function UserSettings({ settings }: { settings: UserSettingType }) {
 }
 
 const BusinessSettingsSchema = z.object({
-  logo_url: z.string().optional(),
+  logoURL: z.string().nullable(),
   name: z.string(),
   email: z.string(),
-  phone: z.string(),
+  // phone: z.string(),
   website: z.string().optional(),
   address: z.string(),
   city: z.string(),
@@ -151,17 +151,17 @@ const BusinessSettingsSchema = z.object({
 const BusinessSchema = z.object({
   name: z.string(),
   email: z.string().email(),
-  phone: z.string(),
+  // phone: z.string(),
   website: z.string(),
   address: z.string(),
   city: z.string(),
   country: z.string(),
   logo: z
-    .instanceof(File)
+    .instanceof(Blob)
     .optional()
-    .refine((file) => !file || file?.size <= MAX_IMAGE_SIZE, `Max image size is 5MB.`)
+    .refine((blob) => !blob || blob?.size <= MAX_IMAGE_SIZE, `Max image size is 5MB.`)
     .refine(
-      (file) => !file || ACCEPTED_IMAGE_TYPES.includes(file?.type),
+      (blob) => !blob || ACCEPTED_IMAGE_TYPES.includes(blob?.type),
       "Only .jpg, .jpeg, .png and .webp formats are supported.",
     ),
 });
@@ -170,27 +170,25 @@ type BusinessSettingsType = z.infer<typeof BusinessSettingsSchema>;
 
 function BusinessSettings({ settings }: { settings: BusinessSettingsType }) {
   const { doPUT } = useFetch();
-  const [avatar, setAvatar] = useState<string | File | null>(null);
+  const [avatar, setAvatar] = useState<string | Blob | null>(null);
 
   const form = useForm({
     defaultValues: {
       name: "",
       email: "",
-      phone: "",
       website: "",
       address: "",
       city: "",
       country: "",
-      logo: undefined as File | undefined,
+      logo: undefined as Blob | undefined,
     } as {
       name: string;
       email: string;
-      phone: string;
       website: string;
       address: string;
       city: string;
       country: string;
-      logo?: File;
+      logo?: Blob;
     },
     validators: {
       onSubmit: BusinessSchema,
@@ -199,7 +197,6 @@ function BusinessSettings({ settings }: { settings: BusinessSettingsType }) {
       const formData = new FormData();
       formData.append("name", value.name);
       formData.append("email", value.email);
-      formData.append("phone", value.phone);
       formData.append("website", value.website);
       formData.append("address", value.address);
       formData.append("city", value.city);
@@ -226,12 +223,12 @@ function BusinessSettings({ settings }: { settings: BusinessSettingsType }) {
       if (settings) {
         form.setFieldValue("name", settings.name);
         form.setFieldValue("email", settings.email);
-        form.setFieldValue("phone", settings.phone);
+        // form.setFieldValue("phone", settings.phone);
         if (settings.website) form.setFieldValue("website", settings.website);
         form.setFieldValue("address", settings.address);
         form.setFieldValue("city", settings.city);
         form.setFieldValue("country", settings.country);
-        if (settings.logo_url) setAvatar(settings.logo_url);
+        if (settings.logoURL) setAvatar(settings.logoURL);
       }
     })();
   }, [settings, form]);
@@ -286,8 +283,6 @@ function BusinessSettings({ settings }: { settings: BusinessSettingsType }) {
                 }}
               />
             </Field>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
             <Field>
               <form.Field
                 name="email"
@@ -304,7 +299,7 @@ function BusinessSettings({ settings }: { settings: BusinessSettingsType }) {
                 }}
               />
             </Field>
-            <Field>
+            {/*<Field>
               <form.Field
                 name="phone"
                 children={(field) => {
@@ -319,9 +314,7 @@ function BusinessSettings({ settings }: { settings: BusinessSettingsType }) {
                   );
                 }}
               />
-            </Field>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
+            </Field>*/}
             <Field>
               <form.Field
                 name="website"

@@ -11,6 +11,7 @@ export const users = sqliteTable("users", {
     firstname: text("firstname"),
     lastname: text("lastname"),
     username: text("username").notNull(),
+    avatarURL: text("avatar_url"),
     deleted: int("deleted", { mode: "boolean" }).notNull().default(false),
     createdAt: int("created_at", { mode: "timestamp" })
         .notNull()
@@ -29,6 +30,7 @@ export const organizations = sqliteTable("organizations", {
     city: text("city"),
     country: text("country"),
     website: text("website"),
+    logoURL: text("logo_url"),
     invoiceNumber: text("invoice_number", { mode: "json" })
         .$type<InvoiceNumber>()
         .notNull()

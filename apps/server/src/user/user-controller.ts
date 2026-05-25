@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { Bindings, Client, Invoice, TokenPayload } from "@/lib/types";
 import { drizzle } from "drizzle-orm/d1";
 import { eq, and } from "drizzle-orm";
-import { clients, invoices } from "@/db/schema";
+import { clients, invoices, organizations, users } from "@/db/schema";
 import {
     countPaidInvoices,
     calculateRevenue,
@@ -12,9 +12,45 @@ import {
     getRecentInvoices,
 } from "./user-service";
 import { authMiddleware } from "@/middleware/auth-middleware";
+import { z } from "zod";
+import { zValidator } from "@hono/zod-validator";
+import { getBlobURL } from "@/lib/utils";
 
 const userRouteV1 = new Hono<{ Bindings: Bindings }>().basePath("/user");
 userRouteV1.use("*", authMiddleware());
+
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
+const UserProfileSettingSchema = z.object({
+    username: z.string(),
+    avatar: z
+        .instanceof(Blob)
+        .optional()
+        .refine((blob) => !blob || blob?.size <= MAX_IMAGE_SIZE, `Max image size is 5mb.`)
+        .refine(
+            (blob) => !blob || ACCEPTED_IMAGE_TYPES.includes(blob?.type),
+            "Only .jpg, .jpeg, .png and .webp formats are supported.",
+        ),
+});
+
+const BusinessSchema = z.object({
+    name: z.string(),
+    email: z.string().email(),
+    // phone: z.string(),
+    website: z.string(),
+    address: z.string(),
+    city: z.string(),
+    country: z.string(),
+    logo: z
+        .instanceof(Blob)
+        .optional()
+        .refine((blob) => !blob || blob?.size <= MAX_IMAGE_SIZE, `Max image size is 5MB.`)
+        .refine(
+            (blob) => !blob || ACCEPTED_IMAGE_TYPES.includes(blob?.type),
+            "Only .jpg, .jpeg, .png and .webp formats are supported.",
+        ),
+});
 
 userRouteV1.get("/dashboard", async (c) => {
     const db = drizzle(c.env.DB);
@@ -59,35 +95,95 @@ userRouteV1.get("/dashboard", async (c) => {
 });
 
 userRouteV1.get("/settings", async (c) => {
-    const tmp = {
+    const db = drizzle(c.env.DB);
+    const jwtPayload = c.get("jwtPayload") as TokenPayload;
+
+    const user = await db.select().from(users).where(eq(users.id, jwtPayload.userId)).get();
+    if (!user) return c.json({ message: "User not found" }, 404);
+
+    const organization = await db
+        .select()
+        .from(organizations)
+        .where(eq(organizations.id, jwtPayload.currentOrgId))
+        .get();
+
+    if (!organization) return c.json({ message: "User organization not found" }, 404);
+
+    const setting = {
         user: {
-            avatar_url: "https://picsum.photos/id/433/300/300",
-            username: "notdoe",
+            avatarURL: user.avatarURL,
+            username: user.username,
         },
         business: {
-            logo_url: "https://picsum.photos/id/403/300/300",
-            name: "ACME",
-            email: "contact@business.com",
-            phone: "+1 (555) 123-4567",
-            website: "example.com",
-            address: "123 Some Street",
-            city: "City",
-            country: "Country",
+            logoURL: organization.logoURL,
+            name: organization.name,
+            email: user.email,
+            website: organization.website,
+            address: organization.address,
+            city: organization.city,
+            country: organization.country,
         },
     };
-    return c.json({ message: "Profile settings", data: tmp }, 200);
+    return c.json({ message: "Profile setting", data: setting }, 200);
 });
 
-userRouteV1.put("/settings/profile", async (c) => {
-    const data = await c.req.parseBody();
-    console.log(data);
+userRouteV1.put("/settings/profile", zValidator("form", UserProfileSettingSchema), async (c) => {
+    const data = c.req.valid("form");
+    const db = drizzle(c.env.DB);
+
+    // console.log(data);
+    const jwtPayload = c.get("jwtPayload") as TokenPayload;
+
+    let blobURL: string | null = null;
+    if (data.avatar) {
+        const value = await c.env.R2.put(`${jwtPayload.userId}-avatar`, data.avatar, {
+            httpMetadata: {
+                contentType: data.avatar.type,
+            },
+        });
+        // console.log(value);
+
+        blobURL = getBlobURL(c, value?.key);
+    }
+
+    await db
+        .update(users)
+        .set({ avatarURL: blobURL || users.avatarURL, username: data.username })
+        .where(eq(users.id, jwtPayload.userId));
 
     return c.json({ message: "User profile updated" }, 200);
 });
 
-userRouteV1.put("/settings/business", async (c) => {
-    const data = await c.req.parseBody();
-    console.log(data);
+userRouteV1.put("/settings/business", zValidator("form", BusinessSchema), async (c) => {
+    const data = c.req.valid("form");
+    const db = drizzle(c.env.DB);
+
+    // console.log(data);
+    const jwtPayload = c.get("jwtPayload") as TokenPayload;
+
+    let blobURL: string | null = null;
+    if (data.logo) {
+        const value = await c.env.R2.put(`${jwtPayload.currentOrgId}-logo`, data.logo, {
+            httpMetadata: {
+                contentType: data.logo.type,
+            },
+        });
+        // console.log(value);
+
+        blobURL = getBlobURL(c, value?.key);
+    }
+
+    await db
+        .update(organizations)
+        .set({
+            logoURL: blobURL || organizations.logoURL,
+            name: data.name,
+            address: data.address,
+            city: data.city,
+            country: data.country,
+            website: data.website,
+        })
+        .where(eq(organizations.id, jwtPayload.currentOrgId));
 
     return c.json({ message: "Business Profile updated" }, 200);
 });

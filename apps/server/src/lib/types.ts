@@ -12,6 +12,7 @@ export type Bindings = {
     ENV: string;
     PAYSTACK_SECRET: string;
     FRONTEND_URL: string;
+    SERVER_URL: string;
     R2: R2Bucket;
 };
 

@@ -97,3 +97,7 @@ export async function verifyPaystackSignature(secret: string, body: string, sign
 
     return hash === signature;
 }
+
+export function getBlobURL(c: Context, key: string): string {
+    return `${c.env.SERVER_URL}/api/v1/blobs/${key}`;
+}
