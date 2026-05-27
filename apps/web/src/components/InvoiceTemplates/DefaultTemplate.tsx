@@ -122,7 +122,6 @@ export const DefaultInvoiceTemplate = forwardRef<HTMLDivElement, InvoicePDFProps
               {invoice.signature && (
                 <img
                   src={invoice.signature}
-                  crossOrigin="anonymous"
                   loading="eager"
                   alt="User Signature"
                   style={{ width: "100%", height: "auto", display: "block" }}
