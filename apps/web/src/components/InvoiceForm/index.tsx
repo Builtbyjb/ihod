@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Plus, Trash2, Mail, Phone } from "lucide-react";
-import type { Client, Invoice, InvoiceStatus, SelectData } from "@/lib/types";
+import type { Client, SelectData } from "@/lib/types";
+import type { Invoice, InvoiceStatus } from "@shared/lib/types";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -22,23 +23,8 @@ import { useFetch } from "@/hooks/useFetch";
 import NumberInput from "../Form/NumberInput";
 import SelectField from "../Form/SelectField";
 import DateField from "../Form/DateField";
-
-const invoiceFormSchema = z.object({
-  issueDate: z.date(),
-  dueDate: z.date(),
-  taxRate: z.number().min(0).max(100),
-  discount: z.number().min(0).max(100),
-  status: z.enum(["draft", "sent", "paid", "overdue"]),
-  items: z.array(
-    z.object({
-      description: z.string(),
-      quantity: z.number(),
-      unitPrice: z.number().positive(),
-    }),
-  ),
-  currency: z.string().min(2),
-  notes: z.string(),
-});
+import SignatureCanvas from "react-signature-canvas";
+import { InvoiceFormSchema } from "@shared/lib/zod-schema";
 
 interface InvoiceFormProps {
   clientInfo: Client | null;
@@ -46,7 +32,7 @@ interface InvoiceFormProps {
   invoiceId?: string;
 }
 
-type InvoiceForm = z.infer<typeof invoiceFormSchema>;
+type InvoiceForm = z.infer<typeof InvoiceFormSchema>;
 
 const status: SelectData[] = [
   { label: "Draft", value: "draft" },
@@ -58,11 +44,16 @@ const status: SelectData[] = [
 export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: InvoiceFormProps) {
   const { doPOST, doPUT } = useFetch();
 
+  const sigCanvas = useRef<SignatureCanvas | null>(null);
+
   const handleCreate = async (value: InvoiceForm) => {
     try {
       if (!clientInfo) throw new Error("Client Id not found");
 
-      const payload = { ...value, clientId: clientInfo.id };
+      // Get user signature
+      const signature = sigCanvas.current?.toDataURL("image/png");
+
+      const payload = { ...value, clientId: clientInfo.id, signature };
 
       const response = await doPOST(`/api/v1/clients/${clientInfo.id}/invoices/create`, payload);
       if (response instanceof Error) throw response;
@@ -83,7 +74,10 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
       if (!clientInfo) throw new Error("Client Id not found");
       if (!invoiceId) throw new Error("Invoice Id not found");
 
-      const payload = { ...value, clientId: clientInfo.id };
+      // Get user signature
+      const signature = sigCanvas.current?.toDataURL("image/png");
+
+      const payload = { ...value, clientId: clientInfo.id, signature };
 
       const response = await doPUT(`/api/v1/clients/${clientInfo.id}/invoices/${invoiceId}/edit`, payload);
       if (response instanceof Error) throw response;
@@ -116,7 +110,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
       notes: "",
     },
     validators: {
-      onSubmit: invoiceFormSchema,
+      onSubmit: InvoiceFormSchema,
     },
     onSubmit: async ({ value }) => {
       if (!existingInvoice) await handleCreate(value);
@@ -136,6 +130,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
       form.setFieldValue("items", existingInvoice.items);
       form.setFieldValue("notes", existingInvoice.notes);
       form.setFieldValue("currency", existingInvoice.currency);
+      if (existingInvoice.signature) sigCanvas.current?.fromDataURL(existingInvoice.signature);
     }
   }, [existingInvoice, form]);
 
@@ -152,30 +147,28 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
         {/* Invoice details card */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Invoice Details</CardTitle>
+            <CardTitle>Invoice</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Select client */}
             <Field>
               <FieldContent>
-                <div className="flex gap-4">
-                  <h1 className="text-lg mb-2">{clientInfo?.name}</h1>
-                  <div className="flex flex-col gap-2 mb-2">
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-md bg-muted flex items-center justify-center shrink-0 mt-0.5">
-                        <Mail className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <p className="text-sm mt-0.5 whitespace-pre-line">{clientInfo?.email}</p>
-                      </div>
+                <h1 className="text-lg mb-4">{clientInfo?.name}</h1>
+                <div className="flex flex-col gap-2 mb-2">
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-md bg-muted flex items-center justify-center shrink-0 mt-0.5">
+                      <Mail className="w-4 h-4" />
                     </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-6 h-6 rounded-md bg-muted flex items-center justify-center shrink-0 mt-0.5">
-                        <Phone className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <p className="text-sm mt-0.5 whitespace-pre-line">{clientInfo?.phone}</p>
-                      </div>
+                    <div>
+                      <p className="text-sm mt-0.5 whitespace-pre-line">{clientInfo?.email}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-md bg-muted flex items-center justify-center shrink-0 mt-0.5">
+                      <Phone className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-sm mt-0.5 whitespace-pre-line">{clientInfo?.phone}</p>
                     </div>
                   </div>
                 </div>
@@ -387,7 +380,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
                           children={(total) => {
                             return (
                               <Field className="col-span-2">
-                                <FieldLabel>Total</FieldLabel>
+                                <FieldLabel>Amount</FieldLabel>
                                 <FieldContent>
                                   <span className="font-medium">{formatCurrency(total)}</span>
                                 </FieldContent>
@@ -427,6 +420,38 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
             </form.Field>
           </div>
         </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Signature</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <SignatureCanvas
+            ref={sigCanvas}
+            penColor="black"
+            canvasProps={{
+              style: {
+                backgroundColor: "#e5e7eb",
+                width: "100%",
+                height: "8rem",
+                display: "block",
+                border: "1px solid #e5e7eb",
+                borderRadius: "0.5rem",
+              },
+              className: "sigCanvas",
+            }}
+          />
+        </CardContent>
+        <CardFooter className="bg-background">
+          <Button
+            variant="outline"
+            onClick={() => {
+              if (sigCanvas.current) sigCanvas.current.clear();
+            }}
+          >
+            Clear
+          </Button>
+        </CardFooter>
       </Card>
 
       {/* Notes card */}

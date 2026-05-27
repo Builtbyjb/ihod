@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import type { InvoiceStatusData } from "@/lib/types";
+import type { InvoiceStatusData } from "@shared/lib/types";
 import { SkeletonPieChart } from "@/components/Skeleton";
 import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
 

@@ -2,7 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { Invoice } from "@/lib/types";
+import type { Invoice } from "@shared/lib/types";
 import { format } from "date-fns";
 import { formatCurrency, getStatusVariant, calculateTotalAmount } from "@/lib/utils";
 import { SkeletonBarChart } from "@/components/Skeleton";

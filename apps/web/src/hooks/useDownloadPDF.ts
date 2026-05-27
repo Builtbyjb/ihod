@@ -2,19 +2,19 @@ import { useRef } from "react";
 import { toBlob } from "html-to-image";
 import jsPDF from "jspdf";
 
-export function useDownloadPDF(filename = "document.pdf") {
+export function useDownloadPDF(filename = "invoice.pdf") {
     const ref = useRef<HTMLDivElement>(null);
 
-    const download = async () => {
+    const generatePDF = async (): Promise<jsPDF | null> => {
         const element = ref.current;
-        if (!element) return;
+        if (!element) return null;
 
         await document.fonts.ready;
 
         const blob = await toBlob(element, { pixelRatio: 2 });
         if (!blob) {
             console.error("toBlob returned null");
-            return;
+            return null;
         }
 
         const url = URL.createObjectURL(blob);
@@ -41,8 +41,19 @@ export function useDownloadPDF(filename = "document.pdf") {
         }
 
         URL.revokeObjectURL(url);
-        pdf.save(filename);
+        return pdf;
     };
 
-    return { ref, download };
+    const download = async () => {
+        const pdf = await generatePDF();
+        if (pdf) pdf.save(filename);
+    };
+
+    const preview = async (): Promise<string | null> => {
+        const pdf = await generatePDF();
+        if (!pdf) return null;
+        return pdf.output("bloburl").toString();
+    };
+
+    return { ref, download, preview };
 }

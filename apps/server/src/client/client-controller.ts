@@ -5,7 +5,7 @@ import { drizzle } from "drizzle-orm/d1";
 import { eq, and, like, desc } from "drizzle-orm";
 import { clients, invoices, members } from "@/db/schema";
 import invoiceRouteV1 from "@/invoice/invoice-controller";
-import { clientFormSchema, clientListSchema, clientSchema } from "./client-zod-schema";
+import { ClientFormSchema, ClientListSchema, ClientSchema } from "@shared/lib/zod-schema";
 import { authMiddleware } from "@/middleware/auth-middleware";
 
 const clientRouteV1 = new Hono<{ Bindings: Bindings }>().basePath("/clients");
@@ -26,7 +26,7 @@ clientRouteV1.get("/", async (c) => {
         .where(and(eq(clients.organizationId, member[0].organizationId), eq(clients.deleted, false)))
         .orderBy(desc(clients.createdAt));
 
-    const parsedResult = clientListSchema.parse(result);
+    const parsedResult = ClientListSchema.parse(result);
 
     return c.json({ message: "All Clients", clients: parsedResult }, 200);
 });
@@ -52,7 +52,7 @@ clientRouteV1.get("/:id", async (c) => {
     return c.json({ clientInfo: client, invoices: invoicesResult }, 200);
 });
 
-clientRouteV1.post("/create", zValidator("json", clientFormSchema), async (c) => {
+clientRouteV1.post("/create", zValidator("json", ClientFormSchema), async (c) => {
     const data = c.req.valid("json");
     const db = drizzle(c.env.DB);
 
@@ -76,7 +76,7 @@ clientRouteV1.post("/create", zValidator("json", clientFormSchema), async (c) =>
         .returning()
         .get();
 
-    const parsedClient = clientSchema.parse(client);
+    const parsedClient = ClientSchema.parse(client);
 
     return c.json({ message: "Client created", client: parsedClient }, 200);
 });
@@ -90,7 +90,7 @@ clientRouteV1.delete("/delete/:id", async (c) => {
     return c.json({ message: "Client Deleted" }, 200);
 });
 
-clientRouteV1.put("/edit/:id", zValidator("json", clientFormSchema), async (c) => {
+clientRouteV1.put("/edit/:id", zValidator("json", ClientFormSchema), async (c) => {
     const db = drizzle(c.env.DB);
     const data = c.req.valid("json");
     const id = c.req.param("id");

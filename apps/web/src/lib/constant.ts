@@ -13,5 +13,3 @@ export const CURRENCY_MAP: Record<string, Currency> = {
     USD: { symbol: "$", locale: "en-US" },
     CAD: { symbol: "€", locale: "en-CA" },
 };
-
-export const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];

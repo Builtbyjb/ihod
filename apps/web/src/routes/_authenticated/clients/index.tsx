@@ -8,20 +8,9 @@ import type { Client } from "@/lib/types";
 import * as z from "zod";
 import { useLayout } from "@/hooks/useLayout";
 import { useFetch } from "@/hooks/useFetch";
+import { ClientSchema } from "@shared/lib/zod-schema";
 
-const clientsResponseSchema = z.array(
-  z.object({
-    id: z.string(),
-    organizationId: z.number(),
-    name: z.string(),
-    email: z.string().email(),
-    phone: z.string(),
-    address: z.string(),
-    city: z.string(),
-    country: z.string(),
-    createdAt: z.string(),
-  }),
-);
+const clientsResponseSchema = z.array(ClientSchema);
 
 function RouteComponent() {
   const { setTitle } = useLayout();

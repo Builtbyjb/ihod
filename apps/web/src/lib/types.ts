@@ -15,53 +15,6 @@ export type Currency = {
     locale: string;
 };
 
-export type InvoiceItem = {
-    description: string;
-    quantity: number;
-    unitPrice: number;
-};
-
-export type InvoiceStatus = "draft" | "sent" | "paid" | "overdue";
-
-export type InvoiceStatusData = {
-    status: InvoiceStatus;
-    count: number;
-};
-
-export type Invoice = {
-    id: string;
-    invoiceNumber: string;
-    clientId: string;
-    items: InvoiceItem[];
-    taxRate: number;
-    discount: number;
-    status: InvoiceStatus;
-    issueDate: string;
-    dueDate: string;
-    currency: string;
-    notes: string;
-    createdAt: string;
-};
-
-export type MonthRevenue = {
-    month: string;
-    revenue: number;
-};
-
-export type TopStats = {
-    totalRevenue: number;
-    paidInvoices: number;
-    pendingAmount: number;
-    totalClients: number;
-};
-
-export type DashboardStats = {
-    topStats: TopStats;
-    invoiceData: InvoiceStatusData[];
-    monthlyRevenues: MonthRevenue[];
-    recentInvoices: Invoice[];
-};
-
 export type User = {
     username: string;
     email: string;
@@ -101,8 +54,8 @@ export type SignupFormField =
 
 export type FetchInstance = {
     doGET: (url: string) => Promise<Response | Error>;
-    doPOST: (url: string, data: any, contentType?: string) => Promise<Response | Error>;
-    doPUT: (url: string, data: any, contentType?: string) => Promise<Response | Error>;
+    doPOST: (url: string, data: any) => Promise<Response | Error>;
+    doPUT: (url: string, data: any) => Promise<Response | Error>;
     doDELETE: (url: string) => Promise<Response | Error>;
 };
 

@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowLeft, Download, Pencil, View } from "lucide-react";
-import type { Client, Invoice } from "@/lib/types";
+import type { Client } from "@/lib/types";
+import type { Invoice } from "@shared/lib/types";
+import { InvoiceSchema, ClientSchema } from "@shared/lib/zod-schema";
 import { DefaultInvoiceTemplate } from "@/components/InvoiceTemplates/DefaultTemplate";
 import { calculateSubTotal, calculateTaxAmount, calculateTotalAmount } from "@/lib/utils";
 import { formatCurrency, getStatusVariant, formatDate } from "@/lib/utils";
@@ -13,18 +15,22 @@ import { useAuth } from "@/hooks/auth";
 import { useDownloadPDF } from "@/hooks/useDownloadPDF";
 import { useLayout } from "@/hooks/useLayout";
 import { useFetch } from "@/hooks/useFetch";
+import ImagePreview from "@/components/ImagePreview";
+import SignatureCanvas from "react-signature-canvas";
 
 function RouteComponent() {
   const { clientId, invoiceId } = Route.useParams();
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [client, setClient] = useState<Client | null>(null);
-  // const [shouldPreview, setShouldPreview] = useState<boolean>(false);
+  const [logoURL, setLogoURL] = useState<string | null>(null);
 
   const navigate = useNavigate();
   const router = useRouter();
   const { user } = useAuth();
-  const { ref, download } = useDownloadPDF();
+  const { ref, download, preview } = useDownloadPDF();
   const { doGET } = useFetch();
+  const sigCanvas = useRef<SignatureCanvas | null>(null);
+  const sigRef = useRef<SignatureCanvas | null>(null);
 
   const { setTitle } = useLayout();
 
@@ -41,18 +47,29 @@ function RouteComponent() {
         const result = await response.json();
         if (!response.ok) throw new Error(result.message);
 
-        // TODO: Zod validate
-        setInvoice(result.invoice);
-        // console.log(result.invoice);
-        setClient(result.client);
+        const parsedInvoice = InvoiceSchema.parse(result.invoice);
+        setInvoice(parsedInvoice);
+
+        const parsedClient = ClientSchema.parse(result.client);
+        setClient(parsedClient);
+
+        setLogoURL(result.logoURL);
       } catch (error) {
         console.log(error);
       }
     })();
   }, [clientId, invoiceId, doGET]);
 
-  const handlePreview = () => {
-    // setShouldPreview(true);
+  useEffect(() => {
+    if (invoice?.signature) {
+      sigCanvas.current?.fromDataURL(invoice.signature);
+      sigRef.current?.fromDataURL(invoice.signature);
+    }
+  }, [invoice?.signature]);
+
+  const handlePreview = async () => {
+    const url = await preview();
+    if (url) window.open(url, "_blank");
   };
 
   return (
@@ -90,10 +107,13 @@ function RouteComponent() {
 
           <div className="grid gap-6 lg:grid-cols-3">
             <Card className="lg:col-span-2">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle className="text-2xl">{invoice.invoiceNumber}</CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">Issued on {formatDate(invoice.issueDate)}</p>
+              <CardHeader className="flex flex-row items-center justify-between mb-4">
+                <div className="flex gap-4 items-center">
+                  <ImagePreview source={logoURL} />
+                  <div>
+                    <CardTitle className="text-2xl">{invoice.invoiceNumber}</CardTitle>
+                    <p className="text-sm text-muted-foreground mt-1">Issued on {formatDate(invoice.issueDate)}</p>
+                  </div>
                 </div>
                 <Badge className={`capitalize text-sm ${getStatusVariant(invoice.status)}`}>{invoice.status}</Badge>
               </CardHeader>
@@ -122,7 +142,7 @@ function RouteComponent() {
                         <TableHead>Description</TableHead>
                         <TableHead className="text-center">Qty</TableHead>
                         <TableHead className="text-right">Unit Price</TableHead>
-                        <TableHead className="text-right">Total</TableHead>
+                        <TableHead className="text-right">Amount</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -141,9 +161,22 @@ function RouteComponent() {
                     </TableBody>
                   </Table>
                 </div>
+                {invoice.signature && (
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium mb-2">Signature</h3>
+                    <SignatureCanvas
+                      ref={sigCanvas}
+                      penColor="black"
+                      canvasProps={{
+                        style: { width: "100%" },
+                        className: "sigCanvas",
+                      }}
+                    />
+                  </div>
+                )}
 
                 {invoice.notes && (
-                  <div className="bg-background p-4 rounded-lg">
+                  <div>
                     <h3 className="text-sm font-medium mb-2">Notes</h3>
                     <p className="text-sm text-muted-foreground">{invoice.notes}</p>
                   </div>
@@ -205,7 +238,14 @@ function RouteComponent() {
       )}
       {invoice && (
         <div className="print-section">
-          <DefaultInvoiceTemplate ref={ref} invoice={invoice} client={client} bussinessname={user?.organizationName} />
+          <DefaultInvoiceTemplate
+            ref={ref}
+            sigRef={sigRef}
+            invoice={invoice}
+            client={client}
+            bussinessname={user?.organizationName}
+            logoURL={logoURL}
+          />
         </div>
       )}
     </div>

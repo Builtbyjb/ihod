@@ -1,5 +1,6 @@
 import { Context } from "hono";
-import { ErrorResult, InvoiceNumber, TokenPayload } from "./types";
+import { ErrorResult, TokenPayload } from "./types";
+import type { InvoiceNumber } from "@shared/lib/types";
 import { getCookie } from "hono/cookie";
 import { verify, sign } from "hono/jwt";
 
@@ -96,4 +97,8 @@ export async function verifyPaystackSignature(secret: string, body: string, sign
         .join("");
 
     return hash === signature;
+}
+
+export function getBlobURL(c: Context, key: string): string {
+    return `${c.env.SERVER_URL}/api/v1/blobs/${key}`;
 }

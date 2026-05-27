@@ -30,63 +30,61 @@ export function useFetch(): FetchInstance {
         return new Error("Request failed due to a network error");
     }, []);
 
-    const doPOST = useCallback(
-        async (url: string, data: any, contentType = "application/json"): Promise<Response | Error> => {
-            let maxRetries = 3;
-            while (maxRetries > 0) {
-                try {
-                    const response = await fetch(`${API_URL}${url}`, {
-                        method: "POST",
-                        credentials: "include",
-                        headers: { "Content-Type": contentType },
-                        body: contentType === "application/json" ? JSON.stringify(data) : data,
-                    });
+    const doPOST = useCallback(async (url: string, data: any): Promise<Response | Error> => {
+        let maxRetries = 3;
+        const isFormData = data instanceof FormData;
 
-                    return response;
-                } catch (error) {
-                    console.error(error);
-                    maxRetries -= 1;
+        while (maxRetries > 0) {
+            try {
+                const response = await fetch(`${API_URL}${url}`, {
+                    method: "POST",
+                    credentials: "include",
+                    headers: isFormData ? undefined : { "Content-Type": "application/json" },
+                    body: isFormData ? data : JSON.stringify(data),
+                });
 
-                    if (maxRetries > 0) {
-                        toast.error("Network Error: Retrying...");
-                        await new Promise((resolve) => setTimeout(resolve, RETRY_INTERVAL));
-                        continue;
-                    }
+                return response;
+            } catch (error) {
+                console.error(error);
+                maxRetries -= 1;
+
+                if (maxRetries > 0) {
+                    toast.error("Network Error: Retrying...");
+                    await new Promise((resolve) => setTimeout(resolve, RETRY_INTERVAL));
+                    continue;
                 }
             }
-            return new Error("Request failed due to a network error");
-        },
-        [],
-    );
+        }
+        return new Error("Request failed due to a network error");
+    }, []);
 
-    const doPUT = useCallback(
-        async (url: string, data: any, contentType = "application/json"): Promise<Response | Error> => {
-            let maxRetries = 3;
-            while (maxRetries > 0) {
-                try {
-                    const response = await fetch(`${API_URL}${url}`, {
-                        method: "PUT",
-                        credentials: "include",
-                        headers: { "Content-Type": contentType },
-                        body: contentType === "application/json" ? JSON.stringify(data) : data,
-                    });
+    const doPUT = useCallback(async (url: string, data: any): Promise<Response | Error> => {
+        let maxRetries = 3;
+        const isFormData = data instanceof FormData;
 
-                    return response;
-                } catch (error) {
-                    console.error(error);
-                    maxRetries -= 1;
+        while (maxRetries > 0) {
+            try {
+                const response = await fetch(`${API_URL}${url}`, {
+                    method: "PUT",
+                    credentials: "include",
+                    headers: isFormData ? undefined : { "Content-Type": "application/json" },
+                    body: isFormData ? data : JSON.stringify(data),
+                });
 
-                    if (maxRetries > 0) {
-                        toast.error("Network Error: Retrying...");
-                        await new Promise((resolve) => setTimeout(resolve, RETRY_INTERVAL));
-                        continue;
-                    }
+                return response;
+            } catch (error) {
+                console.error(error);
+                maxRetries -= 1;
+
+                if (maxRetries > 0) {
+                    toast.error("Network Error: Retrying...");
+                    await new Promise((resolve) => setTimeout(resolve, RETRY_INTERVAL));
+                    continue;
                 }
             }
-            return new Error("Request failed due to a network error");
-        },
-        [],
-    );
+        }
+        return new Error("Request failed due to a network error");
+    }, []);
 
     const doDELETE = useCallback(async (url: string): Promise<Response | Error> => {
         let maxRetries = 3;

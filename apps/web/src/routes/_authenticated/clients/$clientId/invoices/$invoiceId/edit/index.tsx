@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import InvoiceForm from "@/components/InvoiceForm";
 import { Button } from "@/components/ui/button";
-import type { Client, Invoice } from "@/lib/types";
+import type { Client } from "@/lib/types";
+import type { Invoice } from "@shared/lib/types";
 import { ArrowLeft } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
