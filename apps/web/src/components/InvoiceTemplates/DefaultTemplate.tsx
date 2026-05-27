@@ -126,17 +126,17 @@ export const DefaultInvoiceTemplate = forwardRef<HTMLDivElement, InvoicePDFProps
         <div className="mt-10">
           <p className="text-xs font-semibold uppercase text-gray-500 mb-1">Signatures</p>
           <div className="grid grid-cols-2 gap-12 mb-8">
-            <div className="text-center">
+            <div className="text-center relative">
               {invoice.signature && (
                 <img
                   src={invoice.signature}
                   crossOrigin="anonymous"
                   loading="eager"
                   alt="User Signature"
-                  style={{ width: "100%", height: "64px" }}
+                  className="bottom-10 absolute w-full h-16"
                 />
               )}
-              <div className={`border-t pt-2 text-sm ${invoice.signature ? "mt-4" : "mt-20"}`}>{bussinessname}</div>
+              <div className={`border-t pt-2 text-sm mt-20`}>{bussinessname}</div>
             </div>
             <div className="text-center">
               <div className="border-t mt-20 pt-2 text-sm">{client?.name}</div>
