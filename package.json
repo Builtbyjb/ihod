@@ -8,6 +8,7 @@
     "deploy-server": "npx turbo deploy --filter=@invoice/server",
     "build-web": "npx turbo build --filter=@invoice/web",
     "build-server": "npx turbo build --filter=@invoice/server",
+    "build": "npx turbo build",
     "lint-web": "npx turbo lint --filter=@invoice/web",
     "lint-server": "npx turbo lint --filter=@invoice/server",
     "lint": "npx turbo lint",

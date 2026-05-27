@@ -1,3 +1,8 @@
+export type InvoiceNumber = {
+    year: number;
+    currentNumber: number;
+};
+
 export type InvoiceItem = {
     description: string;
     quantity: number;

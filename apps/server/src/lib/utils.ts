@@ -1,5 +1,6 @@
 import { Context } from "hono";
-import { ErrorResult, InvoiceNumber, TokenPayload } from "./types";
+import { ErrorResult, TokenPayload } from "./types";
+import type { InvoiceNumber } from "@shared/lib/types";
 import { getCookie } from "hono/cookie";
 import { verify, sign } from "hono/jwt";
 

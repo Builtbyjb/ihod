@@ -14,7 +14,7 @@ import {
 import { authMiddleware } from "@/middleware/auth-middleware";
 import { zValidator } from "@hono/zod-validator";
 import { getBlobURL } from "@/lib/utils";
-import { UserSchema, BusinessSchema } from "@shared/lib/zod-schema";
+import { UserSchema, BusinessSchema, FeedbackSchema } from "@shared/lib/zod-schema";
 
 const userRouteV1 = new Hono<{ Bindings: Bindings }>().basePath("/user");
 userRouteV1.use("*", authMiddleware());
@@ -153,6 +153,19 @@ userRouteV1.put("/settings/business", zValidator("form", BusinessSchema), async 
         .where(eq(organizations.id, jwtPayload.currentOrgId));
 
     return c.json({ message: "Business Profile updated" }, 200);
+});
+
+userRouteV1.post("/settings/feedback", zValidator("json", FeedbackSchema), async (c) => {
+    const data = c.req.valid("json");
+
+    await c.env.SEND_EMAIL.send({
+        from: "feedback@acorp.app",
+        to: "awotideajibola@gmail.com",
+        subject: `Feedback from ACORP Invoice: ${data.subject}`,
+        text: data.description,
+    });
+
+    return c.json({ message: "Feedback submitted" }, 200);
 });
 
 export default userRouteV1;

@@ -121,3 +121,8 @@ export const TopStatsSchema = z.object({
     pendingAmount: z.number(),
     totalClients: z.number(),
 });
+
+export const FeedbackSchema = z.object({
+    subject: z.string().optional(),
+    description: z.string(),
+});

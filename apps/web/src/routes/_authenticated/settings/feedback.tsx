@@ -1,23 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useLayout } from "@/hooks/useLayout";
 import { useEffect } from "react";
-import Banner from "@/components/Banner";
-import { BadgeInfo } from "lucide-react";
 import { useForm } from "@tanstack/react-form";
 import * as z from "zod";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import TextInputField from "@/components/Form/TextInputField";
+import { useFetch } from "@/hooks/useFetch";
+import { toast } from "sonner";
+import { FeedbackSchema } from "@shared/lib/zod-schema";
 
-const FeedbackSchema = z.object({
-  subject: z.string(),
-  description: z.string(),
-});
+type FeedbackSchemaType = z.infer<typeof FeedbackSchema>;
 
 function RouteComponent() {
   const { setTitle } = useLayout();
+  const { doPOST } = useFetch();
 
   useEffect(() => {
     setTitle("Feedback");
@@ -27,18 +26,29 @@ function RouteComponent() {
     defaultValues: {
       subject: "",
       description: "",
-    },
+    } as FeedbackSchemaType,
     validators: {
       onSubmit: FeedbackSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log(value);
+      try {
+        const response = await doPOST("/api/v1/user/settings/feedback", value);
+        if (response instanceof Error) throw response;
+
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message);
+
+        toast.success("Feedback submitted!");
+        form.reset();
+      } catch (error: unknown) {
+        if (error instanceof Error) toast.error(error.message);
+        console.log(error);
+      }
     },
   });
 
   return (
     <div className="space-y-6">
-      <Banner backgroundColor={"bg-sky-100"} icon={<BadgeInfo />} text={"Coming soon!"} />
       <form
         id="feedback-form"
         onSubmit={(e) => {
@@ -56,21 +66,14 @@ function RouteComponent() {
               <form.Field
                 name="subject"
                 children={(field) => {
-                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
-                    <Field>
-                      <FieldLabel htmlFor="subject-input">Subject</FieldLabel>
-                      <Input
-                        id="subject-input"
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        aria-invalid={isInvalid}
-                        placeholder="Feedback Topic"
-                      />
-                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                    </Field>
+                    <TextInputField
+                      field={field}
+                      id="subject-input"
+                      label="Subject"
+                      placeholder="Feedback Topic"
+                      isRequired={false}
+                    />
                   );
                 }}
               />
