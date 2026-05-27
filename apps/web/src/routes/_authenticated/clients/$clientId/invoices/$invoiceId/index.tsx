@@ -1,60 +1,76 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Download, Pencil, Printer } from "lucide-react";
-import type { Client, Invoice } from "@/lib/types";
+import { ArrowLeft, Download, Pencil, View } from "lucide-react";
+import type { Client } from "@/lib/types";
+import type { Invoice } from "@shared/lib/types";
+import { InvoiceSchema, ClientSchema } from "@shared/lib/zod-schema";
 import { DefaultInvoiceTemplate } from "@/components/InvoiceTemplates/DefaultTemplate";
 import { calculateSubTotal, calculateTaxAmount, calculateTotalAmount } from "@/lib/utils";
-import { useReactToPrint } from "react-to-print";
 import { formatCurrency, getStatusVariant, formatDate } from "@/lib/utils";
 import { useAuth } from "@/hooks/auth";
 import { useDownloadPDF } from "@/hooks/useDownloadPDF";
 import { useLayout } from "@/hooks/useLayout";
+import { useFetch } from "@/hooks/useFetch";
+import ImagePreview from "@/components/ImagePreview";
+import SignatureCanvas from "react-signature-canvas";
 
-const API_URL = import.meta.env.VITE_API_URL;
 function RouteComponent() {
   const { clientId, invoiceId } = Route.useParams();
-  const navigate = useNavigate();
-  const router = useRouter();
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [client, setClient] = useState<Client | null>(null);
+  const [logoURL, setLogoURL] = useState<string | null>(null);
+
+  const navigate = useNavigate();
+  const router = useRouter();
   const { user } = useAuth();
-  const { ref, download } = useDownloadPDF();
+  const { ref, download, preview } = useDownloadPDF();
+  const { doGET } = useFetch();
+  const sigCanvas = useRef<SignatureCanvas | null>(null);
+  const sigRef = useRef<SignatureCanvas | null>(null);
 
   const { setTitle } = useLayout();
 
   useEffect(() => {
-    if (invoice?.id) setTitle(invoice.id);
+    if (invoice?.invoiceNumber) setTitle(invoice.invoiceNumber);
   }, [invoice, setTitle]);
 
   useEffect(() => {
     (async () => {
       try {
-        const response = await fetch(`${API_URL}/api/v1/clients/${clientId}/invoices/${invoiceId}`, {
-          method: "GET",
-          credentials: "include",
-        });
+        const response = await doGET(`/api/v1/clients/${clientId}/invoices/${invoiceId}`);
+        if (response instanceof Error) throw response;
 
-        if (!response.ok) throw new Error("Failed to get invoice");
-
-        // TODO: Zod validate
         const result = await response.json();
-        setInvoice(result.invoice);
-        // console.log(result.invoice);
-        setClient(result.client);
+        if (!response.ok) throw new Error(result.message);
+
+        const parsedInvoice = InvoiceSchema.parse(result.invoice);
+        setInvoice(parsedInvoice);
+
+        const parsedClient = ClientSchema.parse(result.client);
+        setClient(parsedClient);
+
+        setLogoURL(result.logoURL);
       } catch (error) {
         console.log(error);
       }
     })();
-  }, [clientId, invoiceId]);
+  }, [clientId, invoiceId, doGET]);
 
-  const handlePrint = useReactToPrint({
-    contentRef: ref,
-    documentTitle: "Invoice",
-  });
+  useEffect(() => {
+    if (invoice?.signature) {
+      sigCanvas.current?.fromDataURL(invoice.signature);
+      sigRef.current?.fromDataURL(invoice.signature);
+    }
+  }, [invoice?.signature]);
+
+  const handlePreview = async () => {
+    const url = await preview();
+    if (url) window.open(url, "_blank");
+  };
 
   return (
     <div className="space-y-6 w-full">
@@ -78,9 +94,9 @@ function RouteComponent() {
                 <Pencil className="mr-2 h-4 w-4" />
                 Edit
               </Button>
-              <Button variant="outline" onClick={handlePrint}>
-                <Printer className="mr-3 h-4 w-4" />
-                Print
+              <Button variant="outline" onClick={handlePreview}>
+                <View className="mr-2 h-4 w-4" />
+                Preview
               </Button>
               <Button onClick={download}>
                 <Download className="mr-2 h-4 w-4" />
@@ -91,10 +107,13 @@ function RouteComponent() {
 
           <div className="grid gap-6 lg:grid-cols-3">
             <Card className="lg:col-span-2">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle className="text-2xl">{invoice.id}</CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">Issued on {formatDate(invoice.issueDate)}</p>
+              <CardHeader className="flex flex-row items-center justify-between mb-4">
+                <div className="flex gap-4 items-center">
+                  <ImagePreview source={logoURL} />
+                  <div>
+                    <CardTitle className="text-2xl">{invoice.invoiceNumber}</CardTitle>
+                    <p className="text-sm text-muted-foreground mt-1">Issued on {formatDate(invoice.issueDate)}</p>
+                  </div>
                 </div>
                 <Badge className={`capitalize text-sm ${getStatusVariant(invoice.status)}`}>{invoice.status}</Badge>
               </CardHeader>
@@ -123,7 +142,7 @@ function RouteComponent() {
                         <TableHead>Description</TableHead>
                         <TableHead className="text-center">Qty</TableHead>
                         <TableHead className="text-right">Unit Price</TableHead>
-                        <TableHead className="text-right">Total</TableHead>
+                        <TableHead className="text-right">Amount</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -135,16 +154,29 @@ function RouteComponent() {
                             {formatCurrency(item.unitPrice, invoice.currency)}
                           </TableCell>
                           <TableCell className="text-right">
-                            {formatCurrency(item.unitPrice, invoice.currency)}
+                            {formatCurrency(item.quantity * item.unitPrice, invoice.currency)}
                           </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
                   </Table>
                 </div>
+                {invoice.signature && (
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium mb-2">Signature</h3>
+                    <SignatureCanvas
+                      ref={sigCanvas}
+                      penColor="black"
+                      canvasProps={{
+                        style: { width: "100%" },
+                        className: "sigCanvas",
+                      }}
+                    />
+                  </div>
+                )}
 
                 {invoice.notes && (
-                  <div className="bg-background p-4 rounded-lg">
+                  <div>
                     <h3 className="text-sm font-medium mb-2">Notes</h3>
                     <p className="text-sm text-muted-foreground">{invoice.notes}</p>
                   </div>
@@ -191,16 +223,9 @@ function RouteComponent() {
               </CardContent>
             </Card>
           </div>
-          <div className="print-section">
-            <DefaultInvoiceTemplate
-              ref={ref}
-              invoice={invoice}
-              client={client}
-              bussinessname={user?.organizationName}
-            />
-          </div>
         </>
       ) : (
+        // TODO: Add loading state
         <div className="p-4 md:p-6 flex items-center justify-center">
           <div className="text-center">
             <h2 className="text-xl font-semibold mb-2">Invoice not found</h2>
@@ -209,6 +234,18 @@ function RouteComponent() {
               Back to Invoices
             </Button>
           </div>
+        </div>
+      )}
+      {invoice && (
+        <div className="print-section">
+          <DefaultInvoiceTemplate
+            ref={ref}
+            sigRef={sigRef}
+            invoice={invoice}
+            client={client}
+            bussinessname={user?.organizationName}
+            logoURL={logoURL}
+          />
         </div>
       )}
     </div>

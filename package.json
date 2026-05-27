@@ -8,7 +8,10 @@
     "deploy-server": "npx turbo deploy --filter=@invoice/server",
     "build-web": "npx turbo build --filter=@invoice/web",
     "build-server": "npx turbo build --filter=@invoice/server",
+    "build": "npx turbo build",
     "lint-web": "npx turbo lint --filter=@invoice/web",
+    "lint-server": "npx turbo lint --filter=@invoice/server",
+    "lint": "npx turbo lint",
     "prepare": "husky"
   },
   "devDependencies": {
@@ -23,7 +26,9 @@
   ],
   "packageManager": "npm@8.5.0",
   "dependencies": {
+    "@shared/lib": "^0.0.1",
     "@tanstack/react-form": "^1.29.0",
-    "jwt-decode": "^4.0.0"
+    "jwt-decode": "^4.0.0",
+    "react-signature-canvas": "^1.1.0-alpha.2"
   }
 }

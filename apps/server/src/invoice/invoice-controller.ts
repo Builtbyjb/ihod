@@ -1,31 +1,13 @@
 import { Hono } from "hono";
 import { Bindings, TokenPayload } from "@/lib/types";
-import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
 import { drizzle } from "drizzle-orm/d1";
-import { eq, and, sql, desc } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { clients, invoices, organizations } from "@/db/schema";
 import { getNewInvoiceNumber } from "@/lib/utils";
+import { InvoiceFormSchema } from "@shared/lib/zod-schema";
 
 const invoiceRouteV1 = new Hono<{ Bindings: Bindings }>().basePath("/invoices");
-
-const invoiceFormSchema = z.object({
-    clientId: z.string(),
-    issueDate: z.coerce.date(),
-    dueDate: z.coerce.date(),
-    discount: z.number().min(0).max(100),
-    taxRate: z.number().min(0).max(100),
-    status: z.enum(["draft", "sent", "paid", "overdue"]),
-    items: z.array(
-        z.object({
-            description: z.string(),
-            quantity: z.number().positive(),
-            unitPrice: z.number().positive(),
-        }),
-    ),
-    currency: z.string(),
-    notes: z.string(),
-});
 
 /* Returns all the invoices created for a client */
 invoiceRouteV1.get("/", async (c) => {
@@ -51,7 +33,12 @@ invoiceRouteV1.get("/:invoiceId", async (c) => {
     const invoiceId = c.req.param("invoiceId");
     if (!invoiceId) return c.json({ message: "No invoice Id" }, 400);
 
+    const jwt = c.get("jwtPayload") as TokenPayload;
+
     const db = drizzle(c.env.DB);
+
+    const organization = await db.select().from(organizations).where(eq(organizations.id, jwt.currentOrgId)).get();
+    if (!organization) return c.json({ message: "Organization not found" }, 404);
 
     const clientResult = await db.select().from(clients).where(eq(clients.id, clientId)).get();
     if (!clientResult) return c.json({ message: "Client not found" }, 404);
@@ -59,16 +46,17 @@ invoiceRouteV1.get("/:invoiceId", async (c) => {
     const invoiceResult = await db
         .select()
         .from(invoices)
-        .where(and(eq(invoices.clientId, clientId), eq(invoices.id, invoiceId)))
+        .where(and(eq(invoices.clientId, clientId), eq(invoices.id, invoiceId), eq(invoices.deleted, false)))
         .get();
+
     if (!invoiceResult) return c.json({ message: "Invoice not found" }, 404);
 
-    return c.json({ invoice: invoiceResult, client: clientResult }, 200);
+    return c.json({ invoice: invoiceResult, client: clientResult, logoURL: organization.logoURL }, 200);
 });
 
 invoiceRouteV1.post(
     "/create",
-    zValidator("json", invoiceFormSchema, (result, c) => {
+    zValidator("json", InvoiceFormSchema, (result, c) => {
         if (!result.success) {
             console.error(`Zod Validation Error: ${result.error}`);
             return c.json({ message: "Zod Validation Error" }, 400);
@@ -90,15 +78,19 @@ invoiceRouteV1.post(
 
         const newInvoiceNumber = getNewInvoiceNumber(organization.invoiceNumber);
 
-        const invoiceId = "INV-" + newInvoiceNumber.year + "-" + newInvoiceNumber.currentNumber;
+        const invoiceNumber = "INV-" + newInvoiceNumber.year + "-" + newInvoiceNumber.currentNumber;
+
+        if (!data.clientId) return c.json({ message: "Client ID is required" }, 400);
 
         // Create Invoice
         await db.insert(invoices).values({
-            id: invoiceId,
+            id: crypto.randomUUID(),
+            invoiceNumber: invoiceNumber,
             clientId: data.clientId,
             issueDate: data.issueDate,
             dueDate: data.dueDate,
             status: data.status,
+            signature: data.signature,
             discount: data.discount,
             taxRate: data.taxRate,
             items: data.items,
@@ -118,7 +110,7 @@ invoiceRouteV1.post(
 
 invoiceRouteV1.put(
     "/:invoiceId/edit",
-    zValidator("json", invoiceFormSchema, (result, c) => {
+    zValidator("json", InvoiceFormSchema, (result, c) => {
         if (!result.success) {
             console.error(`Zod Validation Error: ${result.error}`);
             return c.json({ message: "Zod Validation Error" }, 400);
@@ -138,9 +130,9 @@ invoiceRouteV1.put(
                 discount: data.discount,
                 taxRate: data.taxRate,
                 items: data.items,
+                signature: data.signature,
                 notes: data.notes,
                 currency: data.currency,
-                updatedAt: sql`(unixepoch())`,
             })
             .where(eq(invoices.id, invoiceId));
 
@@ -152,7 +144,9 @@ invoiceRouteV1.delete("/:invoiceId/delete", async (c) => {
     const invoiceId = c.req.param("invoiceId");
     const db = drizzle(c.env.DB);
 
-    await db.update(invoices).set({ deleted: false }).where(eq(invoices.id, invoiceId));
+    console.log(invoiceId);
+
+    await db.update(invoices).set({ deleted: true }).where(eq(invoices.id, invoiceId));
     return c.json({ message: "Invoice deleted" }, 200);
 });
 

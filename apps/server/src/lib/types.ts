@@ -12,7 +12,8 @@ export type Bindings = {
     ENV: string;
     PAYSTACK_SECRET: string;
     FRONTEND_URL: string;
-    // Add other variables like KV, R2, or Secret Keys here
+    SERVER_URL: string;
+    R2: R2Bucket;
 };
 
 export type TokenPayload = JWTPayload & {
@@ -24,12 +25,6 @@ export type TokenPayload = JWTPayload & {
     otp?: string;
     paystackCustomerCode?: string;
     paystackCustomerId?: number;
-};
-
-export type InvoiceItem = {
-    description: string;
-    quantity: number;
-    unitPrice: number;
 };
 
 export type ReturnId = {
@@ -51,8 +46,3 @@ export class ErrorResult extends Error {
 
 export type Client = typeof clients.$inferSelect;
 export type Invoice = typeof invoices.$inferSelect;
-
-export type InvoiceNumber = {
-    year: number;
-    currentNumber: number;
-};

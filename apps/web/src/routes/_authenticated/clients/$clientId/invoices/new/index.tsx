@@ -4,30 +4,32 @@ import InvoiceForm from "@/components/InvoiceForm";
 import type { Client } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { ClientSchema } from "@shared/lib/zod-schema";
+import { useFetch } from "@/hooks/useFetch";
 
 const API_URL = import.meta.env.VITE_API_URL;
 function RouteComponent() {
   const [clientInfo, setClientInfo] = useState<Client | null>(null);
   const { clientId } = Route.useParams();
   const router = useRouter();
+  const { doGET } = useFetch();
 
   useEffect(() => {
     (async () => {
       try {
-        const response = await fetch(`${API_URL}/api/v1/clients/${clientId}`, {
-          method: "GET",
-          credentials: "include",
-        });
+        const response = await doGET(`${API_URL}/api/v1/clients/${clientId}`);
+        if (response instanceof Error) throw response;
 
-        if (!response.ok) throw new Error("Failed to get client information");
         const result = await response.json();
-        // TODO: Zod validate
-        setClientInfo(result.clientInfo);
+        if (!response.ok) throw new Error(result.message);
+
+        const parsedClient = ClientSchema.parse(result.clientInfo);
+        setClientInfo(parsedClient);
       } catch (error) {
         console.log(error);
       }
     })();
-  }, [clientId]);
+  }, [clientId, doGET]);
 
   return (
     <main className="mb-8">

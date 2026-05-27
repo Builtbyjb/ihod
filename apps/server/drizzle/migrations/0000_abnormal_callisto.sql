@@ -15,11 +15,13 @@ CREATE TABLE `clients` (
 --> statement-breakpoint
 CREATE TABLE `invoices` (
 	`id` text PRIMARY KEY NOT NULL,
+	`invoice_number` text NOT NULL,
 	`client_id` text NOT NULL,
 	`issue_date` integer NOT NULL,
 	`due_date` integer NOT NULL,
 	`status` text NOT NULL,
 	`tax_rate` integer DEFAULT 0 NOT NULL,
+	`discount` integer DEFAULT 0 NOT NULL,
 	`items` text DEFAULT '[]' NOT NULL,
 	`notes` text,
 	`currency` text NOT NULL,
@@ -37,8 +39,8 @@ CREATE TABLE `members` (
 	`start_date` integer DEFAULT (unixepoch()),
 	`end_date` integer,
 	`deleted` integer DEFAULT false NOT NULL,
-	`created_at` integer DEFAULT (unixepoch()),
-	`updated_at` integer DEFAULT (unixepoch()),
+	`created_at` integer DEFAULT (unixepoch()) NOT NULL,
+	`updated_at` integer DEFAULT (unixepoch()) NOT NULL,
 	FOREIGN KEY (`organization_id`) REFERENCES `organizations`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`role_id`) REFERENCES `roles`(`id`) ON UPDATE no action ON DELETE no action
@@ -59,8 +61,8 @@ CREATE TABLE `organizations` (
 	`paystack_plan_id` integer,
 	`paystack_subscription_status` text DEFAULT 'none' NOT NULL,
 	`deleted` integer DEFAULT false NOT NULL,
-	`created_at` integer DEFAULT (unixepoch()),
-	`updated_at` integer DEFAULT (unixepoch())
+	`created_at` integer DEFAULT (unixepoch()) NOT NULL,
+	`updated_at` integer DEFAULT (unixepoch()) NOT NULL
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `organizations_name_unique` ON `organizations` (`name`);--> statement-breakpoint
@@ -70,8 +72,8 @@ CREATE TABLE `roles` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`permissions` text NOT NULL,
-	`created_at` integer DEFAULT (unixepoch()),
-	`updated_at` integer DEFAULT (unixepoch())
+	`created_at` integer DEFAULT (unixepoch()) NOT NULL,
+	`updated_at` integer DEFAULT (unixepoch()) NOT NULL
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `roles_name_unique` ON `roles` (`name`);--> statement-breakpoint
@@ -83,8 +85,8 @@ CREATE TABLE `users` (
 	`lastname` text,
 	`username` text NOT NULL,
 	`deleted` integer DEFAULT false NOT NULL,
-	`created_at` integer DEFAULT (unixepoch()),
-	`updated_at` integer DEFAULT (unixepoch()),
+	`created_at` integer DEFAULT (unixepoch()) NOT NULL,
+	`updated_at` integer DEFAULT (unixepoch()) NOT NULL,
 	FOREIGN KEY (`currency_organization_id`) REFERENCES `organizations`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint

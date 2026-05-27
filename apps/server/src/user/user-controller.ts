@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { Bindings, Client, Invoice, TokenPayload } from "@/lib/types";
 import { drizzle } from "drizzle-orm/d1";
 import { eq, and } from "drizzle-orm";
-import { clients, invoices } from "@/db/schema";
+import { clients, invoices, organizations, users } from "@/db/schema";
 import {
     countPaidInvoices,
     calculateRevenue,
@@ -12,6 +12,9 @@ import {
     getRecentInvoices,
 } from "./user-service";
 import { authMiddleware } from "@/middleware/auth-middleware";
+import { zValidator } from "@hono/zod-validator";
+import { getBlobURL } from "@/lib/utils";
+import { UserSchema, BusinessSchema, FeedbackSchema } from "@shared/lib/zod-schema";
 
 const userRouteV1 = new Hono<{ Bindings: Bindings }>().basePath("/user");
 userRouteV1.use("*", authMiddleware());
@@ -56,6 +59,113 @@ userRouteV1.get("/dashboard", async (c) => {
     };
 
     return c.json({ message: "Success", data }, 200);
+});
+
+userRouteV1.get("/settings", async (c) => {
+    const db = drizzle(c.env.DB);
+    const jwtPayload = c.get("jwtPayload") as TokenPayload;
+
+    const user = await db.select().from(users).where(eq(users.id, jwtPayload.userId)).get();
+    if (!user) return c.json({ message: "User not found" }, 404);
+
+    const organization = await db
+        .select()
+        .from(organizations)
+        .where(eq(organizations.id, jwtPayload.currentOrgId))
+        .get();
+
+    if (!organization) return c.json({ message: "User organization not found" }, 404);
+
+    const setting = {
+        user: {
+            avatarURL: user.avatarURL,
+            username: user.username,
+        },
+        business: {
+            logoURL: organization.logoURL,
+            name: organization.name,
+            email: user.email,
+            website: organization.website,
+            address: organization.address,
+            city: organization.city,
+            country: organization.country,
+        },
+    };
+    return c.json({ message: "Profile setting", data: setting }, 200);
+});
+
+userRouteV1.put("/settings/profile", zValidator("form", UserSchema), async (c) => {
+    const data = c.req.valid("form");
+    const db = drizzle(c.env.DB);
+
+    // console.log(data);
+    const jwtPayload = c.get("jwtPayload") as TokenPayload;
+
+    let blobURL: string | null = null;
+    if (data.avatar) {
+        const value = await c.env.R2.put(`${jwtPayload.userId}-avatar`, data.avatar, {
+            httpMetadata: {
+                contentType: data.avatar.type,
+            },
+        });
+        // console.log(value);
+
+        blobURL = getBlobURL(c, value?.key);
+    }
+
+    await db
+        .update(users)
+        .set({ avatarURL: blobURL || users.avatarURL, username: data.username })
+        .where(eq(users.id, jwtPayload.userId));
+
+    return c.json({ message: "User profile updated" }, 200);
+});
+
+userRouteV1.put("/settings/business", zValidator("form", BusinessSchema), async (c) => {
+    const data = c.req.valid("form");
+    const db = drizzle(c.env.DB);
+
+    // console.log(data);
+    const jwtPayload = c.get("jwtPayload") as TokenPayload;
+
+    let blobURL: string | null = null;
+    if (data.logo) {
+        const value = await c.env.R2.put(`${jwtPayload.currentOrgId}-logo`, data.logo, {
+            httpMetadata: {
+                contentType: data.logo.type,
+            },
+        });
+        // console.log(value);
+
+        blobURL = getBlobURL(c, value?.key);
+    }
+
+    await db
+        .update(organizations)
+        .set({
+            logoURL: blobURL || organizations.logoURL,
+            name: data.name,
+            address: data.address,
+            city: data.city,
+            country: data.country,
+            website: data.website,
+        })
+        .where(eq(organizations.id, jwtPayload.currentOrgId));
+
+    return c.json({ message: "Business Profile updated" }, 200);
+});
+
+userRouteV1.post("/settings/feedback", zValidator("json", FeedbackSchema), async (c) => {
+    const data = c.req.valid("json");
+
+    await c.env.SEND_EMAIL.send({
+        from: "feedback@acorp.app",
+        to: "awotideajibola@gmail.com",
+        subject: `Feedback from ACORP Invoice: ${data.subject}`,
+        text: data.description,
+    });
+
+    return c.json({ message: "Feedback submitted" }, 200);
 });
 
 export default userRouteV1;

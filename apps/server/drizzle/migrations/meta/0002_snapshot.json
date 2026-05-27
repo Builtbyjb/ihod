@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "37069f16-086d-42f1-adf0-0b2c00751600",
-  "prevId": "02c17b32-6ed8-44d0-818b-d9aa3b81724b",
+  "id": "18596731-bf39-470a-b59f-c7e39cf363e9",
+  "prevId": "37069f16-086d-42f1-adf0-0b2c00751600",
   "tables": {
     "clients": {
       "name": "clients",
@@ -151,6 +151,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "signature": {
+          "name": "signature",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "tax_rate": {

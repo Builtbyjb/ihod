@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import type { MonthRevenue } from "@/lib/types";
+import type { MonthRevenue } from "@shared/lib/types";
 import { SkeletonBarChart } from "@/components/Skeleton";
 import { formatCurrency } from "@/lib/utils";
 import type { ValueType } from "recharts/types/component/DefaultTooltipContent";

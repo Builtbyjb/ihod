@@ -4,10 +4,12 @@
   "scripts": {
     "dev": "npx wrangler dev --env=dev --local",
     "deploy": "npx wrangler deploy --minify",
-    "cf-typegen": "npx wrangler types --env-interface CloudflareBindings"
+    "cf-typegen": "npx wrangler types --env-interface CloudflareBindings",
+    "lint": "npx eslint ."
   },
   "dependencies": {
     "@hono/zod-validator": "^0.7.6",
+    "@shared/lib": "^0.0.1",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
     "hono": "^4.12.14"

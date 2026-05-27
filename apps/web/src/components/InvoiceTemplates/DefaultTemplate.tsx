@@ -1,29 +1,34 @@
 import { forwardRef } from "react";
-import type { Invoice, Client } from "@/lib/types";
+import type { Client } from "@/lib/types";
+import type { Invoice, InvoiceItem } from "@shared/lib/types";
 import { format } from "date-fns";
 import { calculateDiscount, formatCurrency } from "@/lib/utils";
 import { calculateSubTotal, calculateTaxAmount, calculateTotalAmount } from "@/lib/utils";
 import { APP_NAME } from "@/lib/constant";
+import SignatureCanvas from "react-signature-canvas";
 
 type InvoicePDFProps = {
   invoice: Invoice;
   client: Client | null;
   bussinessname?: string;
+  logoURL: string | null;
+  sigRef: React.RefObject<SignatureCanvas | null>;
 };
 
 export const DefaultInvoiceTemplate = forwardRef<HTMLDivElement, InvoicePDFProps>(
-  ({ invoice, client, bussinessname }, ref) => (
-    <main ref={ref} className="bg-white w-[210mm] min-h-[297mm] mx-auto p-[10mm] text-gray-900 print:p-[10mm]">
+  ({ invoice, client, bussinessname, logoURL, sigRef }, ref) => (
+    <main ref={ref} className="bg-white w-[210mm] min-h-[290mm] mx-auto p-[10mm] text-gray-900 print:p-[10mm]">
       <div className="h-full flex flex-col justify-between">
         {/* Top Content */}
-        <div className="space-y-8">
+        <div className="space-y-4">
           {/* Header */}
           <div className="flex justify-between items-start border-b pb-6">
             <div>
-              <p className="text-3xl font-bold">{bussinessname}</p>
+              {logoURL && <img src={logoURL} alt="Business Logo" className="w-16 h-16 object-contain mb-2" />}
+              <p className="text-2xl font-medium">{bussinessname}</p>
             </div>
-            <div className="text-right text-sm space-y-1">
-              <p className="font-semibold text-lg">Invoice #{invoice.id}</p>
+            <div className="text-right text-sm space-y-0.5">
+              <p className="font-semibold text-lg"> #{invoice.invoiceNumber}</p>
               <p>Issue: {format(new Date(invoice.issueDate), "MMM d, yyyy")}</p>
               <p>Due: {format(new Date(invoice.dueDate), "MMM d, yyyy")}</p>
             </div>
@@ -33,7 +38,7 @@ export const DefaultInvoiceTemplate = forwardRef<HTMLDivElement, InvoicePDFProps
           <div className="bg-gray-50 p-6 rounded-xl">
             <p className="text-xs font-semibold uppercase text-gray-500 mb-2">Bill To</p>
             {client && (
-              <div className="space-y-1 text-sm">
+              <div className="space-y-0.5 text-sm">
                 <p className="font-medium text-base">{client.name}</p>
                 <p>{client.email}</p>
                 {client.phone && <p>{client.phone}</p>}
@@ -51,10 +56,10 @@ export const DefaultInvoiceTemplate = forwardRef<HTMLDivElement, InvoicePDFProps
               <p>Description</p>
               <p className="text-center">Qty</p>
               <p className="text-right">Unit</p>
-              <p className="text-right">Total</p>
+              <p className="text-right">Amount</p>
             </div>
 
-            {invoice.items.map((item, index) => (
+            {invoice.items.map((item: InvoiceItem, index) => (
               <div key={index} className="grid grid-cols-4 py-3 border-b text-sm">
                 <p>{item.description}</p>
                 <p className="text-center">{item.quantity}</p>
@@ -113,14 +118,24 @@ export const DefaultInvoiceTemplate = forwardRef<HTMLDivElement, InvoicePDFProps
         </div>
 
         {/* Bottom Section (Signatures + Footer) */}
-        <div className="pt-10">
+        <div className="mt-10">
           <p className="text-xs font-semibold uppercase text-gray-500 mb-1">Signatures</p>
           <div className="grid grid-cols-2 gap-12 mb-8">
             <div className="text-center">
-              <div className="border-t mt-16 pt-2 text-sm">{bussinessname}</div>
+              {invoice.signature && (
+                <SignatureCanvas
+                  ref={sigRef}
+                  penColor="black"
+                  canvasProps={{
+                    style: { width: "100%", height: "4rem" },
+                    className: "sigCanvas",
+                  }}
+                />
+              )}
+              <div className={`border-t pt-2 text-sm ${invoice.signature ? "mt-4" : "mt-20"}`}>{bussinessname}</div>
             </div>
             <div className="text-center">
-              <div className="border-t mt-16 pt-2 text-sm">{client?.name}</div>
+              <div className="border-t mt-20 pt-2 text-sm">{client?.name}</div>
             </div>
           </div>
 
