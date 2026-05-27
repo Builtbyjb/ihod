@@ -51,6 +51,7 @@ function RouteComponent() {
         setClient(parsedClient);
 
         setLogoURL(result.logoURL);
+        console.log(result.logoURL);
       } catch (error) {
         console.log(error);
       }
@@ -157,7 +158,7 @@ function RouteComponent() {
                     <img
                       src={invoice.signature}
                       alt="User Signature"
-                      style={{ width: "100%", height: "auto", display: "block" }}
+                      style={{ width: "100%", height: "64px", display: "block" }}
                     />
                   </div>
                 )}
