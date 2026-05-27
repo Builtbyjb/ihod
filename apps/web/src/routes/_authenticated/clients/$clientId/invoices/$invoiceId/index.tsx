@@ -155,11 +155,7 @@ function RouteComponent() {
                 {invoice.signature && (
                   <div className="mb-4">
                     <h3 className="text-sm font-medium mb-2">Signature</h3>
-                    <img
-                      src={invoice.signature}
-                      alt="User Signature"
-                      style={{ width: "100%", height: "64px", display: "block" }}
-                    />
+                    <img src={invoice.signature} alt="User Signature" className="w-full h-16" />
                   </div>
                 )}
 

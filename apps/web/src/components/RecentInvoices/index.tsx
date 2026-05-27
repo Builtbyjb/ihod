@@ -19,6 +19,10 @@ export default function RecentInvoices({ invoices, isLoading }: RecentInvoicesPr
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5);
 
+  const handleNavigate = (invoice: Invoice) => {
+    navigate({ to: `/clients/${invoice.clientId}/invoices/${invoice.id}` });
+  };
+
   return (
     <Card className="col-span-1 lg:col-span-2">
       <CardHeader className="flex flex-row items-center justify-between">
@@ -34,7 +38,11 @@ export default function RecentInvoices({ invoices, isLoading }: RecentInvoicesPr
         {!isLoading ? (
           <div className="space-y-4">
             {recentInvoices.map((invoice) => (
-              <div key={invoice.id} className="flex items-center justify-between p-3 rounded-lg border border-border">
+              <div
+                key={invoice.id}
+                className="flex items-center justify-between p-3 rounded-lg border border-border"
+                onClick={() => handleNavigate(invoice)}
+              >
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{invoice.invoiceNumber}</span>
