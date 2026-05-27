@@ -429,11 +429,12 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
           <SignatureCanvas
             ref={sigCanvas}
             penColor="black"
+            clearOnResize={false}
             canvasProps={{
               style: {
                 backgroundColor: "#e5e7eb",
                 width: "100%",
-                height: "8rem",
+                height: "128px",
                 display: "block",
                 border: "1px solid #e5e7eb",
                 borderRadius: "0.5rem",
