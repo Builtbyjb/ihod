@@ -22,7 +22,15 @@ export const DefaultInvoiceTemplate = forwardRef<HTMLDivElement, InvoicePDFProps
           {/* Header */}
           <div className="flex justify-between items-start border-b pb-6">
             <div>
-              {logoURL && <img src={logoURL} alt="Business Logo" className="w-16 h-16 object-contain mb-2" />}
+              {logoURL && (
+                <img
+                  src={logoURL}
+                  crossOrigin="anonymous"
+                  loading="eager"
+                  alt="Business Logo"
+                  className="w-16 h-16 object-contain mb-2"
+                />
+              )}
               <p className="text-2xl font-medium">{bussinessname}</p>
             </div>
             <div className="text-right text-sm space-y-0.5">
@@ -120,7 +128,13 @@ export const DefaultInvoiceTemplate = forwardRef<HTMLDivElement, InvoicePDFProps
           <div className="grid grid-cols-2 gap-12 mb-8">
             <div className="text-center">
               {invoice.signature && (
-                <img src={invoice.signature} loading="eager" alt="User Signature" className="w-full h-16" />
+                <img
+                  src={invoice.signature}
+                  crossOrigin="anonymous"
+                  loading="eager"
+                  alt="User Signature"
+                  style={{ width: "100%", height: "64px" }}
+                />
               )}
               <div className={`border-t pt-2 text-sm ${invoice.signature ? "mt-4" : "mt-20"}`}>{bussinessname}</div>
             </div>

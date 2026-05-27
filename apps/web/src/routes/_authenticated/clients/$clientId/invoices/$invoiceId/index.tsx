@@ -102,7 +102,7 @@ function RouteComponent() {
                 <div className="flex gap-4 items-center">
                   <ImagePreview source={logoURL} />
                   <div>
-                    <CardTitle className="text-2xl">{invoice.invoiceNumber}</CardTitle>
+                    <CardTitle className="text-xl">{invoice.invoiceNumber}</CardTitle>
                     <p className="text-sm text-muted-foreground mt-1">Issued on {formatDate(invoice.issueDate)}</p>
                   </div>
                 </div>
