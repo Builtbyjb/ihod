@@ -5,18 +5,16 @@ import { format } from "date-fns";
 import { calculateDiscount, formatCurrency } from "@/lib/utils";
 import { calculateSubTotal, calculateTaxAmount, calculateTotalAmount } from "@/lib/utils";
 import { APP_NAME } from "@/lib/constant";
-import SignatureCanvas from "react-signature-canvas";
 
 type InvoicePDFProps = {
   invoice: Invoice;
   client: Client | null;
   bussinessname?: string;
   logoURL: string | null;
-  sigRef: React.RefObject<SignatureCanvas | null>;
 };
 
 export const DefaultInvoiceTemplate = forwardRef<HTMLDivElement, InvoicePDFProps>(
-  ({ invoice, client, bussinessname, logoURL, sigRef }, ref) => (
+  ({ invoice, client, bussinessname, logoURL }, ref) => (
     <main ref={ref} className="bg-white w-[210mm] min-h-[290mm] mx-auto p-[10mm] text-gray-900 print:p-[10mm]">
       <div className="h-full flex flex-col justify-between">
         {/* Top Content */}
@@ -123,19 +121,16 @@ export const DefaultInvoiceTemplate = forwardRef<HTMLDivElement, InvoicePDFProps
           <div className="grid grid-cols-2 gap-12 mb-8">
             <div className="text-center">
               {invoice.signature && (
-                <SignatureCanvas
-                  ref={sigRef}
-                  penColor="black"
-                  canvasProps={{
-                    style: { width: "100%", height: "4rem" },
-                    className: "sigCanvas",
-                  }}
+                <img
+                  src={invoice.signature}
+                  alt="User Signature"
+                  style={{ width: "100%", height: "auto", display: "block" }}
                 />
               )}
-              <div className={`border-t pt-2 text-sm ${invoice.signature ? "mt-4" : "mt-20"}`}>{bussinessname}</div>
+              <div className={`border-t pt-2 text-sm ${invoice.signature ? "mt-4" : "mt-18"}`}>{bussinessname}</div>
             </div>
             <div className="text-center">
-              <div className="border-t mt-20 pt-2 text-sm">{client?.name}</div>
+              <div className="border-t mt-18 pt-2 text-sm">{client?.name}</div>
             </div>
           </div>
 
