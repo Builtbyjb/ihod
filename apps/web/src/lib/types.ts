@@ -7,7 +7,7 @@ export type Client = {
     address: string;
     city: string;
     country: string;
-    createdAt: string;
+    createdAt: Date;
 };
 
 export type Currency = {

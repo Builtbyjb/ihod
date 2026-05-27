@@ -90,7 +90,7 @@ function RouteComponent() {
   }, [doGET]);
 
   return (
-    <div className="flex flex-col space-y-6">
+    <div className="flex flex-col space-y-6 mb-32">
       <StatsCards stats={dashboardStats.topStats} isLoading={isLoading} />
       <div className="grid gap-6 lg:grid-cols-3">
         <RevenueChart data={dashboardStats.monthlyRevenues} isLoading={isLoading} />

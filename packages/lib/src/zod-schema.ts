@@ -83,7 +83,7 @@ export const InvoiceSchema = z.object({
     taxRate: z.number(),
     discount: z.number(),
     status: InvoiceStatusSchema,
-    signature: z.string().optional(),
+    signature: z.string().nullable(),
     issueDate: z.string(),
     dueDate: z.string(),
     currency: z.string(),
@@ -101,7 +101,7 @@ export const ClientSchema = z.object({
     address: z.string(),
     city: z.string(),
     country: z.string(),
-    createdAt: z.string(),
+    createdAt: z.coerce.date(),
 });
 
 export const ClientListSchema = z.array(ClientSchema);

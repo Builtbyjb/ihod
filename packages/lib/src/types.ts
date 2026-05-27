@@ -36,7 +36,7 @@ export type Invoice = {
     taxRate: number;
     discount: number;
     status: InvoiceStatus;
-    signature?: string;
+    signature: string | null;
     issueDate: string;
     dueDate: string;
     currency: string;
