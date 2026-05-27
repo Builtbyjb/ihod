@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +16,6 @@ import { useDownloadPDF } from "@/hooks/useDownloadPDF";
 import { useLayout } from "@/hooks/useLayout";
 import { useFetch } from "@/hooks/useFetch";
 import ImagePreview from "@/components/ImagePreview";
-import SignatureCanvas from "react-signature-canvas";
 
 function RouteComponent() {
   const { clientId, invoiceId } = Route.useParams();
@@ -29,8 +28,6 @@ function RouteComponent() {
   const { user } = useAuth();
   const { ref, download, preview } = useDownloadPDF();
   const { doGET } = useFetch();
-  const sigCanvas = useRef<SignatureCanvas | null>(null);
-  const sigRef = useRef<SignatureCanvas | null>(null);
 
   const { setTitle } = useLayout();
 
@@ -59,13 +56,6 @@ function RouteComponent() {
       }
     })();
   }, [clientId, invoiceId, doGET]);
-
-  useEffect(() => {
-    if (invoice?.signature) {
-      sigCanvas.current?.fromDataURL(invoice.signature);
-      sigRef.current?.fromDataURL(invoice.signature);
-    }
-  }, [invoice?.signature]);
 
   const handlePreview = async () => {
     const url = await preview();
@@ -164,13 +154,10 @@ function RouteComponent() {
                 {invoice.signature && (
                   <div className="mb-4">
                     <h3 className="text-sm font-medium mb-2">Signature</h3>
-                    <SignatureCanvas
-                      ref={sigCanvas}
-                      penColor="black"
-                      canvasProps={{
-                        style: { width: "100%" },
-                        className: "sigCanvas",
-                      }}
+                    <img
+                      src={invoice.signature}
+                      alt="User Signature"
+                      style={{ width: "100%", height: "auto", display: "block" }}
                     />
                   </div>
                 )}
@@ -240,7 +227,6 @@ function RouteComponent() {
         <div className="print-section">
           <DefaultInvoiceTemplate
             ref={ref}
-            sigRef={sigRef}
             invoice={invoice}
             client={client}
             bussinessname={user?.organizationName}
