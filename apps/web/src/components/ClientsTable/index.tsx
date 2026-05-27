@@ -120,7 +120,7 @@ export default function ClientsTable({ onEdit, clients, deleteClient }: ClientsT
                     className="hidden lg:table-cell text-sm text-muted-foreground cursor-pointer"
                     onClick={() => handleNavigate(client.id)}
                   >
-                    {format(new Date(client.createdAt), "MMM d, yyyy")}
+                    {format(client.createdAt, "MMM d, yyyy")}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>

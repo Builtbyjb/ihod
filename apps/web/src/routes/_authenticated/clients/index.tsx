@@ -55,8 +55,8 @@ function RouteComponent() {
 
         if (!response.ok) throw new Error("Failed to fetch clients");
 
-        const data = await response.json();
-        const parsedClients = clientsResponseSchema.parse(data.clients);
+        const result = await response.json();
+        const parsedClients = clientsResponseSchema.parse(result.clients);
 
         setClients(parsedClients);
       } catch (error) {
