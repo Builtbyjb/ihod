@@ -223,6 +223,7 @@ function RouteComponent() {
           </div>
         </div>
       )}
+
       {invoice && (
         <div className="print-section">
           <DefaultInvoiceTemplate

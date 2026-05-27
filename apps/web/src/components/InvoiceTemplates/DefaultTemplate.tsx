@@ -115,14 +115,15 @@ export const DefaultInvoiceTemplate = forwardRef<HTMLDivElement, InvoicePDFProps
           )}
         </div>
 
-        {/* Bottom Section (Signatures + Footer) */}
         <div className="mt-10">
           <p className="text-xs font-semibold uppercase text-gray-500 mb-1">Signatures</p>
           <div className="grid grid-cols-2 gap-12 mb-8">
-            <div className="text-center">
+            <div className="flex flex-col text-center justify-center">
               {invoice.signature && (
                 <img
                   src={invoice.signature}
+                  crossOrigin="anonymous"
+                  loading="eager"
                   alt="User Signature"
                   style={{ width: "100%", height: "auto", display: "block" }}
                 />
