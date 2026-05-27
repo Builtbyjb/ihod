@@ -1,31 +1,60 @@
+import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { Field } from "@/components/ui/field";
 import { useLayout } from "@/hooks/useLayout";
-import { useEffect } from "react";
-import Banner from "@/components/Banner";
-import { BadgeInfo } from "lucide-react";
 import { useForm } from "@tanstack/react-form";
 import * as z from "zod";
+import TextInputField from "@/components/Form/TextInputField";
+import ImageUploadField from "@/components/Form/ImageUploadField";
+import { useFetch } from "@/hooks/useFetch";
+import { toast } from "sonner";
+import ImagePreview from "@/components/ImagePreview";
+import { UserSettingsSchema, UserSchema, BusinessSchema, BusinessSettingsSchema } from "@shared/lib/zod-schema";
 
-const UserSchema = z.object({
-  username: z.string(),
-});
+type UserSettingType = z.infer<typeof UserSettingsSchema>;
 
-function UserSettings() {
+function UserSettings({ settings }: { settings: UserSettingType }) {
+  const { doPUT } = useFetch();
+  const [avatar, setAvatar] = useState<Blob | string | null>(null);
+
   const form = useForm({
     defaultValues: {
       username: "",
-    },
+      avatar: undefined as Blob | undefined,
+    } as { username: string; avatar?: Blob | undefined },
     validators: {
       onSubmit: UserSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log(value);
+      const formData = new FormData();
+      formData.append("username", value.username);
+      if (value.avatar) formData.append("avatar", value.avatar);
+
+      try {
+        const response = await doPUT("/api/v1/user/settings/profile", formData);
+        if (response instanceof Error) throw response;
+
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message);
+
+        toast.success("User profile updated");
+      } catch (error: unknown) {
+        if (error instanceof Error) toast.error(error.message);
+        console.log(error);
+      }
     },
   });
+
+  useEffect(() => {
+    (() => {
+      if (settings) {
+        form.setFieldValue("username", settings.username);
+        if (settings.avatarURL) setAvatar(settings.avatarURL);
+      }
+    })();
+  }, [settings, form]);
 
   return (
     <form
@@ -34,33 +63,45 @@ function UserSettings() {
         e.preventDefault();
         form.handleSubmit();
       }}
+      onChange={(e) => {
+        if (e.target.name === "avatar") setAvatar(e.target.files?.[0]);
+      }}
     >
       <Card>
         <CardHeader>
           <CardTitle>User Information</CardTitle>
           <CardDescription>Update your information</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div>
+        <CardContent className="space-y-4">
+          <ImagePreview source={avatar} />
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Field>
+              <form.Field
+                name="avatar"
+                children={(field) => {
+                  return (
+                    <ImageUploadField
+                      field={field}
+                      id="picture"
+                      label="Profile Picture"
+                      description="Select your profile picture. Max size is 5mb"
+                    />
+                  );
+                }}
+              />
+            </Field>
             <Field>
               <form.Field
                 name="username"
                 children={(field) => {
-                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
-                    <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor="username-input">Username</FieldLabel>
-                      <Input
-                        id="username-input"
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        aria-invalid={isInvalid}
-                        placeholder="Change what we call you"
-                      />
-                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                    </Field>
+                    <TextInputField
+                      field={field}
+                      id="username"
+                      label="Username"
+                      placeholder="Change what we call you"
+                      isRequired={false}
+                    />
                   );
                 }}
               />
@@ -77,34 +118,72 @@ function UserSettings() {
   );
 }
 
-const BusinessSchema = z.object({
-  name: z.string(),
-  email: z.string().email(),
-  phone: z.string(),
-  website: z.string(),
-  address: z.string(),
-  city: z.string(),
-  country: z.string(),
-});
+type BusinessSettingsType = z.infer<typeof BusinessSettingsSchema>;
 
-function BusinessSettings() {
+function BusinessSettings({ settings }: { settings: BusinessSettingsType }) {
+  const { doPUT } = useFetch();
+  const [avatar, setAvatar] = useState<string | Blob | null>(null);
+
   const form = useForm({
     defaultValues: {
       name: "",
       email: "",
-      phone: "",
       website: "",
       address: "",
       city: "",
       country: "",
+      logo: undefined as Blob | undefined,
+    } as {
+      name: string;
+      email: string;
+      website: string;
+      address: string;
+      city: string;
+      country: string;
+      logo?: Blob;
     },
     validators: {
       onSubmit: BusinessSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log(value);
+      const formData = new FormData();
+      formData.append("name", value.name);
+      formData.append("email", value.email);
+      formData.append("website", value.website);
+      formData.append("address", value.address);
+      formData.append("city", value.city);
+      formData.append("country", value.country);
+      if (value.logo) formData.append("logo", value.logo);
+
+      try {
+        const response = await doPUT("/api/v1/user/settings/business", formData);
+        if (response instanceof Error) throw response;
+
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message);
+
+        toast.success("Business profile updated");
+      } catch (error: unknown) {
+        if (error instanceof Error) toast.error(error.message);
+        console.log(error);
+      }
     },
   });
+
+  useEffect(() => {
+    (() => {
+      if (settings) {
+        form.setFieldValue("name", settings.name);
+        form.setFieldValue("email", settings.email);
+        // form.setFieldValue("phone", settings.phone);
+        if (settings.website) form.setFieldValue("website", settings.website);
+        form.setFieldValue("address", settings.address);
+        form.setFieldValue("city", settings.city);
+        form.setFieldValue("country", settings.country);
+        if (settings.logoURL) setAvatar(settings.logoURL);
+      }
+    })();
+  }, [settings, form]);
 
   return (
     <form
@@ -113,6 +192,9 @@ function BusinessSettings() {
         e.preventDefault();
         form.handleSubmit();
       }}
+      onChange={(e) => {
+        if (e.target.name === "logo") setAvatar(e.target.files?.[0]);
+      }}
     >
       <Card>
         <CardHeader>
@@ -120,27 +202,35 @@ function BusinessSettings() {
           <CardDescription>This information will appear on your invoices</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <ImagePreview source={avatar} />
           <div className="grid gap-4 sm:grid-cols-2">
+            <Field>
+              <form.Field
+                name="logo"
+                children={(field) => {
+                  return (
+                    <ImageUploadField
+                      field={field}
+                      id="picture"
+                      label="Business Logo"
+                      description="Select your logo. Max size is 5mb."
+                    />
+                  );
+                }}
+              />
+            </Field>
             <Field>
               <form.Field
                 name="name"
                 children={(field) => {
-                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
-                    <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor="name-input">Business Name</FieldLabel>
-                      <Input
-                        required
-                        id="name-input"
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        aria-invalid={isInvalid}
-                        placeholder="Your Business Name"
-                      />
-                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                    </Field>
+                    <TextInputField
+                      field={field}
+                      id="name"
+                      label="Business Name"
+                      placeholder="Your Business Name"
+                      isRequired={false}
+                    />
                   );
                 }}
               />
@@ -149,98 +239,62 @@ function BusinessSettings() {
               <form.Field
                 name="email"
                 children={(field) => {
-                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
-                    <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor="email-input">Business Email</FieldLabel>
-                      <Input
-                        required
-                        id="email-input"
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        aria-invalid={isInvalid}
-                        placeholder="contact@business.com"
-                      />
-                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                    </Field>
+                    <TextInputField
+                      field={field}
+                      id="email"
+                      label="Business Email"
+                      placeholder="contact@business.com"
+                      isRequired={false}
+                    />
                   );
                 }}
               />
             </Field>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field>
+            {/*<Field>
               <form.Field
                 name="phone"
                 children={(field) => {
-                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
-                    <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor="phone-input">Phone</FieldLabel>
-                      <Input
-                        required
-                        id="phone-input"
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        aria-invalid={isInvalid}
-                        placeholder="+1 (555) 123-4567"
-                      />
-                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                    </Field>
+                    <TextInputField
+                      field={field}
+                      id="phone"
+                      label="Phone"
+                      placeholder="+1 (555) 123-4567"
+                      isRequired={false}
+                    />
                   );
                 }}
               />
-            </Field>
+            </Field>*/}
             <Field>
               <form.Field
                 name="website"
                 children={(field) => {
-                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
-                    <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor="website-input">Website</FieldLabel>
-                      <Input
-                        required
-                        id="website-input"
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        aria-invalid={isInvalid}
-                        placeholder="https://yourwebsite.com"
-                      />
-                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                    </Field>
+                    <TextInputField
+                      field={field}
+                      id="website"
+                      label="Website"
+                      placeholder="https://yourwebsite.com"
+                      isRequired={false}
+                    />
                   );
                 }}
               />
             </Field>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-3">
             <Field>
               <form.Field
                 name="address"
                 children={(field) => {
-                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
-                    <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor="address-input">Address</FieldLabel>
-                      <Input
-                        required
-                        id="address-input"
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        aria-invalid={isInvalid}
-                        placeholder="Street Address"
-                      />
-                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                    </Field>
+                    <TextInputField
+                      field={field}
+                      id="address"
+                      label="Address"
+                      placeholder="Street Address"
+                      isRequired={false}
+                    />
                   );
                 }}
               />
@@ -249,22 +303,14 @@ function BusinessSettings() {
               <form.Field
                 name="city"
                 children={(field) => {
-                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
-                    <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor="city-input">City</FieldLabel>
-                      <Input
-                        required
-                        id="city-input"
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        aria-invalid={isInvalid}
-                        placeholder="City, State ZIP"
-                      />
-                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                    </Field>
+                    <TextInputField
+                      field={field}
+                      id="city"
+                      label="City"
+                      placeholder="City, State ZIP"
+                      isRequired={false}
+                    />
                   );
                 }}
               />
@@ -273,22 +319,14 @@ function BusinessSettings() {
               <form.Field
                 name="country"
                 children={(field) => {
-                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
-                    <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor="country-input">Country</FieldLabel>
-                      <Input
-                        required
-                        id="country-input"
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        aria-invalid={isInvalid}
-                        placeholder="Country"
-                      />
-                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                    </Field>
+                    <TextInputField
+                      field={field}
+                      id="country"
+                      label="Country"
+                      placeholder="Country"
+                      isRequired={false}
+                    />
                   );
                 }}
               />
@@ -305,18 +343,45 @@ function BusinessSettings() {
   );
 }
 
+const SettingsSchema = z.object({
+  user: UserSettingsSchema,
+  business: BusinessSettingsSchema,
+});
+
+type SettingsType = z.infer<typeof SettingsSchema>;
+
 function RouteComponent() {
   const { setTitle } = useLayout();
+  const [settings, setSettings] = useState<SettingsType>({} as SettingsType);
+
+  const { doGET } = useFetch();
 
   useEffect(() => {
     setTitle("Settings");
   }, [setTitle]);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await doGET("/api/v1/user/settings");
+        if (response instanceof Error) throw response;
+
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message);
+
+        const parsedResult = SettingsSchema.parse(result.data);
+        setSettings(parsedResult);
+      } catch (error) {
+        if (error instanceof Error) toast.error(error.message);
+        console.error(error);
+      }
+    })();
+  }, [doGET]);
+
   return (
-    <div className="space-y-6">
-      <Banner backgroundColor={"bg-sky-100"} icon={<BadgeInfo />} text="Coming soon!" />
-      <UserSettings />
-      <BusinessSettings />
+    <div className="space-y-6 mb-32">
+      <UserSettings settings={settings.user} />
+      <BusinessSettings settings={settings.business} />
     </div>
   );
 }

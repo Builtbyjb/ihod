@@ -3,7 +3,7 @@ import {
   ChevronRight,
   CreditCard,
   LayoutDashboard,
-  LayoutTemplate,
+  // LayoutTemplate,
   LogOut,
   Settings,
   User,
@@ -49,11 +49,11 @@ const navItems = [
     url: "/clients",
     icon: Users,
   },
-  {
-    title: "Templates",
-    url: "/templates",
-    icon: LayoutTemplate,
-  },
+  // {
+  //   title: "Templates",
+  //   url: "/templates",
+  //   icon: LayoutTemplate,
+  // },
   {
     title: "Settings",
     url: "/settings",
@@ -87,6 +87,7 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
   const navigate = useNavigate();
   const { logout } = useAuth();
   const { setOpenMobile } = useSidebar();
+
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
@@ -100,8 +101,10 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
           >
             <div className="flex gap-2 text-sm leading-tight">
               <Avatar className="w-8 h-8">
-                <AvatarImage src="https://picsum.photos/id/15/200/300" alt="user avatar" className="" />
-                <AvatarFallback>{props.username?.charAt(0).toUpperCase()}</AvatarFallback>
+                <AvatarImage src={undefined} alt="user avatar" className="" />
+                <AvatarFallback className="border border-border">
+                  {props.username?.charAt(0).toUpperCase()}
+                </AvatarFallback>
               </Avatar>
               <div className="flex flex-col">
                 <span className="truncate font-medium text-xl">{props.businessname}</span>

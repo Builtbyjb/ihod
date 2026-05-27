@@ -19,7 +19,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { MoreHorizontal, Eye, Pencil, Trash2 } from "lucide-react";
-import type { Invoice } from "@/lib/types";
+import type { Invoice } from "@shared/lib/types";
 import { format } from "date-fns";
 import { useNavigate } from "@tanstack/react-router";
 import { calculateTotalAmount, formatCurrency, getStatusVariant } from "@/lib/utils";

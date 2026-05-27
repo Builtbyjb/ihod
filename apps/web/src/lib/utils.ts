@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import type { InvoiceItem, Invoice } from "./types";
+import type { InvoiceItem, Invoice } from "@shared/lib/types";
 import { CURRENCY_MAP } from "./constant";
 import { format } from "date-fns";
 

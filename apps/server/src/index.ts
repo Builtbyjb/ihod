@@ -7,6 +7,8 @@ import authRouteV1 from "./auth/auth-controller";
 import userRouteV1 from "./user/user-controller";
 import clientRouteV1 from "./client/client-controller";
 import paymentRouteV1 from "./payment/payment-paystack-controller";
+import blobRouteV1 from "./blob/blob-controller";
+
 import { INTERNAL_ERROR_MESSAGE } from "./lib/constants";
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -32,5 +34,6 @@ app.route("/api/v1", authRouteV1);
 app.route("/api/v1", userRouteV1);
 app.route("/api/v1", clientRouteV1);
 app.route("/api/v1", paymentRouteV1);
+app.route("/api/v1", blobRouteV1);
 
 export default app;
