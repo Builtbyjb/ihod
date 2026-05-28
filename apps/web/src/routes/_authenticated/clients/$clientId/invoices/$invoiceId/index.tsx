@@ -227,7 +227,8 @@ function RouteComponent() {
             invoice={invoice}
             client={client}
             bussinessname={user?.organizationName}
-            logoURL={logoURL}
+            logoURL={logoURL ?? undefined}
+            signature={invoice.signature ?? undefined}
           />
         </div>
       )}
