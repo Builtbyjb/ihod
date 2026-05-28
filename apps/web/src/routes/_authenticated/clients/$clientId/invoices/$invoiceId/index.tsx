@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { pdf } from "@react-pdf/renderer";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,11 +9,12 @@ import { ArrowLeft, Download, Pencil, View } from "lucide-react";
 import type { Client } from "@/lib/types";
 import type { Invoice } from "@shared/lib/types";
 import { InvoiceSchema, ClientSchema } from "@shared/lib/zod-schema";
-import { DefaultInvoiceTemplate } from "@/components/InvoiceTemplates/DefaultTemplate";
+// import { DefaultInvoiceTemplate } from "@/components/InvoiceTemplates/DefaultTemplate";
+import { DefaultInvoicePDF } from "@/components/InvoiceTemplates/template";
 import { calculateSubTotal, calculateTaxAmount, calculateTotalAmount, formatDate } from "@shared/utils/util";
 import { formatCurrency, getBadgeVariant } from "@/lib/utils";
 import { useAuth } from "@/hooks/auth";
-import { useDownloadPDF } from "@/hooks/useDownloadPDF";
+// import { useDownloadPDF } from "@/hooks/useDownloadPDF";
 import { useLayout } from "@/hooks/useLayout";
 import { useFetch } from "@/hooks/useFetch";
 import ImagePreview from "@/components/ImagePreview";
@@ -26,10 +28,24 @@ function RouteComponent() {
   const navigate = useNavigate();
   const router = useRouter();
   const { user } = useAuth();
-  const { ref, download, preview } = useDownloadPDF();
+  // const { ref, download, preview } = useDownloadPDF();
   const { doGET } = useFetch();
 
   const { setTitle } = useLayout();
+
+  const getBlob = async (invoice: Invoice) => {
+    const blob = await pdf(
+      <DefaultInvoicePDF
+        invoice={invoice}
+        client={client}
+        bussinessname={user?.organizationName}
+        logoURL={logoURL ?? undefined}
+        signature={invoice.signature ?? undefined}
+      />,
+    ).toBlob();
+
+    return blob;
+  };
 
   useEffect(() => {
     if (invoice?.invoiceNumber) setTitle(invoice.invoiceNumber);
@@ -57,8 +73,21 @@ function RouteComponent() {
     })();
   }, [clientId, invoiceId, doGET]);
 
+  const handleDownload = async () => {
+    if (!invoice) return;
+    const blob = await getBlob(invoice);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${invoice?.invoiceNumber}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handlePreview = async () => {
-    const url = await preview();
+    if (!invoice) return;
+    const blob = await getBlob(invoice);
+    const url = URL.createObjectURL(blob);
     if (url) window.open(url, "_blank");
   };
 
@@ -88,7 +117,7 @@ function RouteComponent() {
                 <View className="mr-2 h-4 w-4" />
                 Preview
               </Button>
-              <Button onClick={download}>
+              <Button onClick={handleDownload}>
                 <Download className="mr-2 h-4 w-4" />
                 Download PDF
               </Button>
@@ -220,7 +249,7 @@ function RouteComponent() {
         </div>
       )}
 
-      {invoice && (
+      {/*{invoice && (
         <div className="print-section">
           <DefaultInvoiceTemplate
             ref={ref}
@@ -231,7 +260,7 @@ function RouteComponent() {
             signature={invoice.signature ?? undefined}
           />
         </div>
-      )}
+      )}*/}
     </div>
   );
 }
