@@ -10,11 +10,12 @@ type InvoicePDFProps = {
   invoice: Invoice;
   client: Client | null;
   bussinessname?: string;
-  logoURL: string | null;
+  logoURL?: string;
+  signature?: string;
 };
 
 export const DefaultInvoiceTemplate = forwardRef<HTMLDivElement, InvoicePDFProps>(
-  ({ invoice, client, bussinessname }, ref) => (
+  ({ invoice, client, bussinessname, logoURL, signature }, ref) => (
     <main ref={ref} className="bg-white w-[210mm] min-h-[290mm] mx-auto p-[10mm] text-gray-900 print:p-[10mm]">
       <div className="h-full flex flex-col justify-between">
         {/* Top Content */}
@@ -23,7 +24,7 @@ export const DefaultInvoiceTemplate = forwardRef<HTMLDivElement, InvoicePDFProps
           <div className="flex justify-between items-start border-b pb-6">
             <div>
               <img
-                src={"https://picsum.photos/200/300"}
+                src={logoURL}
                 crossOrigin="anonymous"
                 loading="eager"
                 alt="Business Logo"
@@ -125,15 +126,13 @@ export const DefaultInvoiceTemplate = forwardRef<HTMLDivElement, InvoicePDFProps
           <p className="text-xs font-semibold uppercase text-gray-500 mb-1">Signatures</p>
           <div className="grid grid-cols-2 gap-12 mb-8">
             <div className="text-center relative">
-              {invoice.signature && (
-                <img
-                  src={invoice.signature}
-                  crossOrigin="anonymous"
-                  loading="eager"
-                  alt="User Signature"
-                  style={{ position: "absolute", bottom: "24px", width: "100%", height: "64px" }}
-                />
-              )}
+              <img
+                src={signature}
+                crossOrigin="anonymous"
+                loading="eager"
+                alt="User Signature"
+                style={{ position: "absolute", bottom: "24px", width: "100%", height: "64px" }}
+              />
               <div className={`border-t pt-2 text-sm mt-20`}>{bussinessname}</div>
             </div>
             <div className="text-center">
