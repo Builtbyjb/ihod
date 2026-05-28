@@ -11,7 +11,19 @@ export function useDownloadPDF(filename = "invoice.pdf") {
 
         await document.fonts.ready;
 
-        const blob = await toBlob(element, { pixelRatio: 2 });
+        const images = element.querySelectorAll("img");
+
+        await Promise.all(
+            Array.from(images).map((img) => {
+                if (img.complete) return Promise.resolve();
+                return new Promise((resolve) => {
+                    img.onload = resolve;
+                    img.onerror = resolve;
+                });
+            }),
+        );
+
+        const blob = await toBlob(element, { pixelRatio: 2, cacheBust: true });
         if (!blob) {
             console.error("toBlob returned null");
             return null;
