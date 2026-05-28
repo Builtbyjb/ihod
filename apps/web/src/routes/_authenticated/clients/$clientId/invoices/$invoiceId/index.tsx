@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { pdf } from "@react-pdf/renderer";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,11 +9,10 @@ import { ArrowLeft, Download, Pencil, View } from "lucide-react";
 import type { Client } from "@/lib/types";
 import type { Invoice } from "@shared/lib/types";
 import { InvoiceSchema, ClientSchema } from "@shared/lib/zod-schema";
-import { DefaultInvoiceTemplate } from "@/components/InvoiceTemplates/DefaultTemplate";
-import { calculateSubTotal, calculateTaxAmount, calculateTotalAmount } from "@/lib/utils";
-import { formatCurrency, getStatusVariant, formatDate } from "@/lib/utils";
+import { DefaultInvoicePDF } from "@/components/InvoiceTemplates/Default";
+import { calculateSubTotal, calculateTaxAmount, calculateTotalAmount, formatDate } from "@shared/utils/util";
+import { formatCurrency, getBadgeVariant } from "@/lib/utils";
 import { useAuth } from "@/hooks/auth";
-import { useDownloadPDF } from "@/hooks/useDownloadPDF";
 import { useLayout } from "@/hooks/useLayout";
 import { useFetch } from "@/hooks/useFetch";
 import ImagePreview from "@/components/ImagePreview";
@@ -26,10 +26,23 @@ function RouteComponent() {
   const navigate = useNavigate();
   const router = useRouter();
   const { user } = useAuth();
-  const { ref, download, preview } = useDownloadPDF();
   const { doGET } = useFetch();
 
   const { setTitle } = useLayout();
+
+  const getBlob = async (invoice: Invoice) => {
+    const blob = await pdf(
+      <DefaultInvoicePDF
+        invoice={invoice}
+        client={client}
+        bussinessname={user?.organizationName}
+        logoURL={logoURL ?? undefined}
+        signature={invoice.signature ?? undefined}
+      />,
+    ).toBlob();
+
+    return blob;
+  };
 
   useEffect(() => {
     if (invoice?.invoiceNumber) setTitle(invoice.invoiceNumber);
@@ -57,8 +70,21 @@ function RouteComponent() {
     })();
   }, [clientId, invoiceId, doGET]);
 
+  const handleDownload = async () => {
+    if (!invoice) return;
+    const blob = await getBlob(invoice);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `invoice-${invoice?.invoiceNumber}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handlePreview = async () => {
-    const url = await preview();
+    if (!invoice) return;
+    const blob = await getBlob(invoice);
+    const url = URL.createObjectURL(blob);
     if (url) window.open(url, "_blank");
   };
 
@@ -88,7 +114,7 @@ function RouteComponent() {
                 <View className="mr-2 h-4 w-4" />
                 Preview
               </Button>
-              <Button onClick={download}>
+              <Button onClick={handleDownload}>
                 <Download className="mr-2 h-4 w-4" />
                 Download PDF
               </Button>
@@ -101,11 +127,11 @@ function RouteComponent() {
                 <div className="flex gap-4 items-center">
                   <ImagePreview source={logoURL} />
                   <div>
-                    <CardTitle className="text-2xl">{invoice.invoiceNumber}</CardTitle>
+                    <CardTitle className="text-xl">{invoice.invoiceNumber}</CardTitle>
                     <p className="text-sm text-muted-foreground mt-1">Issued on {formatDate(invoice.issueDate)}</p>
                   </div>
                 </div>
-                <Badge className={`capitalize text-sm ${getStatusVariant(invoice.status)}`}>{invoice.status}</Badge>
+                <Badge className={`capitalize text-sm ${getBadgeVariant(invoice.status)}`}>{invoice.status}</Badge>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid gap-6 sm:grid-cols-2">
@@ -154,11 +180,7 @@ function RouteComponent() {
                 {invoice.signature && (
                   <div className="mb-4">
                     <h3 className="text-sm font-medium mb-2">Signature</h3>
-                    <img
-                      src={invoice.signature}
-                      alt="User Signature"
-                      style={{ width: "100%", height: "auto", display: "block" }}
-                    />
+                    <img src={invoice.signature} alt="User Signature" className="w-full h-16" />
                   </div>
                 )}
 
@@ -199,8 +221,8 @@ function RouteComponent() {
                   </span>
                 </div>
                 <div className="flex justify-between pt-4 border-t border-border">
-                  <span className="font-semibold">Total</span>
-                  <span className="text-xl font-bold">
+                  <span className="font-medium">Total</span>
+                  <span className="text-xl font-medium">
                     {formatCurrency(
                       calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount),
                       invoice.currency,
@@ -221,17 +243,6 @@ function RouteComponent() {
               Back to Invoices
             </Button>
           </div>
-        </div>
-      )}
-      {invoice && (
-        <div className="print-section">
-          <DefaultInvoiceTemplate
-            ref={ref}
-            invoice={invoice}
-            client={client}
-            bussinessname={user?.organizationName}
-            logoURL={logoURL}
-          />
         </div>
       )}
     </div>

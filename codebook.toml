@@ -1,6 +1,6 @@
 dictionaries = ["en_us", "en_gb"]
 min_word_length = 3
 words = [
-    "cloudflare","vitejs", "tanstack", "lucide", "cta", "npx", "ihod", "uat", "hono", "zod", "sonner", "autofill", "hsl", "otp",
+    "cloudflare","vitejs", "tanstack", "lucide", "cta", "npx", "ihod", "uat", "hono", "zod", "sonner", "autofill", "hsl", "otp", "Noto",
     "dotenv", "kuma", "firstname", "lastname", "unixepoch", "NGN", "recharts", "paystack", "MMM", "ACORP", "MMMM", "fns", "PPP", "bloburl"
 ]

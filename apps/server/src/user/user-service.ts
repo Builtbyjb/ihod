@@ -1,18 +1,14 @@
-import type { Invoice, InvoiceItem } from "@/lib/types";
-import { getCurrentYear } from "@/lib/utils";
-
-function calculateTotalAmount(items: InvoiceItem[], taxRate: number): number {
-    const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-    const taxAmount = subtotal * (taxRate / 100);
-    return subtotal + taxAmount;
-}
+import type { Invoice } from "@/lib/types";
+import { calculateTotalAmount, getCurrentYear } from "@shared/utils/util";
 
 export function calculateRevenue(invoices: Invoice[]): number {
     let totalRevenue = 0;
 
     for (const invoice of invoices) {
-        const totalAmount = calculateTotalAmount(invoice.items, invoice.taxRate);
-        totalRevenue += totalAmount;
+        if (invoice.status === "paid") {
+            const totalAmount = calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount);
+            totalRevenue += totalAmount;
+        }
     }
 
     return totalRevenue;
@@ -61,40 +57,40 @@ export function getMonthlyRevenues(invoices: Invoice[]): { month: string; revenu
         const month = invoice.issueDate.getMonth();
         switch (month) {
             case 0:
-                janRev += calculateTotalAmount(invoice.items, invoice.taxRate);
+                janRev += calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount);
                 break;
             case 1:
-                febRev += calculateTotalAmount(invoice.items, invoice.taxRate);
+                febRev += calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount);
                 break;
             case 2:
-                marRev += calculateTotalAmount(invoice.items, invoice.taxRate);
+                marRev += calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount);
                 break;
             case 3:
-                aprRev += calculateTotalAmount(invoice.items, invoice.taxRate);
+                aprRev += calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount);
                 break;
             case 4:
-                mayRev += calculateTotalAmount(invoice.items, invoice.taxRate);
+                mayRev += calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount);
                 break;
             case 5:
-                junRev += calculateTotalAmount(invoice.items, invoice.taxRate);
+                junRev += calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount);
                 break;
             case 6:
-                julRev += calculateTotalAmount(invoice.items, invoice.taxRate);
+                julRev += calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount);
                 break;
             case 7:
-                augRev += calculateTotalAmount(invoice.items, invoice.taxRate);
+                augRev += calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount);
                 break;
             case 8:
-                sepRev += calculateTotalAmount(invoice.items, invoice.taxRate);
+                sepRev += calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount);
                 break;
             case 9:
-                octRev += calculateTotalAmount(invoice.items, invoice.taxRate);
+                octRev += calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount);
                 break;
             case 10:
-                novRev += calculateTotalAmount(invoice.items, invoice.taxRate);
+                novRev += calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount);
                 break;
             case 11:
-                decRev += calculateTotalAmount(invoice.items, invoice.taxRate);
+                decRev += calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount);
                 break;
         }
     });

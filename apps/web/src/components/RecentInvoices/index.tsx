@@ -4,7 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Invoice } from "@shared/lib/types";
 import { format } from "date-fns";
-import { formatCurrency, getStatusVariant, calculateTotalAmount } from "@/lib/utils";
+import { formatCurrency, getBadgeVariant } from "@/lib/utils";
+import { calculateTotalAmount } from "@shared/utils/util";
 import { SkeletonBarChart } from "@/components/Skeleton";
 
 interface RecentInvoicesProps {
@@ -18,6 +19,10 @@ export default function RecentInvoices({ invoices, isLoading }: RecentInvoicesPr
   const recentInvoices = [...invoices]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5);
+
+  const handleNavigate = (invoice: Invoice) => {
+    navigate({ to: `/clients/${invoice.clientId}/invoices/${invoice.id}` });
+  };
 
   return (
     <Card className="col-span-1 lg:col-span-2">
@@ -34,11 +39,15 @@ export default function RecentInvoices({ invoices, isLoading }: RecentInvoicesPr
         {!isLoading ? (
           <div className="space-y-4">
             {recentInvoices.map((invoice) => (
-              <div key={invoice.id} className="flex items-center justify-between p-3 rounded-lg border border-border">
+              <div
+                key={invoice.id}
+                className="flex items-center justify-between p-3 rounded-lg border border-border"
+                onClick={() => handleNavigate(invoice)}
+              >
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{invoice.invoiceNumber}</span>
-                    <Badge className={`${getStatusVariant(invoice.status)} capitalize`}>{invoice.status}</Badge>
+                    <Badge className={`${getBadgeVariant(invoice.status)} capitalize`}>{invoice.status}</Badge>
                   </div>
                   {/*<span className="text-sm text-muted-foreground">{invoice.client.name}</span>*/}
                 </div>

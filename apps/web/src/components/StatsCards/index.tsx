@@ -60,7 +60,7 @@ export default function StatsCards({ stats, isLoading }: StatsCardsProps) {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-medium">{card.value}</div>
+                <div className="text-xl font-medium">{card.value}</div>
                 <p className="text-xs text-muted-foreground mt-1">{card.description}</p>
               </CardContent>
             </Card>

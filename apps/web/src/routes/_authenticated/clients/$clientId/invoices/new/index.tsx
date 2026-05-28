@@ -7,7 +7,6 @@ import { ArrowLeft } from "lucide-react";
 import { ClientSchema } from "@shared/lib/zod-schema";
 import { useFetch } from "@/hooks/useFetch";
 
-const API_URL = import.meta.env.VITE_API_URL;
 function RouteComponent() {
   const [clientInfo, setClientInfo] = useState<Client | null>(null);
   const { clientId } = Route.useParams();
@@ -17,7 +16,7 @@ function RouteComponent() {
   useEffect(() => {
     (async () => {
       try {
-        const response = await doGET(`${API_URL}/api/v1/clients/${clientId}`);
+        const response = await doGET(`/api/v1/clients/${clientId}`);
         if (response instanceof Error) throw response;
 
         const result = await response.json();
