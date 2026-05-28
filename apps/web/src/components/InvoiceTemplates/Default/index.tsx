@@ -69,8 +69,8 @@ export function DefaultInvoicePDF({ invoice, client, bussinessname, logoURL, sig
           <View style={STYLE.billToBox}>
             <Text style={STYLE.sectionLabel}>Bill To</Text>
             <Text style={STYLE.clientName}>{client.name}</Text>
-            <Text style={STYLE.clientMeta}>{client.email}</Text>
-            {client.phone && <Text style={STYLE.clientMeta}>{client.phone}</Text>}
+            {/*<Text style={STYLE.clientMeta}>{client.email}</Text>
+            {client.phone && <Text style={STYLE.clientMeta}>{client.phone}</Text>}*/}
             {client.address && <Text style={STYLE.clientMeta}>{client.address}</Text>}
             <Text style={STYLE.clientMeta}>
               {client.city}, {client.country}
