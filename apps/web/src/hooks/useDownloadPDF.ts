@@ -23,7 +23,7 @@ export function useDownloadPDF(filename = "invoice.pdf") {
             }),
         );
 
-        const blob = await toBlob(element, { pixelRatio: 2, cacheBust: true });
+        const blob = await toBlob(element, { pixelRatio: 2 });
         if (!blob) {
             console.error("toBlob returned null");
             return null;
