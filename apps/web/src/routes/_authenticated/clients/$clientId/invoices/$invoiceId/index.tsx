@@ -9,12 +9,10 @@ import { ArrowLeft, Download, Pencil, View } from "lucide-react";
 import type { Client } from "@/lib/types";
 import type { Invoice } from "@shared/lib/types";
 import { InvoiceSchema, ClientSchema } from "@shared/lib/zod-schema";
-// import { DefaultInvoiceTemplate } from "@/components/InvoiceTemplates/DefaultTemplate";
-import { DefaultInvoicePDF } from "@/components/InvoiceTemplates/template";
+import { DefaultInvoicePDF } from "@/components/InvoiceTemplates/Default";
 import { calculateSubTotal, calculateTaxAmount, calculateTotalAmount, formatDate } from "@shared/utils/util";
 import { formatCurrency, getBadgeVariant } from "@/lib/utils";
 import { useAuth } from "@/hooks/auth";
-// import { useDownloadPDF } from "@/hooks/useDownloadPDF";
 import { useLayout } from "@/hooks/useLayout";
 import { useFetch } from "@/hooks/useFetch";
 import ImagePreview from "@/components/ImagePreview";
@@ -28,7 +26,6 @@ function RouteComponent() {
   const navigate = useNavigate();
   const router = useRouter();
   const { user } = useAuth();
-  // const { ref, download, preview } = useDownloadPDF();
   const { doGET } = useFetch();
 
   const { setTitle } = useLayout();
@@ -79,7 +76,7 @@ function RouteComponent() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${invoice?.invoiceNumber}.pdf`;
+    a.download = `invoice-${invoice?.invoiceNumber}.pdf`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -248,19 +245,6 @@ function RouteComponent() {
           </div>
         </div>
       )}
-
-      {/*{invoice && (
-        <div className="print-section">
-          <DefaultInvoiceTemplate
-            ref={ref}
-            invoice={invoice}
-            client={client}
-            bussinessname={user?.organizationName}
-            logoURL={logoURL ?? undefined}
-            signature={invoice.signature ?? undefined}
-          />
-        </div>
-      )}*/}
     </div>
   );
 }
