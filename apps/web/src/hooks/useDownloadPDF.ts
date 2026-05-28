@@ -71,7 +71,9 @@ export function useDownloadPDF(filename = "invoice.pdf") {
     const preview = async (): Promise<string | null> => {
         const pdf = await generatePDF();
         if (!pdf) return null;
-        return pdf.output("bloburl").toString();
+
+        const pdfBlob = pdf.output("blob") as Blob;
+        return URL.createObjectURL(pdfBlob);
     };
 
     return { ref, download, preview };
