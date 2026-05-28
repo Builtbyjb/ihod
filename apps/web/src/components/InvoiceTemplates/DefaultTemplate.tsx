@@ -133,7 +133,7 @@ export const DefaultInvoiceTemplate = forwardRef<HTMLDivElement, InvoicePDFProps
                   crossOrigin="anonymous"
                   loading="eager"
                   alt="User Signature"
-                  className="bottom-10 absolute w-full h-16"
+                  style={{ position: "absolute", bottom: "24px", width: "100%", height: "64px" }}
                 />
               )}
               <div className={`border-t pt-2 text-sm mt-20`}>{bussinessname}</div>

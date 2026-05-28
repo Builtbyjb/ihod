@@ -5,11 +5,30 @@ import jsPDF from "jspdf";
 export function useDownloadPDF(filename = "invoice.pdf") {
     const ref = useRef<HTMLDivElement>(null);
 
+    const waitForImages = async (element: HTMLElement): Promise<void> => {
+        const images = element.querySelectorAll("img");
+        const promises: Promise<void>[] = [];
+
+        images.forEach((img) => {
+            if (!img.complete) {
+                promises.push(
+                    new Promise<void>((resolve) => {
+                        img.onload = () => resolve();
+                        img.onerror = () => resolve();
+                    }),
+                );
+            }
+        });
+
+        await Promise.all(promises);
+    };
+
     const generatePDF = async (): Promise<jsPDF | null> => {
         const element = ref.current;
         if (!element) return null;
 
         await document.fonts.ready;
+        await waitForImages(element);
 
         const blob = await toBlob(element, { pixelRatio: 2 });
         if (!blob) {
