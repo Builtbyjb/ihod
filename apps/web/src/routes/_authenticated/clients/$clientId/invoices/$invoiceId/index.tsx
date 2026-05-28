@@ -51,7 +51,6 @@ function RouteComponent() {
         setClient(parsedClient);
 
         setLogoURL(result.logoURL);
-        console.log(result.logoURL);
       } catch (error) {
         console.log(error);
       }
@@ -196,8 +195,8 @@ function RouteComponent() {
                   </span>
                 </div>
                 <div className="flex justify-between pt-4 border-t border-border">
-                  <span className="font-semibold">Total</span>
-                  <span className="text-xl font-bold">
+                  <span className="font-medium">Total</span>
+                  <span className="text-xl font-medium">
                     {formatCurrency(
                       calculateTotalAmount(invoice.items, invoice.taxRate, invoice.discount),
                       invoice.currency,

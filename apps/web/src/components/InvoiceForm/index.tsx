@@ -434,8 +434,7 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
               style: {
                 backgroundColor: "#e5e7eb",
                 width: "100%",
-                height: "64px",
-                display: "block",
+                height: "126px",
                 border: "1px solid #e5e7eb",
                 borderRadius: "0.5rem",
               },
