@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { FileText } from "lucide-react";
 import { APP_NAME } from "@/lib/constant";
-import { getCurrentYear } from "@/lib/utils";
+import { getCurrentYear } from "@shared/utils/util";
 
 const footerLinks = {
   Product: [

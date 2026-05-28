@@ -2,8 +2,8 @@ import { forwardRef } from "react";
 import type { Client } from "@/lib/types";
 import type { Invoice, InvoiceItem } from "@shared/lib/types";
 import { format } from "date-fns";
-import { calculateDiscount, formatCurrency } from "@/lib/utils";
-import { calculateSubTotal, calculateTaxAmount, calculateTotalAmount } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
+import { calculateDiscount, calculateSubTotal, calculateTaxAmount, calculateTotalAmount } from "@shared/utils/util";
 import { APP_NAME } from "@/lib/constant";
 
 type InvoicePDFProps = {

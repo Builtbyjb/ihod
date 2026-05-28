@@ -9,8 +9,8 @@ import type { Client } from "@/lib/types";
 import type { Invoice } from "@shared/lib/types";
 import { InvoiceSchema, ClientSchema } from "@shared/lib/zod-schema";
 import { DefaultInvoiceTemplate } from "@/components/InvoiceTemplates/DefaultTemplate";
-import { calculateSubTotal, calculateTaxAmount, calculateTotalAmount } from "@/lib/utils";
-import { formatCurrency, getStatusVariant, formatDate } from "@/lib/utils";
+import { calculateSubTotal, calculateTaxAmount, calculateTotalAmount, formatDate } from "@shared/utils/util";
+import { formatCurrency, getBadgeVariant } from "@/lib/utils";
 import { useAuth } from "@/hooks/auth";
 import { useDownloadPDF } from "@/hooks/useDownloadPDF";
 import { useLayout } from "@/hooks/useLayout";
@@ -105,7 +105,7 @@ function RouteComponent() {
                     <p className="text-sm text-muted-foreground mt-1">Issued on {formatDate(invoice.issueDate)}</p>
                   </div>
                 </div>
-                <Badge className={`capitalize text-sm ${getStatusVariant(invoice.status)}`}>{invoice.status}</Badge>
+                <Badge className={`capitalize text-sm ${getBadgeVariant(invoice.status)}`}>{invoice.status}</Badge>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid gap-6 sm:grid-cols-2">

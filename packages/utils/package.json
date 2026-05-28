@@ -1,0 +1,12 @@
+{
+  "name": "@shared/utils",
+  "version": "0.0.1",
+  "private": true,
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit"
+  }
+}

@@ -1,8 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import type { InvoiceItem, Invoice } from "@shared/lib/types";
 import { CURRENCY_MAP } from "./constant";
-import { format } from "date-fns";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -24,59 +22,30 @@ export function formatCurrency(amount: number, currency?: string): string {
     }
 }
 
-export function formatDate(date: string): string {
-    return format(new Date(date), "MMMM d, yyyy");
-}
+export function getBadgeVariant(action: string): string {
+    const green = "bg-green-50 text-green-700";
+    const blue = "bg-sky-50 text-sky-700";
+    const gray = "bg-gray-200 text-gray-700";
+    const red = "bg-red-50 text-red-700";
 
-export function calculateTotalAmount(items: InvoiceItem[], taxRate: number, discount: number): number {
-    const subtotal = calculateSubTotal(items);
-    const taxAmount = calculateTaxAmount(subtotal, taxRate);
-    const discountAmount = calculateDiscount(subtotal, discount);
-    return subtotal + taxAmount - discountAmount;
-}
-
-export function calculateTaxAmount(subtotal: number, taxRate: number): number {
-    return subtotal * (taxRate / 100);
-}
-
-export function calculateDiscount(subtotal: number, discount: number): number {
-    return subtotal * (discount / 100);
-}
-
-export function calculateSubTotal(items: InvoiceItem[]): number {
-    return items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-}
-
-export function getStatusVariant(status: Invoice["status"]): string {
-    switch (status) {
-        case "paid":
-            return "bg-green-50 text-green-700";
-        case "sent":
-            return "bg-sky-50 text-sky-700";
-        case "draft":
-            return "bg-gray-50 text-gray-700";
-        case "overdue":
-            return "bg-red-50 text-red-700";
-        default:
-            return "bg-secondary text-secondary";
-    }
-}
-
-export function getBadgeVariant(badge: string): string {
-    switch (badge) {
+    switch (action) {
         case "active":
-            return "bg-green-50 text-green-700";
+            return green;
         case "blue":
-            return "bg-sky-50 text-sky-700";
+            return blue;
         case "non-renewing":
-            return "bg-gray-200 text-gray-700";
+            return gray;
         case "disabled":
-            return "bg-red-50 text-red-700";
+            return red;
+        case "paid":
+            return green;
+        case "sent":
+            return blue;
+        case "draft":
+            return gray;
+        case "overdue":
+            return red;
         default:
-            return "bg-gray-200 text-gray-700";
+            return gray;
     }
-}
-
-export function getCurrentYear(): number {
-    return new Date().getFullYear();
 }

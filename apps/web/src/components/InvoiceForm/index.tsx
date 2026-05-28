@@ -10,13 +10,8 @@ import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { Field, FieldLabel, FieldError, FieldContent, FieldTitle } from "@/components/ui/field";
-import {
-  calculateTotalAmount,
-  calculateTaxAmount,
-  formatCurrency,
-  calculateDiscount,
-  calculateSubTotal,
-} from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
+import { calculateTotalAmount, calculateTaxAmount, calculateDiscount, calculateSubTotal } from "@shared/utils/util";
 import { Separator } from "@/components/ui/separator";
 import { CURRENCIES } from "@/lib/constant";
 import { useFetch } from "@/hooks/useFetch";
