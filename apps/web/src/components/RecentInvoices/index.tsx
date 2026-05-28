@@ -4,7 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Invoice } from "@shared/lib/types";
 import { format } from "date-fns";
-import { formatCurrency, getStatusVariant, calculateTotalAmount } from "@/lib/utils";
+import { formatCurrency, getBadgeVariant } from "@/lib/utils";
+import { calculateTotalAmount } from "@shared/utils/util";
 import { SkeletonBarChart } from "@/components/Skeleton";
 
 interface RecentInvoicesProps {
@@ -46,7 +47,7 @@ export default function RecentInvoices({ invoices, isLoading }: RecentInvoicesPr
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{invoice.invoiceNumber}</span>
-                    <Badge className={`${getStatusVariant(invoice.status)} capitalize`}>{invoice.status}</Badge>
+                    <Badge className={`${getBadgeVariant(invoice.status)} capitalize`}>{invoice.status}</Badge>
                   </div>
                   {/*<span className="text-sm text-muted-foreground">{invoice.client.name}</span>*/}
                 </div>

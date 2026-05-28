@@ -1,6 +1,7 @@
 import { Context } from "hono";
 import { ErrorResult, TokenPayload } from "./types";
 import type { InvoiceNumber } from "@shared/lib/types";
+import { getCurrentYear } from "@shared/utils/util";
 import { getCookie } from "hono/cookie";
 import { verify, sign } from "hono/jwt";
 
@@ -73,10 +74,6 @@ export async function sendOTPEmail(c: Context, email: string): Promise<Error | s
     });
 
     return otp;
-}
-
-export function getCurrentYear(): number {
-    return new Date().getFullYear();
 }
 
 // Helper to verify Paystack HMAC-SHA512 signature

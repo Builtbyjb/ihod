@@ -27,6 +27,7 @@
   "packageManager": "npm@8.5.0",
   "dependencies": {
     "@shared/lib": "^0.0.1",
+    "@shared/utils": "^0.0.1",
     "@tanstack/react-form": "^1.29.0",
     "jwt-decode": "^4.0.0",
     "react-signature-canvas": "^1.1.0-alpha.2"

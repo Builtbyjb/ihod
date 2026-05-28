@@ -22,7 +22,8 @@ import { MoreHorizontal, Eye, Pencil, Trash2 } from "lucide-react";
 import type { Invoice } from "@shared/lib/types";
 import { format } from "date-fns";
 import { useNavigate } from "@tanstack/react-router";
-import { calculateTotalAmount, formatCurrency, getStatusVariant } from "@/lib/utils";
+import { formatCurrency, getBadgeVariant } from "@/lib/utils";
+import { calculateTotalAmount } from "@shared/utils/util";
 import { toast } from "sonner";
 import { useFetch } from "@/hooks/useFetch";
 
@@ -114,7 +115,7 @@ export default function InvoicesTable({ invoices, onDelete, clientId }: Invoices
                         )}
                       </TableCell>
                       <TableCell className="cursor-pointer" onClick={() => handleNavigate(clientId, invoice.id)}>
-                        <Badge className={`capitalize ${getStatusVariant(invoice.status)}`}>{invoice.status}</Badge>
+                        <Badge className={`capitalize ${getBadgeVariant(invoice.status)}`}>{invoice.status}</Badge>
                       </TableCell>
                       <TableCell>
                         <DropdownMenu>
