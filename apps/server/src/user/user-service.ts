@@ -19,7 +19,7 @@ export function countPaidInvoices(invoices: Invoice[]): number {
     return paidInvoices.length;
 }
 
-export function countPendingAmount(invoices: Invoice[]): number {
+export function countPendingInvoices(invoices: Invoice[]): number {
     const pendingInvoices: Invoice[] = invoices.filter((i) => i.status === "sent" || i.status === "overdue");
     return pendingInvoices.length;
 }

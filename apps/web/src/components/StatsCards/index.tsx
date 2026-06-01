@@ -30,8 +30,8 @@ export default function StatsCards({ stats, isLoading }: StatsCardsProps) {
       iconColor: "text-blue-600",
     },
     {
-      title: "Pending Amount",
-      value: stats ? stats.pendingAmount : STATS_ERROR,
+      title: "Pending Invoices",
+      value: stats ? stats.pendingInvoices : STATS_ERROR,
       description: "Awaiting payment",
       icon: Clock,
       iconBg: "bg-amber-100",
