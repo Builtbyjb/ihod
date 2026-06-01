@@ -24,7 +24,7 @@ export type MonthRevenue = {
 export type TopStats = {
     totalRevenue: number;
     paidInvoices: number;
-    pendingAmount: number;
+    pendingInvoices: number;
     totalClients: number;
 };
 

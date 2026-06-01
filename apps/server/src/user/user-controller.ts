@@ -6,7 +6,7 @@ import { clients, invoices, organizations, users } from "@/db/schema";
 import {
     countPaidInvoices,
     calculateRevenue,
-    countPendingAmount,
+    countPendingInvoices,
     getInvoiceData,
     getMonthlyRevenues,
     getRecentInvoices,
@@ -46,13 +46,13 @@ userRouteV1.get("/dashboard", async (c) => {
 
     const totalRevenue: number = calculateRevenue(allInvoices);
     const paidInvoices = countPaidInvoices(allInvoices);
-    const pendingAmount = countPendingAmount(allInvoices);
+    const pendingInvoices = countPendingInvoices(allInvoices);
     const invoiceData = getInvoiceData(allInvoices);
     const monthlyRevenues = getMonthlyRevenues(allInvoices);
     const recentInvoices = getRecentInvoices(allInvoices);
 
     const data = {
-        topStats: { totalRevenue, paidInvoices, pendingAmount, totalClients },
+        topStats: { totalRevenue, paidInvoices, pendingInvoices, totalClients },
         invoiceData,
         monthlyRevenues,
         recentInvoices,

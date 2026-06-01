@@ -29,7 +29,7 @@ const schema = z.object({
 });
 
 const defaultStats = {
-  topStats: { totalClients: 0, totalRevenue: 0, pendingAmount: 0, paidInvoices: 0 },
+  topStats: { totalClients: 0, totalRevenue: 0, pendingInvoices: 0, paidInvoices: 0 },
   invoiceData: [
     { status: "paid", count: 0 },
     { status: "draft", count: 0 },

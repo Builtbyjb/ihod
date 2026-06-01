@@ -118,7 +118,7 @@ export const ClientFormSchema = z.object({
 export const TopStatsSchema = z.object({
     totalRevenue: z.number(),
     paidInvoices: z.number(),
-    pendingAmount: z.number(),
+    pendingInvoices: z.number(),
     totalClients: z.number(),
 });
 
