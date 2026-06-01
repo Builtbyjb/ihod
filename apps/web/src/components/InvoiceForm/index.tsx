@@ -20,6 +20,7 @@ import SelectField from "../Form/SelectField";
 import DateField from "../Form/DateField";
 import SignatureCanvas from "react-signature-canvas";
 import { InvoiceFormSchema } from "@shared/lib/zod-schema";
+import { useNavigate } from "@tanstack/react-router";
 
 interface InvoiceFormProps {
   clientInfo: Client | null;
@@ -38,6 +39,7 @@ const status: SelectData[] = [
 
 export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: InvoiceFormProps) {
   const { doPOST, doPUT } = useFetch();
+  const navigate = useNavigate();
 
   const sigCanvas = useRef<SignatureCanvas | null>(null);
 
@@ -58,6 +60,8 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
 
       toast.success("Invoice created");
       form.reset();
+
+      navigate({ to: `/clients/${clientInfo.id}/invoices/${result.data.id}` });
     } catch (error: unknown) {
       if (error instanceof Error) toast.error(error.message);
       console.log(error);
@@ -81,6 +85,8 @@ export default function InvoiceForm({ clientInfo, existingInvoice, invoiceId }: 
       if (!response.ok) throw new Error(result.message);
 
       toast.success("Invoice Edited");
+
+      navigate({ to: `/clients/${clientInfo.id}/invoices/${result.data.id}` });
     } catch (error: unknown) {
       if (error instanceof Error) toast.error(error.message);
       console.log(error);

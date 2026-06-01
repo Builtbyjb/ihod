@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { pdf } from "@react-pdf/renderer";
-import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Download, Pencil, View } from "lucide-react";
+import { ArrowLeft, BadgeInfo, Download, Pencil, View } from "lucide-react";
 import type { Client } from "@/lib/types";
 import type { Invoice } from "@shared/lib/types";
 import { InvoiceSchema, ClientSchema } from "@shared/lib/zod-schema";
@@ -16,6 +16,7 @@ import { useAuth } from "@/hooks/auth";
 import { useLayout } from "@/hooks/useLayout";
 import { useFetch } from "@/hooks/useFetch";
 import ImagePreview from "@/components/ImagePreview";
+import Banner from "@/components/Banner";
 
 function RouteComponent() {
   const { clientId, invoiceId } = Route.useParams();
@@ -24,13 +25,11 @@ function RouteComponent() {
   const [logoURL, setLogoURL] = useState<string | null>(null);
 
   const navigate = useNavigate();
-  const router = useRouter();
   const { user } = useAuth();
   const { doGET } = useFetch();
-
   const { setTitle } = useLayout();
 
-  const getBlob = async (invoice: Invoice) => {
+  const getBlob = async (invoice: Invoice): Promise<Blob> => {
     const blob = await pdf(
       <DefaultInvoicePDF
         invoice={invoice}
@@ -92,8 +91,15 @@ function RouteComponent() {
     <div className="space-y-6 w-full">
       {invoice ? (
         <>
+          <Banner
+            backgroundColor="bg-sky-100"
+            icon={<BadgeInfo />}
+            actionLabel="Add Logo"
+            onClick={() => navigate({ to: "/settings" })}
+            text={"Add your business logo to invoices from the Profile page in Settings."}
+          />
           <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
-            <Button variant="ghost" onClick={() => router.history.back()} className="w-fit">
+            <Button variant="ghost" onClick={() => navigate({ to: `/clients/${clientId}` })} className="w-fit">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back
             </Button>

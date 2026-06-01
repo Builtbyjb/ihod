@@ -83,20 +83,24 @@ invoiceRouteV1.post(
         if (!data.clientId) return c.json({ message: "Client ID is required" }, 400);
 
         // Create Invoice
-        await db.insert(invoices).values({
-            id: crypto.randomUUID(),
-            invoiceNumber: invoiceNumber,
-            clientId: data.clientId,
-            issueDate: data.issueDate,
-            dueDate: data.dueDate,
-            status: data.status,
-            signature: data.signature,
-            discount: data.discount,
-            taxRate: data.taxRate,
-            items: data.items,
-            notes: data.notes,
-            currency: data.currency,
-        });
+        const invoiceId = await db
+            .insert(invoices)
+            .values({
+                id: crypto.randomUUID(),
+                invoiceNumber: invoiceNumber,
+                clientId: data.clientId,
+                issueDate: data.issueDate,
+                dueDate: data.dueDate,
+                status: data.status,
+                signature: data.signature,
+                discount: data.discount,
+                taxRate: data.taxRate,
+                items: data.items,
+                notes: data.notes,
+                currency: data.currency,
+            })
+            .returning({ id: invoices.id })
+            .get();
 
         // Bookkeeping: Updating organizations invoice number
         await db
@@ -104,7 +108,7 @@ invoiceRouteV1.post(
             .set({ invoiceNumber: newInvoiceNumber })
             .where(eq(organizations.id, jwtPayload.currentOrgId));
 
-        return c.json({ message: "Invoice created" }, 200);
+        return c.json({ message: "Invoice created", data: invoiceId }, 200);
     },
 );
 
@@ -136,7 +140,7 @@ invoiceRouteV1.put(
             })
             .where(eq(invoices.id, invoiceId));
 
-        return c.json({ message: "Invoice Updated" }, 200);
+        return c.json({ message: "Invoice Updated", data: { id: invoiceId } }, 200);
     },
 );
 

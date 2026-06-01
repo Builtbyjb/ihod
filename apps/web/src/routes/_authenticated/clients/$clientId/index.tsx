@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Mail, MapPin, Phone, Plus, UserCircle, ArrowLeft } from "lucide-react";
 import InvoicesTable from "@/components/InvoicesTable";
@@ -10,11 +10,14 @@ import { toast } from "sonner";
 import { useLayout } from "@/hooks/useLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useFetch } from "@/hooks/useFetch";
+import { InvoiceSchema, ClientSchema } from "@shared/lib/zod-schema";
+import { z } from "zod";
+
+const InvoicesSchema = z.array(InvoiceSchema);
 
 function RouteComponent() {
   const [clientInfo, setClientInfo] = useState<Client>();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const router = useRouter();
 
   const { clientId } = Route.useParams();
   const { doGET } = useFetch();
@@ -37,23 +40,24 @@ function RouteComponent() {
         const response = await doGET(`/api/v1/clients/${clientId}`);
         if (response instanceof Error) throw response;
 
-        if (!response.ok) throw new Error("Failed to fetch client");
-
         const result = await response.json();
-        // console.log(result)
-        // TODO: Zod validate
-        setClientInfo(result.clientInfo);
-        setInvoices(result.invoices);
-      } catch (error) {
+        if (!response.ok) throw new Error(result.message);
+
+        const parsedClientInfo = ClientSchema.parse(result.clientInfo);
+        const parsedInvoices = InvoicesSchema.parse(result.invoices);
+
+        setClientInfo(parsedClientInfo);
+        setInvoices(parsedInvoices);
+      } catch (error: unknown) {
+        if (error instanceof Error) toast.error(error.message);
         console.log(error);
-        toast.error("Failed to fetch invoices");
       }
     })();
   }, [doGET, clientId]);
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Button variant="ghost" onClick={() => router.history.back()} className="w-fit mb-4">
+      <Button variant="ghost" onClick={() => navigate({ to: "/clients" })} className="w-fit mb-4">
         <ArrowLeft className="mr-2 h-8 w-8" />
         Back
       </Button>
